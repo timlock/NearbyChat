@@ -4,4 +4,10 @@
     <string name="chats">chats</string>
     <string name="profile">profile</string>
     <string name="settings">settings</string>
+    <string name="available_desc">available users nearby</string>
+    <string name="chats_desc">saved chats</string>
+    <string name="profile_desc">your NearbyChat profile</string>
+    <string name="settings_desc">settings for the app</string>
+    <string name="error_name_missing">[name missing]</string>
+    <string name="error_desc_missing">[description missing]</string>
 </resources>

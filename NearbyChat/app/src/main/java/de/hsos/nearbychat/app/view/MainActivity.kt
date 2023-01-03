@@ -17,28 +17,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         toolbar = supportActionBar!!
-        toolbar.setSubtitle(R.string.available)
+        toolbar.setSubtitle(R.string.available_desc)
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
         bottomNavView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.available_tab -> {
-                    toolbar.setSubtitle(R.string.available)
+                    toolbar.setSubtitle(R.string.available_desc)
                     openFragment(AvailableView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.chats_tab -> {
-                    toolbar.setSubtitle(R.string.chats)
+                    toolbar.setSubtitle(R.string.chats_desc)
                     openFragment(ChatsView.newInstance(null))
                     return@setOnItemSelectedListener true
                 }
                 R.id.profile_tab -> {
-                    toolbar.setSubtitle(R.string.profile)
+                    toolbar.setSubtitle(R.string.profile_desc)
                     openFragment(ProfileView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.settings_tab -> {
-                    toolbar.setSubtitle(R.string.settings)
+                    toolbar.setSubtitle(R.string.settings_desc)
                     openFragment(SettingsView.newInstance())
                     return@setOnItemSelectedListener true
                 }

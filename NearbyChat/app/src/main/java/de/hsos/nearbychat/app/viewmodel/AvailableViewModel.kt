@@ -1,4 +1,4 @@
 package de.hsos.nearbychat.app.viewmodel
 
-class HomeViewModel {
+class AvailableViewModel {
 }
