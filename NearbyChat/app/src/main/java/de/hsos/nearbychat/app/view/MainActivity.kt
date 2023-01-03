@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.chats_tab -> {
                     toolbar.setSubtitle(R.string.chats_desc)
-                    openFragment(ChatsView.newInstance(null))
+                    openFragment(ChatsView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.profile_tab -> {
@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
     private fun openFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_layout, fragment)
-        transaction.addToBackStack(null)
         transaction.commit()
     }
 

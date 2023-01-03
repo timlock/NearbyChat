@@ -8,6 +8,13 @@
     <string name="chats_desc">saved chats</string>
     <string name="profile_desc">your NearbyChat profile</string>
     <string name="settings_desc">settings for the app</string>
+
+    <string name="name">name</string>
+    <string name="description">description</string>
+    <string name="name_label">name:</string>
+    <string name="description_label">description:</string>
+
     <string name="error_name_missing">[name missing]</string>
     <string name="error_desc_missing">[description missing]</string>
+    <string name="error_message_missing">[message missing]</string>
 </resources>

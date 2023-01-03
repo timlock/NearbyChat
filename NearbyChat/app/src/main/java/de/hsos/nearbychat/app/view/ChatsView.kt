@@ -1,11 +1,15 @@
 package de.hsos.nearbychat.app.view
 
+import ChatUserAdapter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
+import de.hsos.nearbychat.app.domain.Profile
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "macAddress"
@@ -16,21 +20,33 @@ private const val ARG_PARAM1 = "macAddress"
  * create an instance of this fragment.
  */
 class ChatsView : Fragment() {
-    private var macAddress: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            macAddress = it.getString(ARG_PARAM1)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chats_view, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_chats_view, container, false)
+        val recyclerView: RecyclerView = view.findViewById(R.id.chat_user_recycler)
+
+        val list = mutableListOf<Profile>()
+        var profile = Profile("Mac-Address-1");
+        profile.name = "Peter"
+        list.add(profile)
+        profile = Profile("Mac-Address-2");
+        profile.name = "Hans"
+        list.add(profile)
+        profile = Profile("Mac-Address-3");
+        profile.name = "Jürgen"
+        list.add(profile)
+
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = ChatUserAdapter(list)
+
+        return view
     }
 
     companion object {
@@ -42,11 +58,8 @@ class ChatsView : Fragment() {
          * @return A new instance of fragment HomeView.
          */
         @JvmStatic
-        fun newInstance(macAddress: String?) =
+        fun newInstance() =
             ChatsView().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, macAddress)
-                }
             }
     }
 }
