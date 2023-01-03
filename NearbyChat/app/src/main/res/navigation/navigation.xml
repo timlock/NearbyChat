@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/availableView">
+    <fragment
+        android:id="@+id/availableView"
+        android:name="de.hsos.nearbychat.app.view.AvailableView"
+        android:label="AvailableView" />
+    <fragment
+        android:id="@+id/chatsView"
+        android:name="de.hsos.nearbychat.app.view.ChatsView"
+        android:label="ChatsView" />
+    <fragment
+        android:id="@+id/profileView"
+        android:name="de.hsos.nearbychat.app.view.ProfileView"
+        android:label="ProfileView" />
+    <fragment
+        android:id="@+id/settingsView"
+        android:name="de.hsos.nearbychat.app.view.SettingsView"
+        android:label="SettingsView" />
+</navigation>
