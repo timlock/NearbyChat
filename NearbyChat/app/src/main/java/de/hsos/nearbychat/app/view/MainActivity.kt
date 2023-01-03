@@ -3,6 +3,7 @@ package de.hsos.nearbychat.app.view
 import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
@@ -18,6 +19,11 @@ class MainActivity : AppCompatActivity() {
 
         toolbar = supportActionBar!!
         toolbar.setSubtitle(R.string.available_desc)
+
+        val nightModePreference = getSharedPreferences("NIGHT_MODE", MODE_PRIVATE)
+        if (nightModePreference.getBoolean("night_mode", false)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
         bottomNavView.setOnItemSelectedListener {

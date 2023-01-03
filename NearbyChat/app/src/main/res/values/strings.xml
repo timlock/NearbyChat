@@ -13,6 +13,8 @@
     <string name="description">description</string>
     <string name="name_label">name:</string>
     <string name="description_label">description:</string>
+    <string name="save">save</string>
+    <string name="night_mode">night mode</string>
 
     <string name="error_name_missing">[name missing]</string>
     <string name="error_desc_missing">[description missing]</string>
