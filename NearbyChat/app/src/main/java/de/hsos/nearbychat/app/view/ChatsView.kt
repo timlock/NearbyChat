@@ -9,10 +9,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
+import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
-
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "macAddress"
 
 /**
  * A simple [Fragment] subclass.
@@ -32,19 +30,10 @@ class ChatsView : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_chats_view, container, false)
         val recyclerView: RecyclerView = view.findViewById(R.id.chat_user_recycler)
 
-        val list = mutableListOf<Profile>()
-        var profile = Profile("Mac-Address-1");
-        profile.name = "Peter"
-        list.add(profile)
-        profile = Profile("Mac-Address-2");
-        profile.name = "Hans"
-        list.add(profile)
-        profile = Profile("Mac-Address-3");
-        profile.name = "Jürgen"
-        list.add(profile)
-
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = ChatUserAdapter(list)
+        recyclerView.adapter = ChatUserAdapter(MainActivity.getExampleData()){
+            (activity as MainActivity).openChat(it!!)
+        }
 
         return view
     }

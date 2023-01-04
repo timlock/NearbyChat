@@ -12,11 +12,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import de.hsos.nearbychat.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 /**
  * A simple [Fragment] subclass.
  * Use the [SettingsView.newInstance] factory method to
@@ -48,7 +43,6 @@ class SettingsView : Fragment() {
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
-            val nightModePreference = requireContext().getSharedPreferences("NIGHT_MODE", Context.MODE_PRIVATE)
             val editor: SharedPreferences.Editor = nightModePreference.edit()
             editor.putBoolean("night_mode", night_mode)
             editor.apply()

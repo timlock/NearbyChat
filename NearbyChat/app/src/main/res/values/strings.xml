@@ -9,6 +9,7 @@
     <string name="profile_desc">your NearbyChat profile</string>
     <string name="settings_desc">settings for the app</string>
 
+    <string name="message">message</string>
     <string name="name">name</string>
     <string name="description">description</string>
     <string name="name_label">name:</string>
@@ -16,7 +17,12 @@
     <string name="save">save</string>
     <string name="night_mode">night mode</string>
 
+    <string name="time_pattern">HH:mm</string>
+    <string name="date_pattern">MM/dd/yyyy</string>
+
     <string name="error_name_missing">[name missing]</string>
     <string name="error_desc_missing">[description missing]</string>
     <string name="error_message_missing">[message missing]</string>
+    <string name="error_time_missing">[time missing]</string>
+    <string name="error_date_missing">[date missing]</string>
 </resources>
