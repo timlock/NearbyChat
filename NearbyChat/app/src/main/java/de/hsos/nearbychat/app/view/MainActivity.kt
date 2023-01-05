@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -72,6 +73,23 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
     companion object {
+        fun getUserColorRes(id: Int): Int {
+            var color = R.id.profile_color
+            when(id) {
+                0 -> color = R.color.profile_0
+                1 -> color = R.color.profile_1
+                2 -> color = R.color.profile_2
+                3 -> color = R.color.profile_3
+                4 -> color = R.color.profile_4
+                5 -> color = R.color.profile_5
+                6 -> color = R.color.profile_6
+                7 -> color = R.color.profile_7
+                8 -> color = R.color.profile_8
+                9 -> color = R.color.profile_9
+            }
+            return color
+        }
+
         fun getExampleData(): MutableList<Profile> {
             // Testdaten
             val messageList = mutableListOf<Message>()
@@ -91,20 +109,20 @@ class MainActivity : AppCompatActivity() {
             profile.name = "Peter"
             profile.description = "ich bin der Peter"
             profile.messages = messageList
-            profile.color = Color.parseColor("#FF0000")
+            profile.color = 0
             list.add(profile)
             profile = Profile("Mac-Address-2");
             profile.name = "Hans"
             profile.description = "ich bin der Hans"
             profile.messages = messageList
             profile.isAvailable = true
-            profile.color = Color.parseColor("#00FF00")
+            profile.color = 4
             list.add(profile)
             profile = Profile("Mac-Address-3");
             profile.name = "Jürgen"
             profile.description = "ich bin der Jürgen"
             profile.messages = messageList
-            profile.color = Color.parseColor("#0000FF")
+            profile.color = 7
             list.add(profile)
 
             return list

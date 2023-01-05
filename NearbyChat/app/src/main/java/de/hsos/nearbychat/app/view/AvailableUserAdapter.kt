@@ -4,9 +4,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.app.view.MainActivity
 
 class AvailableUserAdapter (private val availableProfiles: List<Profile>, private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<AvailableUserAdapter.ViewHolder>()
 {
@@ -39,7 +41,10 @@ class AvailableUserAdapter (private val availableProfiles: List<Profile>, privat
         val profile: Profile = availableProfiles[position]
         viewHolder.userName.text = profile.name
         viewHolder.userDesc.text = profile.description
-        viewHolder.symbol.setColorFilter(profile.color)
+        viewHolder.symbol.setColorFilter(
+            ResourcesCompat.getColor(context.resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
         viewHolder.profile = profile;
     }
 

@@ -5,9 +5,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.app.view.MainActivity
 
 class ChatUserAdapter (private val availableProfiles: List<Profile>, private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<ChatUserAdapter.ViewHolder>()
 {
@@ -44,7 +46,10 @@ class ChatUserAdapter (private val availableProfiles: List<Profile>, private val
         } else {
             viewHolder.userMessage.text = ""
         }
-        viewHolder.symbol.setColorFilter(profile.color)
+        viewHolder.symbol.setColorFilter(
+            ResourcesCompat.getColor(context.resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
         if(profile.isAvailable) {
             viewHolder.symbol.setImageDrawable(
                 AppCompatResources.getDrawable(

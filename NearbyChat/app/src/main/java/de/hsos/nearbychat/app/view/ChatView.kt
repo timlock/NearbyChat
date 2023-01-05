@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,7 +49,10 @@ class ChatView : Fragment() {
         view.findViewById<TextView>(R.id.chat_user_message).text = profile.description
 
         val symbol = view.findViewById<ImageView>(R.id.chat_user_symbol)
-        symbol.setColorFilter(profile.color)
+        symbol.setColorFilter(
+            ResourcesCompat.getColor(requireContext().resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
         if(profile.isAvailable) {
             symbol.setImageDrawable(
                     AppCompatResources.getDrawable(
