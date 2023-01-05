@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NearbyChat</string>
+    <string name="available">Verfügbar</string>
+    <string name="chats">Chats</string>
+    <string name="profile">Profil</string>
+    <string name="settings">Einstellungen</string>
+    <string name="available_desc">Verfügbare Nutzer in der Nähe</string>
+    <string name="chats_desc">Gespeicherte Chats</string>
+    <string name="profile_desc">Dein NearbyChat Profil</string>
+    <string name="settings_desc">Einstellungen der App</string>
+
+    <string name="message">Nachricht</string>
+    <string name="name">Name</string>
+    <string name="description">Beschreibung</string>
+    <string name="name_label">Name:</string>
+    <string name="description_label">Beschreibung:</string>
+    <string name="color_label">Farbe:</string>
+    <string name="save">Speichern</string>
+    <string name="night_mode">Nachtmodus</string>
+    <string name="language_label">Sprache:</string>
+    <string name="language_en">Englisch</string>
+    <string name="language_de">Deutsch</string>
+    <string name="system_default">Systemstandard</string>
+    <string name="language_hint">Hinweis: Spracheinstellungen werden erst nach Neustarten der App angewendet.</string>
+
+    <string name="time_pattern">HH:mm</string>
+    <string name="date_pattern">dd.MM.yyyy</string>
+
+    <string name="error_name_missing">[Name fehlt]</string>
+    <string name="error_desc_missing">[Beschreibung fehlt]</string>
+    <string name="error_message_missing">[Nachricht fehlt]</string>
+    <string name="error_time_missing">[Zeit fehlt]</string>
+    <string name="error_date_missing">[Datum fehlt]</string>
+</resources>

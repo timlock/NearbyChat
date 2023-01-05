@@ -17,6 +17,11 @@
     <string name="color_label">color:</string>
     <string name="save">save</string>
     <string name="night_mode">night mode</string>
+    <string name="language_label">language:</string>
+    <string name="language_en">English</string>
+    <string name="language_de">German</string>
+    <string name="system_default">system default</string>
+    <string name="language_hint">hint: Language settings are applied after restart of the app.</string>
 
     <string name="time_pattern">HH:mm</string>
     <string name="date_pattern">MM/dd/yyyy</string>

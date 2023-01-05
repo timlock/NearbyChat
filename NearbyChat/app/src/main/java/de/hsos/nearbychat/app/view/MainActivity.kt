@@ -1,17 +1,18 @@
 package de.hsos.nearbychat.app.view
 
-import android.graphics.Color
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,19 +21,19 @@ class MainActivity : AppCompatActivity() {
     lateinit var bottomNavView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        updateLanguage(this)
+        updateNightMode(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        openFragment(AvailableView.newInstance())
 
         toolbar = supportActionBar!!
         toolbar.setSubtitle(R.string.available_desc)
 
-        val nightModePreference = getSharedPreferences("NIGHT_MODE", MODE_PRIVATE)
-        if (nightModePreference.getBoolean("night_mode", false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
-
         bottomNavView = findViewById(R.id.bottom_navigation_view)
         bottomNavView.setOnItemSelectedListener {
+            supportFragmentManager.popBackStackImmediate() // prevent something remaining on backstack
             when (it.itemId) {
                 R.id.available_tab -> {
                     toolbar.setSubtitle(R.string.available_desc)
@@ -73,6 +74,30 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
     companion object {
+        fun updateLanguage(context: Context) {
+            val languageSetting = context.getSharedPreferences("APP_SETTINGS", MODE_PRIVATE).getString("language", "default")
+            val locale = if(languageSetting == null || languageSetting == "default") {
+                Locale.getDefault()
+            } else {
+                Locale(languageSetting)
+            }
+            Locale.setDefault(locale)
+            val config: Configuration = context.resources.configuration
+            config.setLocale(locale)
+            context.resources.updateConfiguration(
+                config,
+                context.resources.displayMetrics
+            )
+        }
+
+        fun updateNightMode(context: Context) {
+            if (context.getSharedPreferences("APP_SETTINGS", MODE_PRIVATE).getBoolean("night_mode", false)) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
+
         fun getUserColorRes(id: Int): Int {
             var color = R.id.profile_color
             when(id) {
