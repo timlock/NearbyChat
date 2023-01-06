@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
@@ -18,6 +19,7 @@ class AvailableUserAdapter (private val availableProfiles: List<Profile>, privat
         val userName: TextView = itemView.findViewById(R.id.available_user_name)
         val userDesc: TextView = itemView.findViewById(R.id.available_user_message)
         val symbol: ImageView = itemView.findViewById(R.id.available_user_symbol)
+        val signalStrength: ImageView = itemView.findViewById(R.id.available_user_signal_strength)
         var profile: Profile? = null
 
         init {
@@ -45,6 +47,11 @@ class AvailableUserAdapter (private val availableProfiles: List<Profile>, privat
             ResourcesCompat.getColor(context.resources,
                 MainActivity.getUserColorRes(profile.color), null
             ))
+        viewHolder.signalStrength.setColorFilter(
+            ResourcesCompat.getColor(context.resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
+        viewHolder.signalStrength.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_baseline_network_wifi_2_bar_24)) //TODO: visualize different strengths
         viewHolder.profile = profile;
     }
 

@@ -19,6 +19,7 @@ class ChatUserAdapter (private val availableProfiles: List<Profile>, private val
         val userName: TextView = itemView.findViewById(R.id.chats_user_name)
         val userMessage: TextView = itemView.findViewById(R.id.chats_user_message)
         val symbol: ImageView = itemView.findViewById(R.id.chats_user_symbol)
+        val signalStrength: ImageView = itemView.findViewById(R.id.chats_user_signal_strength)
         var profile: Profile? = null
 
         init {
@@ -50,11 +51,15 @@ class ChatUserAdapter (private val availableProfiles: List<Profile>, private val
             ResourcesCompat.getColor(context.resources,
                 MainActivity.getUserColorRes(profile.color), null
             ))
+        viewHolder.signalStrength.setColorFilter(
+            ResourcesCompat.getColor(context.resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
         if(profile.isAvailable) {
-            viewHolder.symbol.setImageDrawable(
+            viewHolder.signalStrength.setImageDrawable(
                 AppCompatResources.getDrawable(
                     context,
-                    R.drawable.ic_baseline_person_pin_circle_24
+                    R.drawable.ic_baseline_network_wifi_3_bar_24 //TODO: in abhängigkeit der Signalstärke
                 )
             )
         }

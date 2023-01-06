@@ -9,9 +9,9 @@ data class Profile(val macAddress: String) : Parcelable {
     lateinit var description: String
     var color: Int = 0
     var isAvailable: Boolean = false
-    var neighbors: List<Profile> = mutableListOf()
+    var neighbors: List<Profile> = mutableListOf() // streichen
     var messages: List<Message> = mutableListOf()
-    var rssi: Int = 0
+    var rssi: Int = 0 // hinzufügen zeitstempel letzte nachricht & hop count
 
     constructor(parcel: Parcel) : this(parcel.readString()!!) {
         name = parcel.readString()!!

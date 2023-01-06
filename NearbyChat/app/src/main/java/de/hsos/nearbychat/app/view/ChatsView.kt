@@ -6,8 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
@@ -31,9 +33,34 @@ class ChatsView : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.chat_user_recycler)
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = ChatUserAdapter(MainActivity.getExampleData()){
+        val chatUserAdapter = ChatUserAdapter(MainActivity.getExampleData()){
             (activity as MainActivity).openChat(it!!)
         }
+        recyclerView.adapter = chatUserAdapter
+
+            ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+            
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                //TODO: remove from list
+                chatUserAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+
+                Snackbar.make(recyclerView, R.string.deleted_chat, Snackbar.LENGTH_LONG)
+                .setAction(
+                    R.string.undo,
+                    View.OnClickListener {
+                    //TODO: add to list
+                    chatUserAdapter.notifyItemInserted(position)
+                    }).show()
+                }
+            }).attachToRecyclerView(recyclerView)
 
         return view
     }

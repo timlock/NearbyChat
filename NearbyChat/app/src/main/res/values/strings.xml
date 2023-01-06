@@ -22,6 +22,8 @@
     <string name="language_de">German</string>
     <string name="system_default">system default</string>
     <string name="language_hint">hint: Language settings are applied after restart of the app.</string>
+    <string name="deleted_chat">deleted chat.</string>
+    <string name="undo">undo</string>
 
     <string name="time_pattern">HH:mm</string>
     <string name="date_pattern">MM/dd/yyyy</string>

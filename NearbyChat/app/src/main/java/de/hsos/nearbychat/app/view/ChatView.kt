@@ -49,15 +49,20 @@ class ChatView : Fragment() {
         view.findViewById<TextView>(R.id.chat_user_message).text = profile.description
 
         val symbol = view.findViewById<ImageView>(R.id.chat_user_symbol)
+        val signalStrength = view.findViewById<ImageView>(R.id.chat_user_signal_strength)
         symbol.setColorFilter(
             ResourcesCompat.getColor(requireContext().resources,
                 MainActivity.getUserColorRes(profile.color), null
             ))
+        signalStrength.setColorFilter(
+            ResourcesCompat.getColor(requireContext().resources,
+                MainActivity.getUserColorRes(profile.color), null
+            ))
         if(profile.isAvailable) {
-            symbol.setImageDrawable(
+            signalStrength.setImageDrawable(
                     AppCompatResources.getDrawable(
                         requireContext(),
-                        R.drawable.ic_baseline_person_pin_circle_24
+                        R.drawable.ic_baseline_network_wifi_3_bar_24 //TODO: an signalstärke anpassen
                     )
             )
         }
