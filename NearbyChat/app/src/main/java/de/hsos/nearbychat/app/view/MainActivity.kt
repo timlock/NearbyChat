@@ -18,9 +18,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         PermissionManager.permissionCheck(this,this)
-        var bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
+        val bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
         this.bleController = MeshController(bluetoothManager.adapter)
-        this.input = findViewById(R.id.input)  as EditText
+        this.input = findViewById<EditText>(R.id.input)
         findViewById<Button>(R.id.scan).setOnClickListener { this.bleController.startScan() }
         findViewById<Button>(R.id.advertise).setOnClickListener { this.bleController.startAdvertise() }
         findViewById<Button>(R.id.send).setOnClickListener{this.bleController.sendMessage(this.input.text.toString())}
