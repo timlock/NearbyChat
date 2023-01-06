@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/available"
+        android:icon="@drawable/ic_baseline_person_pin_circle_24"
+        android:id="@+id/available_tab"/>
+    <item android:title="@string/chats"
+        android:icon="@drawable/ic_baseline_chat_24"
+        android:id="@+id/chats_tab"/>
+    <item android:title="@string/profile"
+        android:icon="@drawable/ic_baseline_person_24"
+        android:id="@+id/profile_tab"/>
+    <item android:title="@string/settings"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:id="@+id/settings_tab"/>
+</menu>

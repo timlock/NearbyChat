@@ -1,5 +1,34 @@
 <resources>
     <string name="app_name">NearbyChat</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="available">available</string>
+    <string name="chats">chats</string>
+    <string name="profile">profile</string>
+    <string name="settings">settings</string>
+    <string name="available_desc">available users nearby</string>
+    <string name="chats_desc">saved chats</string>
+    <string name="profile_desc">your NearbyChat profile</string>
+    <string name="settings_desc">settings for the app</string>
+
+    <string name="message">message</string>
+    <string name="name">name</string>
+    <string name="description">description</string>
+    <string name="name_label">name:</string>
+    <string name="description_label">description:</string>
+    <string name="color_label">color:</string>
+    <string name="save">save</string>
+    <string name="night_mode">night mode</string>
+    <string name="language_label">language:</string>
+    <string name="language_en">English</string>
+    <string name="language_de">German</string>
+    <string name="system_default">system default</string>
+    <string name="language_hint">hint: Language settings are applied after restart of the app.</string>
+
+    <string name="time_pattern">HH:mm</string>
+    <string name="date_pattern">MM/dd/yyyy</string>
+
+    <string name="error_name_missing">[name missing]</string>
+    <string name="error_desc_missing">[description missing]</string>
+    <string name="error_message_missing">[message missing]</string>
+    <string name="error_time_missing">[time missing]</string>
+    <string name="error_date_missing">[date missing]</string>
 </resources>
