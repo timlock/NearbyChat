@@ -6,6 +6,7 @@ import android.bluetooth.le.*
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.util.forEach
+import de.hsos.nearbychat.service.bluetooth.util.AdvertisementMessage
 import de.hsos.nearbychat.service.bluetooth.util.Broadcaster
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -83,6 +84,7 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
     }
 
     override fun send(message: String): Boolean {
+        Log.d(TAG, "send() called with: message = $message")
         val advertiseData: AdvertiseData = AdvertiseData.Builder()
             .addServiceUuid(advertiseUUID)
             .addServiceData(this.advertiseUUID, message.encodeToByteArray())

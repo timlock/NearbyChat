@@ -10,14 +10,13 @@ import java.util.concurrent.TimeUnit
 class MessageHandler(
     private val broadCaster: Broadcaster,
     private val period: Long,
-    private val retries: Int,
     private val sizeLimit: Int
 ) {
     private val TAG: String = MessageHandler::class.java.simpleName
     private var messageExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
     private var isActive: Boolean = false
-    private var messageQueue: Queue<AdvertisementMessage> = LinkedList()
+    private var messageQueue: MutableList<String> = LinkedList()
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
 
     @Synchronized
@@ -54,15 +53,24 @@ class MessageHandler(
             val packageBuilder: StringBuilder = StringBuilder()
                 .append(this.idGenerator.next())
                 .append(':')
-            while (packageBuilder.length < this.sizeLimit && !this.messageQueue.isEmpty()) {
-                packageBuilder.append(this.messageQueue.poll())
+            while (packageBuilder.length < this.sizeLimit && this.messageQueue.isNotEmpty()) {
+                val msg = this.messageQueue.removeFirst()
+                if(msg.length + packageBuilder.length > this.sizeLimit){
+                    packageBuilder.append(msg.substring(0,this.sizeLimit - packageBuilder.length))
+                    this.messageQueue.add(0,msg.substring(this.sizeLimit - packageBuilder.length))
+                }else{
+                    packageBuilder.append(msg)
+                }
+
             }
-            this.broadCaster.send(packageBuilder.toString())
+            if(packageBuilder.length > 2) {
+                this.broadCaster.send(packageBuilder.toString())
+            }
         }
     }
 
     fun send(message: AdvertisementMessage) {
         Log.d(TAG, "send: $message")
-        this.messageQueue.add(message)
+        this.messageQueue.add(message.toString())
     }
 }

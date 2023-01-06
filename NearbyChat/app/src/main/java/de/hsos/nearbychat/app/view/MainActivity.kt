@@ -14,7 +14,6 @@ import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() {
 
     lateinit var toolbar: ActionBar
@@ -23,11 +22,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         updateLanguage(this)
         updateNightMode(this)
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         openFragment(AvailableView.newInstance())
-
         toolbar = supportActionBar!!
         toolbar.setSubtitle(R.string.available_desc)
 

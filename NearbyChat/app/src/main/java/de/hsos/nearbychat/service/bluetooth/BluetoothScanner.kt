@@ -68,7 +68,7 @@ class BluetoothScanner(private var observer : ScannerObserver, private var bluet
             result.scanRecord?.serviceData?.forEach { (uuid, data) -> stringLog += " " + uuid.toString() + " " + data.decodeToString() }
             Log.i(TAG, "onScanResult: $stringLog")
             val message: String? = result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
-            this.observer.onMessage(result.device.address, message ?: "")
+            this.observer.onMessage(result.device.address, result.rssi,message ?: "")
         } catch (e: SecurityException) {
             Log.w(TAG, "startScan: ", e)
         }

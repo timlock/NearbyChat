@@ -1,19 +1,15 @@
 package de.hsos.nearbychat.app.viewmodel
 
-import android.content.BroadcastReceiver
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.IBinder
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.service.controller.NearbyChatService
 
 class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceConnection {
     private val TAG: String = NearbyChatServiceCon::class.java.simpleName
-    private var nearbyChatService: NearbyChatService? = null
+    private lateinit var nearbyChatService: NearbyChatService
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.d(TAG, "onServiceConnected() called with: name = $name, service = $service")
@@ -40,19 +36,28 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun sendMessage(message: Message): Boolean{
-        return if (this.nearbyChatService == null){
+        return if (this::nearbyChatService.isInitialized){
             false
         }else{
             this.nearbyChatService.sendMessage(message)
+            true
         }
     }
 
     private val broadcastReceiver : BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when(intent?.action) {
-                NearbyChatService.MESSAGE_PARAM -> intent.getParcelableExtra<>()
-        }
+            when (intent?.action) {
+                NearbyChatService.MESSAGE_PARAM -> intent.getParcelableExtra<Message>(
+                    NearbyChatService.MESSAGE_PARAM
+                )
+                    ?.let { observer.onMessage(it) }
+                NearbyChatService.PROFILE_PARAM -> intent.getParcelableExtra<Profile>(
+                    NearbyChatService.PROFILE_PARAM
+                )
+                    ?.let { observer.onProfile(it) }
+            }
 
+        }
     }
 
 }
