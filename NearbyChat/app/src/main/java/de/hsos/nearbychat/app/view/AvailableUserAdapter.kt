@@ -11,9 +11,10 @@ import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.view.MainActivity
 
-class AvailableUserAdapter (private val availableProfiles: List<Profile>, private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<AvailableUserAdapter.ViewHolder>()
+class AvailableUserAdapter (private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<AvailableUserAdapter.ViewHolder>()
 {
     lateinit var context: Context
+    private val availableProfiles: List<Profile> = mutableListOf()
 
     inner class ViewHolder(itemView: View, onItemClicked: (Profile?) -> Unit) : RecyclerView.ViewHolder(itemView) {
         val userName: TextView = itemView.findViewById(R.id.available_user_name)
@@ -28,7 +29,6 @@ class AvailableUserAdapter (private val availableProfiles: List<Profile>, privat
             }
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AvailableUserAdapter.ViewHolder {
         context = parent.context
@@ -52,7 +52,7 @@ class AvailableUserAdapter (private val availableProfiles: List<Profile>, privat
                 MainActivity.getUserColorRes(profile.color), null
             ))
         viewHolder.signalStrength.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_baseline_network_wifi_2_bar_24)) //TODO: visualize different strengths
-        viewHolder.profile = profile;
+        viewHolder.profile = profile
     }
 
     override fun getItemCount(): Int {

@@ -114,43 +114,5 @@ class MainActivity : AppCompatActivity() {
             }
             return color
         }
-
-        fun getExampleData(): MutableList<Profile> {
-            // Testdaten
-            val messageList = mutableListOf<Message>()
-            messageList.add(Message("Message0", 1))
-            var message: Message = Message("Message1", 2000000)
-            message.isSelfAuthored = true
-            message.isReceived = true
-            messageList.add(message)
-            messageList.add(Message("Message2", 2000000000))
-            messageList.add(Message("Message3\ntest", System.currentTimeMillis()))
-            message = Message("Message4", System.currentTimeMillis())
-            message.isSelfAuthored = true
-            messageList.add(message)
-
-            val list = mutableListOf<Profile>()
-            var profile = Profile("Mac-Address-1");
-            profile.name = "Peter"
-            profile.description = "ich bin der Peter"
-            profile.messages = messageList
-            profile.color = 0
-            list.add(profile)
-            profile = Profile("Mac-Address-2");
-            profile.name = "Hans"
-            profile.description = "ich bin der Hans"
-            profile.messages = messageList
-            profile.isAvailable = true
-            profile.color = 4
-            list.add(profile)
-            profile = Profile("Mac-Address-3");
-            profile.name = "Jürgen"
-            profile.description = "ich bin der Jürgen"
-            profile.messages = messageList
-            profile.color = 7
-            list.add(profile)
-
-            return list
-        }
     }
 }

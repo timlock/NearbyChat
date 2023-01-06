@@ -32,8 +32,7 @@ class AvailableView : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.available_user_recycler)
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        val list = MainActivity.getExampleData()
-        list.removeAll {profile -> return@removeAll !profile.isAvailable}
+
         recyclerView.adapter = AvailableUserAdapter(list) {
             (activity as MainActivity).openChat(it!!)
         }
