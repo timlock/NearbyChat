@@ -12,7 +12,11 @@ class Repository(database: Database) {
     private val ownProfileDao: OwnProfileDao = database.onwProfileDao()
 
     val savedProfiles: LiveData<List<Profile>> = profileDao.get()
-    val ownProfile: LiveData<OwnProfile> = ownProfileDao.get()
+    val ownProfile: LiveData<OwnProfile?> = ownProfileDao.get()
+
+    fun getProfile(macAddress: String): LiveData<Profile> {
+        return profileDao.get(macAddress)
+    }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

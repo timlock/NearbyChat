@@ -12,8 +12,9 @@ import kotlin.math.roundToInt
 
 @Entity
 class OwnProfile() {
-    lateinit var name: String
-    lateinit var description: String
+    @PrimaryKey
+    var id: Int = 0
+    var name: String = ""
+    var description: String = ""
     var color: Int = 0
-
 }

@@ -2,14 +2,14 @@ package de.hsos.nearbychat.app.viewmodel
 
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
-import androidx.room.Transaction
 import de.hsos.nearbychat.app.data.Repository
+import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 import kotlinx.coroutines.launch
 
 class ViewModel(private val repository: Repository) : ViewModel(){
-    val ownProfile: LiveData<OwnProfile> = repository.ownProfile
+    val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
     val availableProfiles: LiveData<List<Profile>> = MutableLiveData()
 
@@ -21,8 +21,26 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         repository.insertProfile(profile)
     }
 
+    fun getSavedProfile(macAddress: String): LiveData<Profile> {
+        return repository.getProfile(macAddress)
+    }
+
     fun deleteSavedProfile(macAddress: String) = viewModelScope.launch {
         repository.deleteProfile(macAddress)
+    }
+
+    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> {
+        val profile: LiveData<Profile?> = MutableLiveData()
+        availableProfiles.observe(lifecycleOwner) { profiles ->
+            profiles.let {
+                for(p in it) {
+                    if(p.macAddress == macAddress) {
+                        (profile as MutableLiveData<Profile?>).value = p
+                    }
+                }
+            }
+        }
+        return profile
     }
 
     fun updateAvailableProfile(profile: Profile) {
@@ -49,14 +67,22 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         }
     }
 
+    fun getMessages(macAddress: String): LiveData<List<Message>> {
+        return repository.getMessages(macAddress)
+    }
 
-    class WordViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
+    fun addMessage(message: Message) = viewModelScope.launch {
+        repository.insertMessage(message)
+    }
+
+    fun deleteMessages(macAddress: String) = viewModelScope.launch {
+        repository.deleteMessages(macAddress)
+    }
+
+    class ViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(ViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return ViewModel(repository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
+            @Suppress("UNCHECKED_CAST")
+            return ViewModel(repository) as T
         }
     }
 

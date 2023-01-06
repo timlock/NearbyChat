@@ -12,9 +12,11 @@ import de.hsos.nearbychat.app.domain.Message
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class ChatAdapter (private val messages: List<Message>, private val context: Context?) : RecyclerView.Adapter<ChatAdapter.ViewHolder>()
+class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAdapter.ViewHolder>()
 {
     var lastDay: String = ""
+
+    var messages: List<Message> = mutableListOf()
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var messageIn: ConstraintLayout? = null

@@ -10,7 +10,7 @@ import de.hsos.nearbychat.app.domain.OwnProfile
 @Dao
 interface OwnProfileDao {
     @Query("SELECT * FROM OwnProfile")
-    fun get(): LiveData<OwnProfile>
+    fun get(): LiveData<OwnProfile?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(ownProfile: OwnProfile)

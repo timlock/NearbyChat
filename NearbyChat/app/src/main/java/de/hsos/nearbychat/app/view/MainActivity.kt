@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import java.util.*
 
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     fun openChat(profile: Profile) {
         (bottomNavView.getChildAt(0) as BottomNavigationMenuView).getChildAt(1).callOnClick()
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile))
+        transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile.macAddress))
         transaction.addToBackStack(null)
         transaction.commit()
     }
@@ -99,9 +98,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun getUserColorRes(id: Int): Int {
-            var color = R.id.profile_color
+            var color = R.color.profile_0
             when(id) {
-                0 -> color = R.color.profile_0
                 1 -> color = R.color.profile_1
                 2 -> color = R.color.profile_2
                 3 -> color = R.color.profile_3
@@ -113,6 +111,17 @@ class MainActivity : AppCompatActivity() {
                 9 -> color = R.color.profile_9
             }
             return color
+        }
+
+        fun getSignalStrengthIcon(id: Int): Int {
+            var drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
+            when(id) {
+                1 -> drawable = R.drawable.ic_baseline_network_wifi_1_bar_24
+                2 -> drawable = R.drawable.ic_baseline_network_wifi_2_bar_24
+                3 -> drawable = R.drawable.ic_baseline_network_wifi_3_bar_24
+                4 -> drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
+            }
+            return drawable
         }
     }
 }
