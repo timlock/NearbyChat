@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import java.util.*
 
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     fun openChat(profile: Profile) {
         (bottomNavView.getChildAt(0) as BottomNavigationMenuView).getChildAt(1).callOnClick()
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile))
+        transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile.macAddress))
         transaction.addToBackStack(null)
         transaction.commit()
     }
@@ -96,9 +95,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun getUserColorRes(id: Int): Int {
-            var color = R.id.profile_color
+            var color = R.color.profile_0
             when(id) {
-                0 -> color = R.color.profile_0
                 1 -> color = R.color.profile_1
                 2 -> color = R.color.profile_2
                 3 -> color = R.color.profile_3
@@ -112,42 +110,15 @@ class MainActivity : AppCompatActivity() {
             return color
         }
 
-        fun getExampleData(): MutableList<Profile> {
-            // Testdaten
-            val messageList = mutableListOf<Message>()
-            messageList.add(Message("Message0", 1))
-            var message: Message = Message("Message1", 2000000)
-            message.isSelfAuthored = true
-            message.isReceived = true
-            messageList.add(message)
-            messageList.add(Message("Message2", 2000000000))
-            messageList.add(Message("Message3\ntest", System.currentTimeMillis()))
-            message = Message("Message4", System.currentTimeMillis())
-            message.isSelfAuthored = true
-            messageList.add(message)
-
-            val list = mutableListOf<Profile>()
-            var profile = Profile("Mac-Address-1");
-            profile.name = "Peter"
-            profile.description = "ich bin der Peter"
-            profile.messages = messageList
-            profile.color = 0
-            list.add(profile)
-            profile = Profile("Mac-Address-2");
-            profile.name = "Hans"
-            profile.description = "ich bin der Hans"
-            profile.messages = messageList
-            profile.isAvailable = true
-            profile.color = 4
-            list.add(profile)
-            profile = Profile("Mac-Address-3");
-            profile.name = "Jürgen"
-            profile.description = "ich bin der Jürgen"
-            profile.messages = messageList
-            profile.color = 7
-            list.add(profile)
-
-            return list
+        fun getSignalStrengthIcon(id: Int): Int {
+            var drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
+            when(id) {
+                1 -> drawable = R.drawable.ic_baseline_network_wifi_1_bar_24
+                2 -> drawable = R.drawable.ic_baseline_network_wifi_2_bar_24
+                3 -> drawable = R.drawable.ic_baseline_network_wifi_3_bar_24
+                4 -> drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
+            }
+            return drawable
         }
     }
 }

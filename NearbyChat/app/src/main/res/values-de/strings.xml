@@ -23,6 +23,8 @@
     <string name="language_de">Deutsch</string>
     <string name="system_default">Systemstandard</string>
     <string name="language_hint">Hinweis: Spracheinstellungen werden erst nach Neustarten der App angewendet.</string>
+    <string name="deleted_chat">Chat gelöscht.</string>
+    <string name="undo">Rückgängig</string>
 
     <string name="time_pattern">HH:mm</string>
     <string name="date_pattern">dd.MM.yyyy</string>

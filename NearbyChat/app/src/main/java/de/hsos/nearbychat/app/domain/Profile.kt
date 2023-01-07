@@ -1,50 +1,26 @@
 package de.hsos.nearbychat.app.domain
 
-import android.graphics.Color
-import android.os.Parcel
-import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import java.lang.Integer.max
+import java.lang.Integer.min
 
-data class Profile(val macAddress: String) : Parcelable {
+@Entity
+class Profile(@PrimaryKey val macAddress: String) {
     lateinit var name: String
     lateinit var description: String
     var color: Int = 0
-    var isAvailable: Boolean = false
-    var neighbors: List<Profile> = mutableListOf()
-    var messages: List<Message> = mutableListOf()
-    var rssi: Int = 0
+    var lastInteraction: Long = Long.MIN_VALUE
+    @Ignore
+    var rssi: Int = Int.MIN_VALUE
+    @Ignore
+    var hopCount: Int = 0
 
-    constructor(parcel: Parcel) : this(parcel.readString()!!) {
-        name = parcel.readString()!!
-        description = parcel.readString()!!
-        color = parcel.readInt()
-        isAvailable = parcel.readByte() != 0.toByte()
-        neighbors = parcel.createTypedArrayList(CREATOR)!!
-        messages = parcel.createTypedArrayList(Message)!!
-        rssi = parcel.readInt()
+    fun signalStrength0to4(): Int {
+        var strength = rssi + 140
+        strength -= hopCount * 20
+        return min(max(strength / 60, 0), 4)
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(macAddress)
-        parcel.writeString(name)
-        parcel.writeInt(color)
-        parcel.writeString(description)
-        parcel.writeByte(if (isAvailable) 1 else 0)
-        parcel.writeTypedList(neighbors)
-        parcel.writeTypedList(messages)
-        parcel.writeInt(rssi)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<Profile> {
-        override fun createFromParcel(parcel: Parcel): Profile {
-            return Profile(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Profile?> {
-            return arrayOfNulls(size)
-        }
-    }
 }

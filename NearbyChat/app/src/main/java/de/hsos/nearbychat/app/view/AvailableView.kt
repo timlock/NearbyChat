@@ -6,12 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.Profile
-import java.util.function.Predicate
+import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.viewmodel.ViewModel
+import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
+
 
 /**
  * A simple [Fragment] subclass.
@@ -20,8 +22,8 @@ import java.util.function.Predicate
  */
 class AvailableView : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel: ViewModel by viewModels {
+        ViewModelFactory((activity?.application as Application).repository)
     }
 
     override fun onCreateView(
@@ -32,11 +34,16 @@ class AvailableView : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.available_user_recycler)
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        val list = MainActivity.getExampleData()
-        list.removeAll {profile -> return@removeAll !profile.isAvailable}
-        recyclerView.adapter = AvailableUserAdapter(list) {
+
+        val adapter = AvailableUserAdapter() {
             (activity as MainActivity).openChat(it!!)
         }
+
+        viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->
+            profiles.let { adapter.availableProfiles = profiles }
+        }
+
+        recyclerView.adapter = adapter
 
         return view
     }
