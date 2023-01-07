@@ -1,9 +1,9 @@
-package de.hsos.nearbychat.service.bluetooth.util
+package de.hsos.nearbychat.service.bluetooth
 
 class NeighbourTable(private val timeout: Long) {
     private val TAG: String = NeighbourTable::class.java.simpleName
     private val innerTable: HashMap<String, Neighbour> = HashMap()
-    private val directNeighbourTable: HashMap<String,Neighbour> = HashMap()
+    private val directNeighbourTable: HashMap<String, Neighbour> = HashMap()
 
     fun updateNeighbour(neighbour: Neighbour) {
         val entry: Neighbour? = this.innerTable[neighbour.address]

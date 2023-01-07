@@ -8,6 +8,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.provider.Settings
 import de.hsos.nearbychat.app.domain.Message
+import de.hsos.nearbychat.app.domain.OwnProfile
+import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.MeshObserver
 import de.hsos.nearbychat.service.bluetooth.util.AdvertisementMessage
@@ -25,18 +27,18 @@ class NearbyChatService: Service(), MeshObserver {
         return binder
     }
 
-    override fun onCreate() {
-        val androidID : String = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)
-        val bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        this.meshController = MeshController(this, bluetoothManager.adapter,androidID)
+
+   fun start(ownProfile: OwnProfile){
+       val bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+       this.meshController = MeshController(this, bluetoothManager.adapter,ownProfile)
+   }
+
+    fun close() {
+        stopSelf()
     }
 
     fun sendMessage(message: Message){
         this.meshController.sendMessage(message)
-    }
-
-    fun close() {
-        stopSelf()
     }
 
 

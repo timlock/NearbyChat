@@ -1,6 +1,7 @@
-package de.hsos.nearbychat.service.bluetooth.util
+package de.hsos.nearbychat.service.bluetooth.advertise
 
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -8,8 +9,8 @@ import java.util.concurrent.TimeUnit
 
 
 class MessageHandler(
-    private val broadCaster: Broadcaster,
-    private val period: Long,
+    private val broadCaster: Advertiser,
+    val period: Long,
     private val sizeLimit: Int
 ) {
     private val TAG: String = MessageHandler::class.java.simpleName
@@ -47,30 +48,33 @@ class MessageHandler(
     }
 
     private fun broadcast() {
-        if (this.messageQueue.isEmpty()) {
-            return
-        } else {
-            val packageBuilder: StringBuilder = StringBuilder()
-                .append(this.idGenerator.next())
-                .append(':')
-            while (packageBuilder.length < this.sizeLimit && this.messageQueue.isNotEmpty()) {
-                val msg = this.messageQueue.removeFirst()
-                if(msg.length + packageBuilder.length > this.sizeLimit){
-                    packageBuilder.append(msg.substring(0,this.sizeLimit - packageBuilder.length))
-                    this.messageQueue.add(0,msg.substring(this.sizeLimit - packageBuilder.length))
-                }else{
-                    packageBuilder.append(msg)
-                }
+        var sendCounter: Int = 0
+        val packageBuilder: StringBuilder = StringBuilder()
+            .append(this.idGenerator.next())
+            .append(':')
+        while (packageBuilder.length < this.sizeLimit && this.messageQueue.isNotEmpty()) {
+            val msg = this.messageQueue.removeFirst()
+            if (msg.length + packageBuilder.length > this.sizeLimit) {
+                this.messageQueue.add(0, msg.substring(this.sizeLimit - packageBuilder.length))
+                packageBuilder.append(msg.substring(0, this.sizeLimit - packageBuilder.length))
+            } else {
+                packageBuilder.append(msg)
+            }
+            sendCounter++
 
-            }
-            if(packageBuilder.length > 2) {
-                this.broadCaster.send(packageBuilder.toString())
-            }
         }
+        if (packageBuilder.length > 2) {
+            this.broadCaster.send(packageBuilder.toString())
+        }
+        Log.d(
+            TAG,
+            "broadcast: Send $sendCounter messages, ${this.messageQueue.size} messages are remaining"
+        )
+
     }
 
-    fun send(message: AdvertisementMessage) {
+    fun send(message: String) {
         Log.d(TAG, "send: $message")
-        this.messageQueue.add(message.toString())
+        this.messageQueue.add(message)
     }
 }

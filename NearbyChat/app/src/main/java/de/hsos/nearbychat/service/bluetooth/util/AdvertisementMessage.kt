@@ -17,27 +17,22 @@ class AdvertisementMessage private constructor(
 ) {
     val TAG: String = AdvertisementMessage::class.java.simpleName
 
-    fun decrementHop() {
-        this.hops = this.hops?.minus(1)
-    }
+    fun decrementHop() = apply { this.hops = this.hops?.minus(1) }
+
 
     @Throws(IllegalStateException::class)
     override fun toString(): String {
         val builder: StringBuilder = StringBuilder()
             .append("{")
-            .append(type)
+            .append(type?.type)
             .append(":")
         when (type) {
             MessageType.NEIGHBOUR_MESSAGE -> {
-                builder.append(id)
-                    .append(';')
-                    .append(hops)
+                builder.append(hops)
                     .append(';')
                     .append(rssi)
                     .append(';')
                     .append(sender)
-                    .append(';')
-                    .append(receiver)
                     .append(';')
                     .append(name)
                     .append(';')
@@ -49,6 +44,8 @@ class AdvertisementMessage private constructor(
                 builder.append(id)
                     .append(';')
                     .append(sender)
+                    .append(';')
+                    .append(receiver)
             }
             MessageType.MESSAGE_MESSAGE -> {
                 builder.append(id)
@@ -92,51 +89,52 @@ class AdvertisementMessage private constructor(
         fun message(message: String) = apply { this.message = message }
         fun rawMessage(rawMessage: String) = apply {
             try {
-                when (rawMessage[1]) {
-                    MessageType.MESSAGE_MESSAGE.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':')
+                this.type = MessageType.values().first { it.type == rawMessage[1] }
+                when (this.type) {
+                    MessageType.MESSAGE_MESSAGE -> {
+                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id =
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
+                        lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
                         this.message = rawMessage.substring(lastSeparator, nextSeparator)
                     }
-                    MessageType.ACKNOWLEDGE_MESSAGE.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':')
+                    MessageType.ACKNOWLEDGE_MESSAGE -> {
+                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id =
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
+                        lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
                     }
-                    MessageType.NEIGHBOUR_MESSAGE.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':')
+                    MessageType.NEIGHBOUR_MESSAGE -> {
+                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.hops = rawMessage.substring(lastSeparator, nextSeparator).toInt()
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.rssi = rawMessage.substring(lastSeparator, nextSeparator).toInt()
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.name = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.description = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = nextSeparator
+                        lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
                         this.color = rawMessage.substring(lastSeparator, nextSeparator).toInt()
                     }

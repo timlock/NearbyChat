@@ -1,4 +1,4 @@
-package de.hsos.nearbychat.service.bluetooth.util
+package de.hsos.nearbychat.service.bluetooth
 
 data class Neighbour(
     val address: String,

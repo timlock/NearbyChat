@@ -1,4 +1,4 @@
-package de.hsos.nearbychat.service.bluetooth
+package de.hsos.nearbychat.service.bluetooth.scan
 
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
