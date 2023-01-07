@@ -27,7 +27,6 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
         Log.d(TAG, "onServiceDisconnected() called with: name = $name")
     }
 
-    //val androidID : String = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)
     fun startService(context: Context, ownProfile: OwnProfile) {
         this.ownProfile = ownProfile
         val startServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
