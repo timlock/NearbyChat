@@ -8,7 +8,8 @@ class AdvertisementMessage private constructor(
     var id: Char? = null,
     var hops: Int? = null,
     var rssi: Int? = null,
-    var address: String? = null,
+    var sender: String? = null,
+    var receiver: String? = null,
     var name: String? = null,
     var description: String? = null,
     var color: Int? = null,
@@ -34,7 +35,9 @@ class AdvertisementMessage private constructor(
                     .append(';')
                     .append(rssi)
                     .append(';')
-                    .append(address)
+                    .append(sender)
+                    .append(';')
+                    .append(receiver)
                     .append(';')
                     .append(name)
                     .append(';')
@@ -45,12 +48,14 @@ class AdvertisementMessage private constructor(
             MessageType.ACKNOWLEDGE_MESSAGE -> {
                 builder.append(id)
                     .append(';')
-                    .append(address)
+                    .append(sender)
             }
             MessageType.MESSAGE_MESSAGE -> {
                 builder.append(id)
                     .append(';')
-                    .append(address)
+                    .append(sender)
+                    .append(';')
+                    .append(receiver)
                     .append(';')
                     .append(message)
             }
@@ -67,7 +72,8 @@ class AdvertisementMessage private constructor(
         var id: Char? = null,
         var hops: Int? = null,
         var rssi: Int? = null,
-        var address: String? = null,
+        var sender: String? = null,
+        var receiver: String? = null,
         var name: String? = null,
         var description: String? = null,
         var color: Int? = null,
@@ -78,7 +84,8 @@ class AdvertisementMessage private constructor(
         fun id(id: Char) = apply { this.id = id }
         fun hops(hops: Int) = apply { this.hops = hops }
         fun rssi(rssi: Int) = apply { this.rssi = rssi }
-        fun address(address: String) = apply { this.address = address }
+        fun sender(sender: String) = apply { this.sender = sender }
+        fun receiver(receiver: String) = apply { this.receiver = receiver }
         fun name(name: String) = apply { this.name = name }
         fun description(description: String) = apply { this.description = description }
         fun color(color: Int) = apply { this.color = color }
@@ -93,9 +100,12 @@ class AdvertisementMessage private constructor(
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = nextSeparator
+                        nextSeparator = rawMessage.indexOf('}')
                         this.message = rawMessage.substring(lastSeparator, nextSeparator)
                     }
                     MessageType.ACKNOWLEDGE_MESSAGE.type -> {
@@ -105,7 +115,10 @@ class AdvertisementMessage private constructor(
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = nextSeparator
+                        nextSeparator = rawMessage.indexOf('}')
+                        this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
                     }
                     MessageType.NEIGHBOUR_MESSAGE.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':')
@@ -116,7 +129,7 @@ class AdvertisementMessage private constructor(
                         this.rssi = rawMessage.substring(lastSeparator, nextSeparator).toInt()
                         lastSeparator = nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
                         this.name = rawMessage.substring(lastSeparator, nextSeparator)
@@ -124,7 +137,7 @@ class AdvertisementMessage private constructor(
                         nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
                         this.description = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator + 1)
+                        nextSeparator = rawMessage.indexOf('}')
                         this.color = rawMessage.substring(lastSeparator, nextSeparator).toInt()
                     }
                     else -> Log.w(
@@ -144,7 +157,8 @@ class AdvertisementMessage private constructor(
                 id,
                 hops,
                 rssi,
-                address,
+                sender,
+                receiver,
                 name,
                 description,
                 color,

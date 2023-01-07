@@ -25,7 +25,6 @@ class NeighbourTable(private val timeout: Long) {
     }
 
     fun getDirectNeighbour(macAddress: String): Neighbour? = this.directNeighbourTable[macAddress]
-
-
+    fun getEntry(address: String) : Neighbour? = this.innerTable[address]
 
 }

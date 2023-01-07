@@ -26,9 +26,9 @@ class NearbyChatService: Service(), MeshObserver {
     }
 
     override fun onCreate() {
-        var android_id : String = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)
+        val androidID : String = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)
         val bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        this.meshController = MeshController(this, bluetoothManager.adapter,android_id)
+        this.meshController = MeshController(this, bluetoothManager.adapter,androidID)
     }
 
     fun sendMessage(message: Message){
@@ -39,18 +39,26 @@ class NearbyChatService: Service(), MeshObserver {
         stopSelf()
     }
 
-    companion object {
-        val MESSAGE_PARAM: String = "MESSAGE_PARAM"
-        val PROFILE_PARAM: String = "PROFILE_PARAM"
-    }
 
     override fun onMessage(advertisementMessage: AdvertisementMessage) {
-        TODO("Not yet implemented")
+        val intent: Intent = Intent()
+        intent.action = NearbyChatService.MESSAGE_ACTION
+
     }
 
     override fun onMessageAck(advertisementMessage: AdvertisementMessage) {
         TODO("Not yet implemented")
     }
 
+    override fun onNeighbour(advertisementMessage: AdvertisementMessage) {
+        TODO("Not yet implemented")
+    }
+
+    companion object{
+        val MESSAGE_PARAM: String = "MESSAGE_PARAM"
+        val PROFILE_PARAM: String = "PROFILE_PARAM"
+        val MESSAGE_ACTION: String = "MESSAGE_ACTION"
+        val ACKNOWLEDGE_ACTION: String = "ACKNOWLEDGE_ACTION"
+    }
 
 }
