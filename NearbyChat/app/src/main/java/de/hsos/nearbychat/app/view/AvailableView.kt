@@ -14,12 +14,6 @@ import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
 
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AvailableView.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AvailableView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
@@ -49,12 +43,6 @@ class AvailableView : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @return A new instance of fragment HomeView.
-         */
         @JvmStatic
         fun newInstance() =
             AvailableView().apply {

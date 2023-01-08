@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -47,13 +48,13 @@ class ProfileView : Fragment() {
                 } else {
                     profile = OwnProfile()
                 }
-                val nameView = view.findViewById<Button>(R.id.profile_name)
+                val nameView = view.findViewById<TextView>(R.id.profile_name)
                 nameView.text = profile.name
                 nameView.addTextChangedListener {
                     profile.name = it.toString()
                 }
 
-                val descView = view.findViewById<Button>(R.id.profile_desc)
+                val descView = view.findViewById<TextView>(R.id.profile_desc)
                 descView.text = profile.description
                 descView.addTextChangedListener {
                     profile.description = it.toString()

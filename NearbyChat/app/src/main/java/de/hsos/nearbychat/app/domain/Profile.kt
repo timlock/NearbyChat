@@ -7,7 +7,7 @@ import java.lang.Integer.max
 import java.lang.Integer.min
 
 @Entity
-class Profile(@PrimaryKey val macAddress: String) {
+class Profile(@PrimaryKey val address: String) {
     lateinit var name: String
     lateinit var description: String
     var color: Int = 0

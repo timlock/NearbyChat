@@ -34,7 +34,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         availableProfiles.observe(lifecycleOwner) { profiles ->
             profiles.let {
                 for(p in it) {
-                    if(p.macAddress == macAddress) {
+                    if(p.address == macAddress) {
                         (profile as MutableLiveData<Profile?>).value = p
                     }
                 }
@@ -47,7 +47,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         if(availableProfiles.value != null) {
             val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
             for (i in 0..availableProfiles.value!!.size) {
-                if(list[i].macAddress == profile.macAddress) {
+                if(list[i].address == profile.address) {
                     list[i] = profile
                     (availableProfiles as MutableLiveData<List<Profile>>).value = list
                 }
@@ -59,7 +59,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         if(availableProfiles.value != null) {
             val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
             for (i in 0..availableProfiles.value!!.size) {
-                if(list[i].macAddress == macAddress) {
+                if(list[i].address == macAddress) {
                     list.removeAt(i)
                     (availableProfiles as MutableLiveData<List<Profile>>).value = list
                 }
