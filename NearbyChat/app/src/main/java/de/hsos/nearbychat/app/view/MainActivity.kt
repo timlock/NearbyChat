@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                 1 -> drawable = R.drawable.ic_baseline_network_wifi_1_bar_24
                 2 -> drawable = R.drawable.ic_baseline_network_wifi_2_bar_24
                 3 -> drawable = R.drawable.ic_baseline_network_wifi_3_bar_24
-                4 -> drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
+                4 -> drawable = R.drawable.ic_baseline_signal_wifi_4_bar_24
             }
             return drawable
         }
