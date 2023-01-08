@@ -1,17 +1,16 @@
 import android.content.Context
 import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Message
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import de.hsos.nearbychat.app.view.MainActivity
 
 class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAdapter.ViewHolder>()
 {
@@ -28,6 +27,8 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
         var timeOut: TextView? = null
         var date: TextView? = null
         var received: ImageView? = null
+        var cardIn: CardView? = null
+        var cardOut: CardView? = null
         init {
             messageIn = itemView.findViewById(R.id.chat_message_in)
             messageOut = itemView.findViewById(R.id.chat_message_out)
@@ -37,6 +38,8 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
             textOut = itemView.findViewById(R.id.chat_message_out_text)
             timeOut = itemView.findViewById(R.id.chat_message_out_time)
             received = itemView.findViewById(R.id.chat_message_out_received)
+            cardIn = itemView.findViewById(R.id.chat_message_in_card)
+            cardOut = itemView.findViewById(R.id.chat_message_out_card)
         }
     }
 

@@ -12,9 +12,9 @@ class Profile(@PrimaryKey val address: String) {
     lateinit var description: String
     var color: Int = 0
     var lastInteraction: Long = Long.MIN_VALUE
-    @Ignore
+    //@Ignore
     var rssi: Int = Int.MIN_VALUE
-    @Ignore
+    //@Ignore
     var hopCount: Int = 0
 
     fun signalStrength0to4(): Int {

@@ -48,6 +48,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_signal_wifi_0_bar_24" />
+        app:srcCompat="@drawable/ic_baseline_signal_wifi_0_bar_24"
+        app:tint="?colorOnSecondary"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

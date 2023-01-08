@@ -51,10 +51,6 @@ class AvailableUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Rec
             ResourcesCompat.getColor(context.resources,
                 MainActivity.getUserColorRes(profile.color), null
             ))
-        viewHolder.signalStrength.setColorFilter(
-            ResourcesCompat.getColor(context.resources,
-                MainActivity.getUserColorRes(profile.color), null
-            ))
         viewHolder.signalStrength.setImageDrawable(AppCompatResources.getDrawable(context, MainActivity.getSignalStrengthIcon(profile.signalStrength0to4())))
         viewHolder.profile = profile
     }

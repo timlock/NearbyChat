@@ -7,6 +7,7 @@
     <string name="settings">Einstellungen</string>
     <string name="available_desc">Verfügbare Nutzer in der Nähe</string>
     <string name="chats_desc">Gespeicherte Chats</string>
+    <string name="chat_desc">Dein Chat mit einem Nutzer</string>
     <string name="profile_desc">Dein NearbyChat Profil</string>
     <string name="settings_desc">Einstellungen der App</string>
 

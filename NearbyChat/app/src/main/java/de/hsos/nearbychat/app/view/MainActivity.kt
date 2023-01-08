@@ -1,5 +1,6 @@
 package de.hsos.nearbychat.app.view
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
@@ -95,10 +96,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openChat(profile: Profile) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile.address))
-        transaction.addToBackStack(null)
-        transaction.commit()
+        val intent = Intent(this, ChatActivity::class.java)
+        intent.putExtra(ChatActivity.INTENT_ADDRESS, profile.address)
+        startActivity(intent)
     }
 
     fun getNightMode(): Boolean  {

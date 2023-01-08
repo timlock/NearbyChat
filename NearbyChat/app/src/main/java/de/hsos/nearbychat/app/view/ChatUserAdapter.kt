@@ -58,10 +58,6 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
             ResourcesCompat.getColor(context.resources,
                 MainActivity.getUserColorRes(profile.color), null
             ))
-        viewHolder.signalStrength.setColorFilter(
-            ResourcesCompat.getColor(context.resources,
-                MainActivity.getUserColorRes(profile.color), null
-            ))
         viewHolder.signalStrength.setImageDrawable(
             AppCompatResources.getDrawable(
                 context,
