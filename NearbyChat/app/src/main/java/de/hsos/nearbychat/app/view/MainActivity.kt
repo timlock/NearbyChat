@@ -4,11 +4,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
@@ -33,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferences = getSharedPreferences("APP_SETTINGS", MODE_PRIVATE)
         currentFragment = savedInstanceState?.getString("currentFragmentName")
-
+        
         clearDatabaseFromTestData()
         fillDatabaseWithTestData()
 
@@ -155,8 +157,6 @@ class MainActivity : AppCompatActivity() {
             profile.name = "name-$i"
             profile.color = i
             profile.description = "description-$i"
-            profile.hopCount = i % 5
-            profile.rssi = 120
             for(j in 0..19) {
                 val offset: Long = Timestamp.valueOf("2020-01-01 00:00:00").time
                 val end: Long = Timestamp.valueOf("2020-03-03 00:00:00").time
@@ -173,7 +173,11 @@ class MainActivity : AppCompatActivity() {
                 viewModel.addMessage(message)
             }
 
-            if(i % 2 == 0) viewModel.updateAvailableProfile(profile)
+            if(i % 2 == 0) {
+                profile.hopCount = i % 5
+                profile.rssi = 120
+                viewModel.updateAvailableProfile(profile)
+            }
             viewModel.updateSavedProfile(profile)
         }
     }

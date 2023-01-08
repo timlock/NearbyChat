@@ -37,6 +37,10 @@ class ChatsView : Fragment() {
             profiles.let { adapter.savedProfiles = profiles }
         }
 
+        viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->
+            profiles.let {} //TODO: profile, wenn verfügbar angepasst anzeigen
+        }
+
         recyclerView.adapter = adapter
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {

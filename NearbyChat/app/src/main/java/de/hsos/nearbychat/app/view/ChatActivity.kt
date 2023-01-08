@@ -47,6 +47,10 @@ class ChatActivity : AppCompatActivity() {
             )
         }
 
+        viewModel.availableProfiles.observe(this) { profiles ->
+            profiles.let {} //TODO: profile, wenn verfügbar angepasst anzeigen
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val adapter = MessageAdapter(this)

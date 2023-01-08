@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class ViewModel(private val repository: Repository) : ViewModel(){
     val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
-    val availableProfiles: LiveData<List<Profile>> = MutableLiveData()
+    val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
 
     fun updateOwnProfile(ownProfile: OwnProfile) = viewModelScope.launch {
         repository.insertOwnProfile(ownProfile)
@@ -29,7 +29,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         repository.deleteProfile(macAddress)
     }
 
-    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> {
+    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> { //TODO: Funktioniert vermutlich nicht, daher löschen
         val profile: LiveData<Profile?> = MutableLiveData()
         availableProfiles.observe(lifecycleOwner) { profiles ->
             profiles.let {
