@@ -136,6 +136,7 @@ class MeshController(
                     "onMessage: cant forward message: $advertisementMessage ${advertisementMessage.receiver} is not reachable"
                 )
             } else {
+                advertisementMessage.address = nextTarget
                 this.messageHandler.send(advertisementMessage.toString())
             }
         }
@@ -154,6 +155,7 @@ class MeshController(
                     "onMessage: cant forward message: $advertisementMessage ${advertisementMessage.receiver} is unknown"
                 )
             } else {
+                advertisementMessage.address = nextTarget
                 this.messageHandler.send(advertisementMessage.toString())
             }
         }
@@ -165,7 +167,7 @@ class MeshController(
     ) {
         advertisementMessage.decrementHop()
         val neighbour: Neighbour = Neighbour(
-            advertisementMessage.sender!!,
+            advertisementMessage.address!!,
             advertisementMessage.rssi!!,
             MAX_HOPS - advertisementMessage.hops!!,
             closestNeighbour!!.lastSeen,

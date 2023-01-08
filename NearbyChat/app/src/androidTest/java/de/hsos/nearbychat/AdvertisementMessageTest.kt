@@ -18,11 +18,12 @@ class AdvertisementMessageTest {
         val advertisementMessage: AdvertisementMessage = AdvertisementMessage.Builder()
             .type(MessageType.MESSAGE_MESSAGE)
             .id('0')
+            .address("address")
             .sender("sender")
             .receiver("receiver")
             .message("message")
             .build()
-        var excepted: String = "{M:0;sender;receiver;message}"
+        var excepted: String = "{M:0;address;sender;receiver;message}"
         var actual: String = advertisementMessage.toString()
         assertEquals(excepted, actual)
         actual = AdvertisementMessage.Builder().rawMessage(excepted).build().toString()
@@ -36,10 +37,11 @@ class AdvertisementMessageTest {
         val advertisementMessage: AdvertisementMessage = AdvertisementMessage.Builder()
             .type(MessageType.ACKNOWLEDGE_MESSAGE)
             .id('0')
+            .address("address")
             .sender("sender")
             .receiver("receiver")
             .build()
-        var excepted: String = "{A:0;sender;receiver}"
+        var excepted: String = "{A:0;address;sender;receiver}"
         var actual: String = advertisementMessage.toString()
         assertEquals(excepted, actual)
         actual = AdvertisementMessage.Builder().rawMessage(excepted).build().toString()
@@ -55,12 +57,12 @@ class AdvertisementMessageTest {
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .hops(10)
             .rssi(-50)
-            .sender("sender")
+            .address("address")
             .name("name")
             .description("description")
             .color(255)
             .build()
-        var excepted: String = "{N:10;-50;sender;name;description;255}"
+        var excepted: String = "{N:10;-50;address;name;description;255}"
         var actual: String = advertisementMessage.toString()
         assertEquals(excepted, actual)
         actual = AdvertisementMessage.Builder().rawMessage(excepted).build().toString()

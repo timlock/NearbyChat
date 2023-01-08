@@ -8,6 +8,7 @@ class AdvertisementMessage private constructor(
     var id: Char? = null,
     var hops: Int? = null,
     var rssi: Int? = null,
+    var address: String? = null,
     var sender: String? = null,
     var receiver: String? = null,
     var name: String? = null,
@@ -32,7 +33,7 @@ class AdvertisementMessage private constructor(
                     .append(';')
                     .append(rssi)
                     .append(';')
-                    .append(sender)
+                    .append(address)
                     .append(';')
                     .append(name)
                     .append(';')
@@ -43,12 +44,16 @@ class AdvertisementMessage private constructor(
             MessageType.ACKNOWLEDGE_MESSAGE -> {
                 builder.append(id)
                     .append(';')
+                    .append(address)
+                    .append(';')
                     .append(sender)
                     .append(';')
                     .append(receiver)
             }
             MessageType.MESSAGE_MESSAGE -> {
                 builder.append(id)
+                    .append(';')
+                    .append(address)
                     .append(';')
                     .append(sender)
                     .append(';')
@@ -69,6 +74,7 @@ class AdvertisementMessage private constructor(
         var id: Char? = null,
         var hops: Int? = null,
         var rssi: Int? = null,
+        var address: String? = null,
         var sender: String? = null,
         var receiver: String? = null,
         var name: String? = null,
@@ -81,6 +87,7 @@ class AdvertisementMessage private constructor(
         fun id(id: Char) = apply { this.id = id }
         fun hops(hops: Int) = apply { this.hops = hops }
         fun rssi(rssi: Int) = apply { this.rssi = rssi }
+        fun address(address: String) = apply { this.address = address }
         fun sender(sender: String) = apply { this.sender = sender }
         fun receiver(receiver: String) = apply { this.receiver = receiver }
         fun name(name: String) = apply { this.name = name }
@@ -98,6 +105,9 @@ class AdvertisementMessage private constructor(
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
@@ -113,6 +123,9 @@ class AdvertisementMessage private constructor(
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
@@ -127,7 +140,7 @@ class AdvertisementMessage private constructor(
                         this.rssi = rawMessage.substring(lastSeparator, nextSeparator).toInt()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.name = rawMessage.substring(lastSeparator, nextSeparator)
@@ -155,6 +168,7 @@ class AdvertisementMessage private constructor(
                 id,
                 hops,
                 rssi,
+                address,
                 sender,
                 receiver,
                 name,

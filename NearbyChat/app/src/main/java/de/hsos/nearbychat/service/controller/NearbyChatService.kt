@@ -45,7 +45,7 @@ class NearbyChatService: Service(), MeshObserver {
     override fun onMessage(advertisementMessage: AdvertisementMessage) {
         val intent: Intent = Intent()
         intent.action = NearbyChatService.MESSAGE_ACTION
-
+        val message: Message = Message(advertisementMessage.sender,advertisementMessage.message,)
     }
 
     override fun onMessageAck(advertisementMessage: AdvertisementMessage) {
