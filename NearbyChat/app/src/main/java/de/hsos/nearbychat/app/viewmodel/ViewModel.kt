@@ -44,24 +44,31 @@ class ViewModel(private val repository: Repository) : ViewModel(){
     }
 
     fun updateAvailableProfile(profile: Profile) {
-        if(availableProfiles.value != null) {
-            val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
-            for (i in 0..availableProfiles.value!!.size) {
-                if(list[i].address == profile.address) {
-                    list[i] = profile
-                    (availableProfiles as MutableLiveData<List<Profile>>).value = list
-                }
+        val list: MutableList<Profile> = if(availableProfiles.value != null) {
+            availableProfiles.value!!.toMutableList()
+        } else {
+            mutableListOf()
+        }
+        for (i in 0 until list.size) {
+            if(list[i].address == profile.address) {
+                list[i] = profile
+                (availableProfiles as MutableLiveData<List<Profile>>).value = list
+                return
             }
         }
+        list.add(profile)
+        (availableProfiles as MutableLiveData<List<Profile>>).value = list
+
     }
 
     fun deleteAvailableProfile(macAddress: String) {
         if(availableProfiles.value != null) {
             val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
-            for (i in 0..availableProfiles.value!!.size) {
+            for (i in 0 until availableProfiles.value!!.size) {
                 if(list[i].address == macAddress) {
                     list.removeAt(i)
                     (availableProfiles as MutableLiveData<List<Profile>>).value = list
+                    return
                 }
             }
         }

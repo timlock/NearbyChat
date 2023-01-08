@@ -1,9 +1,9 @@
 package de.hsos.nearbychat.app.view
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -11,19 +11,29 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
+import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.app.viewmodel.ViewModel
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var toolbar: ActionBar
-    lateinit var bottomNavView: BottomNavigationView
-    lateinit var sharedPreferences: SharedPreferences
-    var currentFragment: String? = null
+    private lateinit var toolbar: ActionBar
+    private lateinit var bottomNavView: BottomNavigationView
+    private lateinit var sharedPreferences: SharedPreferences
+    private var currentFragment: String? = null
+
+    private val viewModel: ViewModel by viewModels {
+        ViewModel.ViewModelFactory((this.application as Application).repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferences = getSharedPreferences("APP_SETTINGS", MODE_PRIVATE)
         currentFragment = savedInstanceState?.getString("currentFragmentName")
+
+        clearDatabaseFromTestData()
+        fillDatabaseWithTestData()
 
         updateLanguage()
         updateNightMode()
@@ -121,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    fun updateLanguage() {
+    private fun updateLanguage() {
         val languageSetting = sharedPreferences.getString("language", "default")
         val locale = if(languageSetting == null || languageSetting == "default") {
             Locale.getDefault()
@@ -135,6 +145,41 @@ class MainActivity : AppCompatActivity() {
             config,
             resources.displayMetrics
         )
+    }
+
+    private fun fillDatabaseWithTestData() {
+        var profile: Profile
+        var message: Message
+        for(i in 0..9) {
+            profile = Profile("address-$i")
+            profile.name = "name-$i"
+            profile.color = i
+            profile.description = "description-$i"
+            profile.hopCount = i % 5
+            profile.rssi = 120
+            for(j in 0..19) {
+                message = Message(profile.address, "message-$j from ${profile.name}", System.currentTimeMillis() - i * 100000 - j * 10000000)
+                if(j == 0) {
+                    profile.lastInteraction = message.timeStamp
+                }
+                if(j % 3 == 0) {
+                    message.isSelfAuthored = true
+                    if(j % 2 == 0) message.isReceived = true
+                }
+                viewModel.addMessage(message)
+            }
+
+            if(i % 2 == 0) viewModel.updateAvailableProfile(profile)
+            viewModel.updateSavedProfile(profile)
+        }
+    }
+
+    private fun clearDatabaseFromTestData() {
+        for(i in 0..9) {
+            viewModel.deleteSavedProfile("address-$i")
+            viewModel.deleteMessages("address-$i")
+            if(i % 2 == 0) viewModel.deleteAvailableProfile("address-$i")
+        }
     }
 
     companion object {

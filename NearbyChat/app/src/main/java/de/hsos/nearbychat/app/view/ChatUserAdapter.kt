@@ -1,5 +1,6 @@
 import android.content.Context
 import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
 
     inner class ViewHolder(itemView: View, onItemClicked: (Profile?) -> Unit) : RecyclerView.ViewHolder(itemView) {
         val userName: TextView = itemView.findViewById(R.id.chats_user_name)
-        val userMessage: TextView = itemView.findViewById(R.id.chats_user_message)
+        val userLastInteraction: TextView = itemView.findViewById(R.id.chats_user_last_interaction)
         val symbol: ImageView = itemView.findViewById(R.id.chats_user_symbol)
         val signalStrength: ImageView = itemView.findViewById(R.id.chats_user_signal_strength)
         var profile: Profile? = null
@@ -51,7 +52,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
 
         val dateFormat = SimpleDateFormat(context?.getString(R.string.date_pattern) + " " + context?.getString(R.string.time_pattern))
 
-        viewHolder.userMessage.text = dateFormat.format(profile.lastInteraction)
+        viewHolder.userLastInteraction.text = dateFormat.format(profile.lastInteraction)
 
         viewHolder.symbol.setColorFilter(
             ResourcesCompat.getColor(context.resources,

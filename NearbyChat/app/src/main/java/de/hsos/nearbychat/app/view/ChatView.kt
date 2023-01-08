@@ -42,12 +42,7 @@ class ChatView : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_chat_view, container, false)
         val recyclerView: RecyclerView = view.findViewById(R.id.chat_messages_recycler)
 
-        var profileLiveData: LiveData<Profile> = viewModel.getSavedProfile(address)
-        if(profileLiveData.value == null) {
-            profileLiveData = viewModel.getAvailableProfile(address, viewLifecycleOwner) as LiveData<Profile>
-        }
-
-        profileLiveData.observe(viewLifecycleOwner) {
+        viewModel.getSavedProfile(address).observe(viewLifecycleOwner) {
             view.findViewById<TextView>(R.id.chat_user_name).text = it.name
             view.findViewById<TextView>(R.id.chat_user_message).text = it.description
 

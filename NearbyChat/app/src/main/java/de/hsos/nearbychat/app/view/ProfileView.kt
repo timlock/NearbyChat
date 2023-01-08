@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.OwnProfile
@@ -99,6 +100,7 @@ class ProfileView : Fragment() {
                     if (inputMethodManager.isAcceptingText) {
                         inputMethodManager.hideSoftInputFromWindow( requireActivity().currentFocus!!.windowToken, 0)
                     }
+                    Snackbar.make(view, R.string.saved_profile, Snackbar.LENGTH_LONG).show()
                 }
             }
         }

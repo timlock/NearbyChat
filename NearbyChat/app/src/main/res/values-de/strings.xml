@@ -17,6 +17,7 @@
     <string name="description_label">Beschreibung:</string>
     <string name="color_label">Farbe:</string>
     <string name="save">Speichern</string>
+    <string name="saved_profile">Profil gespeichert</string>
     <string name="night_mode">Nachtmodus</string>
     <string name="language_label">Sprache:</string>
     <string name="language_en">Englisch</string>

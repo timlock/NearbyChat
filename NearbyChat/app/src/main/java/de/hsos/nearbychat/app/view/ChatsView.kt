@@ -56,11 +56,11 @@ class ChatsView : Fragment() {
 
             Snackbar.make(recyclerView, R.string.deleted_chat, Snackbar.LENGTH_LONG)
                 .setAction(
-                    R.string.undo,
-                    View.OnClickListener {
+                    R.string.undo
+                ) {
                     viewModel.updateSavedProfile(profile)
                     //adapter.notifyItemInserted(position)
-                    })
+                }
                 .addCallback(object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         super.onDismissed(transientBottomBar, event)

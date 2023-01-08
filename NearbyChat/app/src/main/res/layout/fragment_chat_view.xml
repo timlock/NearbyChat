@@ -70,6 +70,7 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:hint="@string/message"
+        android:maxLength="64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chat_send_message"
         app:layout_constraintStart_toStartOf="parent"
