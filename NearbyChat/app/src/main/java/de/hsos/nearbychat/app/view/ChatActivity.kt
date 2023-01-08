@@ -1,6 +1,6 @@
 package de.hsos.nearbychat.app.view
 
-import ChatAdapter
+import MessageAdapter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
@@ -24,14 +23,12 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-        supportActionBar!!.setSubtitle(R.string.available_desc)
+        supportActionBar!!.setSubtitle(R.string.chat_desc)
 
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
         val recyclerView: RecyclerView = findViewById(R.id.chat_messages_recycler)
 
-        var ownColor = 0
         viewModel.getSavedProfile(address).observe(this) {
-            ownColor = it.color
 
             findViewById<TextView>(R.id.chat_user_name).text = it.name
             findViewById<TextView>(R.id.chat_user_message).text = it.description
@@ -52,7 +49,7 @@ class ChatActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val adapter = ChatAdapter(this)
+        val adapter = MessageAdapter(this)
 
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let { adapter.messages = messages }

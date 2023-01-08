@@ -15,6 +15,7 @@ import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
+import java.sql.Timestamp
 import java.util.*
 
 
@@ -157,7 +158,11 @@ class MainActivity : AppCompatActivity() {
             profile.hopCount = i % 5
             profile.rssi = 120
             for(j in 0..19) {
-                message = Message(profile.address, "message-$j from ${profile.name}", i * 10000L + j * 100000L)
+                val offset: Long = Timestamp.valueOf("2020-01-01 00:00:00").time
+                val end: Long = Timestamp.valueOf("2020-03-03 00:00:00").time
+                val diff = end - offset + 1
+                val rand = Timestamp(offset + (Math.random() * diff).toLong())
+                message = Message(profile.address, "message-$j from ${profile.name}", rand.time)
                 if(j == 0) {
                     profile.lastInteraction = message.timeStamp
                 }
