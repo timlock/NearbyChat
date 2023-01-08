@@ -52,14 +52,9 @@ class ChatsView : Fragment() {
             val position = viewHolder.adapterPosition
             val profile = adapter.savedProfiles[position]
             viewModel.deleteSavedProfile(profile.address)
-            //adapter.notifyItemRemoved(viewHolder.adapterPosition)
-
             Snackbar.make(recyclerView, R.string.deleted_chat, Snackbar.LENGTH_LONG)
-                .setAction(
-                    R.string.undo
-                ) {
+                .setAction(R.string.undo) {
                     viewModel.updateSavedProfile(profile)
-                    //adapter.notifyItemInserted(position)
                 }
                 .addCallback(object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {

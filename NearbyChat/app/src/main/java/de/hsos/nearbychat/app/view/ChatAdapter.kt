@@ -51,8 +51,8 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
 
     override fun onBindViewHolder(viewHolder: ChatAdapter.ViewHolder, position: Int) {
         val message: Message = messages[position]
-        var contentView: TextView? = null
-        var timeView: TextView? = null
+        val contentView: TextView?
+        val timeView: TextView?
 
         if(message.isSelfAuthored) {
             contentView = viewHolder.textOut
@@ -68,6 +68,8 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
         val dateFormat = SimpleDateFormat(context?.getString(R.string.date_pattern))
         val timeFormat = SimpleDateFormat(context?.getString(R.string.time_pattern))
 
+
+        //TODO: Colorize messages in profile colors
         contentView?.text = message.content
         timeView?.text = timeFormat.format(message.timeStamp)
 

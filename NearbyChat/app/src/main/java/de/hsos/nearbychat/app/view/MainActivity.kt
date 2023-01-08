@@ -8,7 +8,6 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
@@ -16,6 +15,7 @@ import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -95,7 +95,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openChat(profile: Profile) {
-        (bottomNavView.getChildAt(0) as BottomNavigationMenuView).getChildAt(1).callOnClick()
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_layout, ChatView.newInstance(profile.address))
         transaction.addToBackStack(null)
@@ -158,7 +157,7 @@ class MainActivity : AppCompatActivity() {
             profile.hopCount = i % 5
             profile.rssi = 120
             for(j in 0..19) {
-                message = Message(profile.address, "message-$j from ${profile.name}", System.currentTimeMillis() - i * 100000 - j * 10000000)
+                message = Message(profile.address, "message-$j from ${profile.name}", i * 10000L + j * 100000L)
                 if(j == 0) {
                     profile.lastInteraction = message.timeStamp
                 }
