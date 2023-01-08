@@ -53,6 +53,7 @@
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:hint="@string/name"
+        android:maxLength="16"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/profile_name_label"
         app:layout_constraintTop_toTopOf="parent" />
@@ -67,6 +68,7 @@
         android:inputType="textPersonName"
         android:minHeight="48dp"
         android:hint="@string/description"
+        android:maxLength="32"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_desc_label" />

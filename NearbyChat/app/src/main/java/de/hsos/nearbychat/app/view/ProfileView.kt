@@ -1,24 +1,22 @@
 package de.hsos.nearbychat.app.view
 
-import android.graphics.drawable.ColorDrawable
+import android.app.Activity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
+
 
 /**
  * A simple [Fragment] subclass.
@@ -61,6 +59,7 @@ class ProfileView : Fragment() {
                 }
 
                 colorPreview = view.findViewById(R.id.profile_color)
+                changeColor(profile.color, profile)
 
                 view.findViewById<Button>(R.id.profile_color_0).setOnClickListener{
                     changeColor(0, profile)
@@ -95,6 +94,11 @@ class ProfileView : Fragment() {
 
                 view.findViewById<Button>(R.id.profile_save).setOnClickListener{
                     viewModel.updateOwnProfile(profile)
+                    // hide keyboard
+                    val inputMethodManager: InputMethodManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    if (inputMethodManager.isAcceptingText) {
+                        inputMethodManager.hideSoftInputFromWindow( requireActivity().currentFocus!!.windowToken, 0)
+                    }
                 }
             }
         }
