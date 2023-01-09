@@ -1,7 +1,7 @@
 package de.hsos.nearbychat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import de.hsos.nearbychat.service.bluetooth.Neighbour
-import de.hsos.nearbychat.service.bluetooth.NeighbourTable
+import de.hsos.nearbychat.service.bluetooth.util.Neighbour
+import de.hsos.nearbychat.service.bluetooth.util.NeighbourTable
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
+import de.hsos.nearbychat.app.PermissionManager
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
                     return@setOnItemSelectedListener true
                 }
             }
+            PermissionManager.permissionCheck(this,this)
             return@setOnItemSelectedListener false
         }
     }

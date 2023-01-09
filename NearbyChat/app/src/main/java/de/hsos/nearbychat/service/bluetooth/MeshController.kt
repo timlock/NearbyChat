@@ -7,11 +7,9 @@ import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.advertise.Client
-import de.hsos.nearbychat.service.bluetooth.advertise.MessageHandler
+import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
-import de.hsos.nearbychat.service.bluetooth.util.Advertisement
-import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
-import de.hsos.nearbychat.service.bluetooth.util.MessageBuffer
+import de.hsos.nearbychat.service.bluetooth.util.*
 
 class MeshController(
     private var observer: MeshObserver,
@@ -20,13 +18,13 @@ class MeshController(
     private var scanner: Scanner
     ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
-    private var messageHandler: MessageHandler
+    private var advertisementExecutor: AdvertisementExecutor
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
 
     init {
-        this.messageHandler = MessageHandler(
+        this.advertisementExecutor = AdvertisementExecutor(
             this.advertiser as Client,
             AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
             this.advertiser.getMaxMessageSize()
@@ -46,17 +44,17 @@ class MeshController(
     fun startAdvertise() {
         Log.d(TAG, "startAdvertise: ")
         this.advertiser.start()
-        this.messageHandler.start()
+        this.advertisementExecutor.start()
     }
 
     fun stopAdvertising() {
         Log.d(TAG, "stopAdvertising: ")
-        this.messageHandler.stop()
+        this.advertisementExecutor.stop()
         this.advertiser.stop()
     }
 
     fun sendMessage(message: Message) {
-        this.messageHandler.send(
+        this.advertisementExecutor.send(
             Advertisement.Builder()
                 .type(MessageType.MESSAGE_MESSAGE)
                 .id(this.idGenerator.next())
@@ -135,7 +133,7 @@ class MeshController(
                 )
             } else {
                 advertisement.address = nextTarget
-                this.messageHandler.send(advertisement.toString())
+                this.advertisementExecutor.send(advertisement.toString())
             }
         }
     }
@@ -154,7 +152,7 @@ class MeshController(
                 )
             } else {
                 advertisement.address = nextTarget
-                this.messageHandler.send(advertisement.toString())
+                this.advertisementExecutor.send(advertisement.toString())
             }
         }
     }
@@ -175,7 +173,7 @@ class MeshController(
         this.observer.onNeighbour(advertisement)
         advertisement.decrementHop()
         if(advertisement.hops!! >= 0){
-            this.messageHandler.send(advertisement.toString())
+            this.advertisementExecutor.send(advertisement.toString())
         }
     }
 

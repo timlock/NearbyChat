@@ -1,4 +1,4 @@
-package de.hsos.nearbychat.service.bluetooth
+package de.hsos.nearbychat.service.bluetooth.util
 
 class NeighbourTable(private val timeout: Long) {
     private val TAG: String = NeighbourTable::class.java.simpleName
