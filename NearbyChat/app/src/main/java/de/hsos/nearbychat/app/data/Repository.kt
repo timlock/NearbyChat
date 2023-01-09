@@ -91,6 +91,11 @@ class Repository(database: Database) {
         var foundProfile = false
         savedList.forEach { savedProfile ->
             if(message.address == savedProfile.address) {
+                if(!message.isSelfAuthored) {
+                    // set unread if message is not self authored
+                    savedProfile.unread = true
+                    updateProfile(savedProfile)
+                }
                 foundProfile = true
                 return@forEach
             }
@@ -104,12 +109,14 @@ class Repository(database: Database) {
                     return@forEach
                 }
             }
-            if(profile != null) {
-                // insert it from available profiles
+            if(profile == null) {
+                // profile not available so use empty profile just with address and let it update later
+                profile = Profile(message.address)
+            }
+            if(!message.isSelfAuthored) {
+                // set unread if message is not self authored
+                profile!!.unread = true
                 insertProfile(profile!!)
-            } else {
-                // profile not available so insert empty profile just with address and wait for it to update
-                insertProfile(Profile(message.address))
             }
         }
         messageDao.insert(message)

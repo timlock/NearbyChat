@@ -99,10 +99,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun openChat(profile: Profile) {
-        if(profile.unread) {
-            profile.unread = false
-            viewModel.updateSavedProfile(profile)
-        }
         val intent = Intent(this, ChatActivity::class.java)
         intent.putExtra(ChatActivity.INTENT_ADDRESS, profile.address)
         startActivity(intent)
