@@ -1,11 +1,11 @@
 package de.hsos.nearbychat.app.view
 
 import MessageAdapter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +33,7 @@ class ChatActivity : AppCompatActivity() {
 
         viewModel.savedProfiles.observe(this) {
             it.forEach { profile ->
-                if(profile.address == address) {
+                if (profile.address == address) {
                     this.profile = profile
 
                     findViewById<TextView>(R.id.chat_user_name).text = profile.name
@@ -42,9 +42,11 @@ class ChatActivity : AppCompatActivity() {
                     val symbol = findViewById<ImageView>(R.id.chat_user_symbol)
                     val signalStrength = findViewById<ImageView>(R.id.chat_user_signal_strength)
                     symbol.setColorFilter(
-                        ResourcesCompat.getColor(resources,
+                        ResourcesCompat.getColor(
+                            resources,
                             Application.getUserColorRes(profile.color), null
-                        ))
+                        )
+                    )
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
@@ -57,6 +59,7 @@ class ChatActivity : AppCompatActivity() {
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
+        //layoutManager.reverseLayout = true
         recyclerView.layoutManager = layoutManager
 
         val adapter = MessageAdapter(this)
@@ -64,6 +67,9 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let {
                 adapter.messages = messages
+                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                    recyclerView.scrollToPosition(messages.size - 1)
+                }
             }
         }
 
@@ -71,7 +77,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        if(profile != null && profile!!.unread) {
+        if (profile != null && profile!!.unread) {
             profile!!.unread = false
             viewModel.updateSavedProfile(profile!!)
         }
