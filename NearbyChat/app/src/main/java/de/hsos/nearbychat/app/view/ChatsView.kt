@@ -15,11 +15,6 @@ import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ChatsView.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChatsView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
@@ -42,6 +37,10 @@ class ChatsView : Fragment() {
             profiles.let { adapter.savedProfiles = profiles }
         }
 
+        viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->
+            profiles.let {} //TODO: profile, wenn verfügbar angepasst anzeigen
+        }
+
         recyclerView.adapter = adapter
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -56,20 +55,15 @@ class ChatsView : Fragment() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.adapterPosition
             val profile = adapter.savedProfiles[position]
-            viewModel.deleteSavedProfile(profile.macAddress)
-            //adapter.notifyItemRemoved(viewHolder.adapterPosition)
-
+            viewModel.deleteSavedProfile(profile.address)
             Snackbar.make(recyclerView, R.string.deleted_chat, Snackbar.LENGTH_LONG)
-                .setAction(
-                    R.string.undo,
-                    View.OnClickListener {
+                .setAction(R.string.undo) {
                     viewModel.updateSavedProfile(profile)
-                    //adapter.notifyItemInserted(position)
-                    })
+                }
                 .addCallback(object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         super.onDismissed(transientBottomBar, event)
-                        viewModel.deleteMessages(profile.macAddress)
+                        viewModel.deleteMessages(profile.address)
                     }
                 })
                 .show()
@@ -81,13 +75,6 @@ class ChatsView : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param macAddress mac address of Chat.
-         * @return A new instance of fragment HomeView.
-         */
         @JvmStatic
         fun newInstance() =
             ChatsView().apply {

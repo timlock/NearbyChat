@@ -6,6 +6,7 @@
     <string name="settings">settings</string>
     <string name="available_desc">available users nearby</string>
     <string name="chats_desc">saved chats</string>
+    <string name="chat_desc">your chat with a user</string>
     <string name="profile_desc">your NearbyChat profile</string>
     <string name="settings_desc">settings for the app</string>
 
@@ -16,6 +17,7 @@
     <string name="description_label">description:</string>
     <string name="color_label">color:</string>
     <string name="save">save</string>
+    <string name="saved_profile">saved profile</string>
     <string name="night_mode">night mode</string>
     <string name="language_label">language:</string>
     <string name="language_en">English</string>

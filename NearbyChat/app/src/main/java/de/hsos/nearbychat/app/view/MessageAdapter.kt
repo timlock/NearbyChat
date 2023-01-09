@@ -5,17 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Message
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
-class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAdapter.ViewHolder>()
+class MessageAdapter (private val context: Context?) : RecyclerView.Adapter<MessageAdapter.ViewHolder>()
 {
-    var lastDay: String = ""
-
     var messages: List<Message> = mutableListOf()
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,6 +24,8 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
         var timeOut: TextView? = null
         var date: TextView? = null
         var received: ImageView? = null
+        var cardIn: CardView? = null
+        var cardOut: CardView? = null
         init {
             messageIn = itemView.findViewById(R.id.chat_message_in)
             messageOut = itemView.findViewById(R.id.chat_message_out)
@@ -36,11 +35,13 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
             textOut = itemView.findViewById(R.id.chat_message_out_text)
             timeOut = itemView.findViewById(R.id.chat_message_out_time)
             received = itemView.findViewById(R.id.chat_message_out_received)
+            cardIn = itemView.findViewById(R.id.chat_message_in_card)
+            cardOut = itemView.findViewById(R.id.chat_message_out_card)
         }
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageAdapter.ViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.message, parent, false)
@@ -48,33 +49,35 @@ class ChatAdapter (private val context: Context?) : RecyclerView.Adapter<ChatAda
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(viewHolder: ChatAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: MessageAdapter.ViewHolder, position: Int) {
         val message: Message = messages[position]
-        var contentView: TextView? = null
-        var timeView: TextView? = null
+        val contentView: TextView?
+        val timeView: TextView?
 
         if(message.isSelfAuthored) {
             contentView = viewHolder.textOut
             timeView = viewHolder.timeOut
             viewHolder.messageIn?.visibility = View.INVISIBLE
+            viewHolder.messageOut?.visibility = View.VISIBLE
         } else {
             contentView = viewHolder.textIn
             timeView = viewHolder.timeIn
             viewHolder.messageOut?.visibility = View.INVISIBLE
+            viewHolder.messageIn?.visibility = View.VISIBLE
         }
 
         val internFormat = SimpleDateFormat("yyyy-MM-dd")
         val dateFormat = SimpleDateFormat(context?.getString(R.string.date_pattern))
         val timeFormat = SimpleDateFormat(context?.getString(R.string.time_pattern))
 
+
         contentView?.text = message.content
         timeView?.text = timeFormat.format(message.timeStamp)
 
-        if(internFormat.format(message.timeStamp) != lastDay) {
-            lastDay = internFormat.format(message.timeStamp)
-            viewHolder.date?.text = dateFormat.format(message.timeStamp)
-        } else {
+        if(position > 0 && internFormat.format(message.timeStamp) == internFormat.format(messages[position - 1].timeStamp)) {
             viewHolder.date?.text = ""
+        } else {
+            viewHolder.date?.text = dateFormat.format(message.timeStamp)
         }
 
         if(message.isReceived) {

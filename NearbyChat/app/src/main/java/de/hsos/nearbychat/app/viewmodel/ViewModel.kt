@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class ViewModel(private val repository: Repository) : ViewModel(){
     val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
-    val availableProfiles: LiveData<List<Profile>> = MutableLiveData()
+    val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
 
     fun updateOwnProfile(ownProfile: OwnProfile) = viewModelScope.launch {
         repository.insertOwnProfile(ownProfile)
@@ -29,12 +29,12 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         repository.deleteProfile(macAddress)
     }
 
-    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> {
+    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> { //TODO: Funktioniert vermutlich nicht, daher löschen
         val profile: LiveData<Profile?> = MutableLiveData()
         availableProfiles.observe(lifecycleOwner) { profiles ->
             profiles.let {
                 for(p in it) {
-                    if(p.macAddress == macAddress) {
+                    if(p.address == macAddress) {
                         (profile as MutableLiveData<Profile?>).value = p
                     }
                 }
@@ -44,24 +44,31 @@ class ViewModel(private val repository: Repository) : ViewModel(){
     }
 
     fun updateAvailableProfile(profile: Profile) {
-        if(availableProfiles.value != null) {
-            val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
-            for (i in 0..availableProfiles.value!!.size) {
-                if(list[i].macAddress == profile.macAddress) {
-                    list[i] = profile
-                    (availableProfiles as MutableLiveData<List<Profile>>).value = list
-                }
+        val list: MutableList<Profile> = if(availableProfiles.value != null) {
+            availableProfiles.value!!.toMutableList()
+        } else {
+            mutableListOf()
+        }
+        for (i in 0 until list.size) {
+            if(list[i].address == profile.address) {
+                list[i] = profile
+                (availableProfiles as MutableLiveData<List<Profile>>).value = list
+                return
             }
         }
+        list.add(profile)
+        (availableProfiles as MutableLiveData<List<Profile>>).value = list
+
     }
 
     fun deleteAvailableProfile(macAddress: String) {
         if(availableProfiles.value != null) {
             val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
-            for (i in 0..availableProfiles.value!!.size) {
-                if(list[i].macAddress == macAddress) {
+            for (i in 0 until availableProfiles.value!!.size) {
+                if(list[i].address == macAddress) {
                     list.removeAt(i)
                     (availableProfiles as MutableLiveData<List<Profile>>).value = list
+                    return
                 }
             }
         }

@@ -2,6 +2,7 @@ package de.hsos.nearbychat.app.data
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
@@ -11,6 +12,7 @@ class Repository(database: Database) {
     private val profileDao: ProfileDao = database.profileDao()
     private val ownProfileDao: OwnProfileDao = database.onwProfileDao()
 
+    val availableProfiles: LiveData<List<Profile>> = MutableLiveData()
     val savedProfiles: LiveData<List<Profile>> = profileDao.get()
     val ownProfile: LiveData<OwnProfile?> = ownProfileDao.get()
 

@@ -9,12 +9,12 @@ import de.hsos.nearbychat.app.domain.Message
 
 @Dao
 interface MessageDao {
-    @Query("SELECT * FROM Message WHERE macAddress = :macAddress ORDER BY timeStamp ASC")
+    @Query("SELECT * FROM Message WHERE address = :macAddress ORDER BY timeStamp ASC")
     fun get(macAddress: String): LiveData<List<Message>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(message: Message)
 
-    @Query("DELETE FROM Message WHERE macAddress = :macAddress")
+    @Query("DELETE FROM Message WHERE address = :macAddress")
     suspend fun delete(macAddress: String)
 }
