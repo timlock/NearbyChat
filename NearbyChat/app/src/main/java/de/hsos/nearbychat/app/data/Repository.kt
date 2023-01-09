@@ -1,5 +1,6 @@
 package de.hsos.nearbychat.app.data
 
+import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -59,6 +60,15 @@ class Repository(database: Database) {
                 }
             }
             (savedProfiles as MutableLiveData).value = savedList
+        }
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun ackReceivedMessage(address: String, timestamp: Long) {
+        val messageList = messageDao.get(address, timestamp, true)
+        messageList.forEach {
+            messageDao.update(it)
         }
     }
 
