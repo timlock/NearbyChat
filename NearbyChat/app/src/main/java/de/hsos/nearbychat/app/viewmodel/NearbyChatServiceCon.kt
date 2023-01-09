@@ -2,12 +2,9 @@ package de.hsos.nearbychat.app.viewmodel
 
 import android.content.*
 import android.os.IBinder
-import android.provider.Settings
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
-import de.hsos.nearbychat.service.bluetooth.util.AdvertisementMessage
 import de.hsos.nearbychat.service.controller.NearbyChatService
 
 class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceConnection {

@@ -5,5 +5,5 @@ data class Neighbour(
     var rssi: Int,
     val hops: Int,
     var lastSeen: Long,
-    val closestNeighbour: Neighbour?
+    var closestNeighbour: Neighbour? = null
 )

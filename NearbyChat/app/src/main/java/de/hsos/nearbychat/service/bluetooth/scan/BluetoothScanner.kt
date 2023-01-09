@@ -7,10 +7,12 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.ParcelUuid
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.Scanner
 import java.util.*
 
-class BluetoothScanner(private var observer : ScannerObserver, private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback() {
+class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback(),Scanner  {
     private val TAG: String = BluetoothScanner::class.java.simpleName
+    private var observer: ScannerObserver? = null
     private var scanning = false
     private var advertiseUUID: ParcelUuid =
         ParcelUuid(UUID.fromString("e889813c-5d19-49e2-8bc4-d4596b4f5250"))
@@ -28,7 +30,7 @@ class BluetoothScanner(private var observer : ScannerObserver, private var bluet
         this.scanFilters = mutableListOf(scanFilter)
     }
 
-    fun start(): Boolean {
+    override fun start(): Boolean {
         Log.d(TAG, "startScan: ")
         if (scanning) {
             this.stop()
@@ -46,7 +48,7 @@ class BluetoothScanner(private var observer : ScannerObserver, private var bluet
         return false
     }
 
-    fun stop(): Boolean {
+   override fun stop(): Boolean {
         Log.d(TAG, "stopScan: ")
         if (this.scanning) {
             return try {
@@ -68,9 +70,13 @@ class BluetoothScanner(private var observer : ScannerObserver, private var bluet
             result.scanRecord?.serviceData?.forEach { (uuid, data) -> stringLog += " " + uuid.toString() + " " + data.decodeToString() }
             Log.i(TAG, "onScanResult: $stringLog")
             val message: String? = result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
-            this.observer.onPackage(result.device.address, result.rssi,message ?: "")
+            this.observer?.onPackage(result.device.address, result.rssi,message ?: "")
         } catch (e: SecurityException) {
             Log.w(TAG, "startScan: ", e)
         }
+    }
+
+    override fun subscribe(observer: ScannerObserver) {
+        this.observer = observer
     }
 }

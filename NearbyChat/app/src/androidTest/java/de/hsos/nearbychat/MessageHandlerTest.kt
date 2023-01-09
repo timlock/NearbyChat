@@ -4,11 +4,8 @@ package de.hsos.nearbychat
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import de.hsos.nearbychat.service.bluetooth.MessageType
 import de.hsos.nearbychat.service.bluetooth.advertise.MessageHandler
-import de.hsos.nearbychat.service.bluetooth.util.AdvertisementMessage
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 

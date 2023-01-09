@@ -1,28 +1,25 @@
 package de.hsos.nearbychat.service.bluetooth
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertisingSetParameters
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.service.bluetooth.advertise.BluetoothAdvertiser
+import de.hsos.nearbychat.service.bluetooth.advertise.Client
 import de.hsos.nearbychat.service.bluetooth.advertise.MessageHandler
-import de.hsos.nearbychat.service.bluetooth.scan.BluetoothScanner
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
-import de.hsos.nearbychat.service.bluetooth.util.*
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
+import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
+import de.hsos.nearbychat.service.bluetooth.util.MessageBuffer
 
 class MeshController(
     private var observer: MeshObserver,
-    private var bluetoothAdapter: BluetoothAdapter,
-    private var ownProfile: OwnProfile
-) : ScannerObserver {
+    private var advertiser: Advertiser,
+    private var ownProfile: OwnProfile,
+    private var scanner: Scanner
+    ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
-    private var advertiser: BluetoothAdvertiser =
-        BluetoothAdvertiser(this.bluetoothAdapter, AdvertisingSetParameters.INTERVAL_MEDIUM)
-    private var scanner: BluetoothScanner =
-        BluetoothScanner(this, this.bluetoothAdapter.bluetoothLeScanner)
     private var messageHandler: MessageHandler
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
@@ -30,10 +27,11 @@ class MeshController(
 
     init {
         this.messageHandler = MessageHandler(
-            this.advertiser,
+            this.advertiser as Client,
             AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
-            this.advertiser.maxMessageLength
+            this.advertiser.getMaxMessageSize()
         )
+        this.scanner.subscribe(this)
     }
 
     fun startScan() {
@@ -59,7 +57,7 @@ class MeshController(
 
     fun sendMessage(message: Message) {
         this.messageHandler.send(
-            AdvertisementMessage.Builder()
+            Advertisement.Builder()
                 .type(MessageType.MESSAGE_MESSAGE)
                 .id(this.idGenerator.next())
                 .message(message.content)
@@ -101,17 +99,17 @@ class MeshController(
         closestNeighbour: Neighbour?,
         advertisementPackage: String
     ) {
-        val advertisementMessage =
-            AdvertisementMessage.Builder().rawMessage(message).build()
-        when (advertisementMessage.type) {
+        val advertisement =
+            Advertisement.Builder().rawMessage(message).build()
+        when (advertisement.type) {
             MessageType.MESSAGE_MESSAGE -> {
-                handleMessage(advertisementMessage)
+                handleMessage(advertisement)
             }
             MessageType.ACKNOWLEDGE_MESSAGE -> {
-                handleAcknowledgment(advertisementMessage)
+                handleAcknowledgment(advertisement)
             }
             MessageType.NEIGHBOUR_MESSAGE -> {
-                handleNeighbour(advertisementMessage, closestNeighbour)
+                handleNeighbour(advertisement, closestNeighbour)
             }
             else -> {
                 Log.w(
@@ -123,61 +121,61 @@ class MeshController(
     }
 
 
-    private fun handleAcknowledgment(advertisementMessage: AdvertisementMessage) {
-        if (this.ownProfile.address == advertisementMessage.receiver) {
+    private fun handleAcknowledgment(advertisement: Advertisement) {
+        if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received ack for this device")
-            this.observer.onMessageAck(advertisementMessage)
+            this.observer.onMessageAck(advertisement)
         } else {
             val nextTarget: String? =
-                this.neighbourTable.getClosestNeighbour(advertisementMessage.receiver as String)
+                this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
             if (nextTarget == null) {
                 Log.w(
                     TAG,
-                    "onMessage: cant forward message: $advertisementMessage ${advertisementMessage.receiver} is not reachable"
+                    "onMessage: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
                 )
             } else {
-                advertisementMessage.address = nextTarget
-                this.messageHandler.send(advertisementMessage.toString())
+                advertisement.address = nextTarget
+                this.messageHandler.send(advertisement.toString())
             }
         }
     }
 
-    private fun handleMessage(advertisementMessage: AdvertisementMessage) {
-        if (this.ownProfile.address == advertisementMessage.receiver) {
+    private fun handleMessage(advertisement: Advertisement) {
+        if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
-            this.observer.onMessage(advertisementMessage)
+            this.observer.onMessage(advertisement)
         } else {
             val nextTarget: String? =
-                this.neighbourTable.getClosestNeighbour(advertisementMessage.receiver as String)
+                this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
             if (nextTarget == null) {
                 Log.w(
                     TAG,
-                    "onMessage: cant forward message: $advertisementMessage ${advertisementMessage.receiver} is unknown"
+                    "onMessage: cant forward message: $advertisement ${advertisement.receiver} is unknown"
                 )
             } else {
-                advertisementMessage.address = nextTarget
-                this.messageHandler.send(advertisementMessage.toString())
+                advertisement.address = nextTarget
+                this.messageHandler.send(advertisement.toString())
             }
         }
     }
 
     private fun handleNeighbour(
-        advertisementMessage: AdvertisementMessage,
+        advertisement: Advertisement,
         closestNeighbour: Neighbour?
     ) {
-        advertisementMessage.decrementHop()
+        advertisement.decrementHop()
         val neighbour: Neighbour = Neighbour(
-            advertisementMessage.address!!,
-            advertisementMessage.rssi!!,
-            MAX_HOPS - advertisementMessage.hops!!,
+            advertisement.address!!,
+            advertisement.rssi!!,
+            MAX_HOPS - advertisement.hops!!,
             closestNeighbour!!.lastSeen,
             closestNeighbour
         )
         this.neighbourTable.updateNeighbour(neighbour)
-        this.observer.onNeighbour(advertisementMessage)
-        advertisementMessage.decrementHop()
-        if(advertisementMessage.hops!! >= 0){
-            this.messageHandler.send(advertisementMessage.toString())
+        this.observer.onNeighbour(advertisement)
+        advertisement.decrementHop()
+        if(advertisement.hops!! >= 0){
+            this.messageHandler.send(advertisement.toString())
         }
     }
 

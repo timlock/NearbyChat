@@ -3,7 +3,7 @@ package de.hsos.nearbychat.service.bluetooth.util
 import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.MessageType
 
-class AdvertisementMessage private constructor(
+class Advertisement private constructor(
     var type: MessageType? = null,
     var id: Char? = null,
     var hops: Int? = null,
@@ -15,8 +15,9 @@ class AdvertisementMessage private constructor(
     var description: String? = null,
     var color: Int? = null,
     var message: String? = null,
+    var timestamp: Long? = null,
 ) {
-    val TAG: String = AdvertisementMessage::class.java.simpleName
+    val TAG: String = Advertisement::class.java.simpleName
 
     fun decrementHop() = apply { this.hops = this.hops?.minus(1) }
 
@@ -59,6 +60,8 @@ class AdvertisementMessage private constructor(
                     .append(';')
                     .append(receiver)
                     .append(';')
+                    .append(timestamp)
+                    .append(';')
                     .append(message)
             }
             else -> {
@@ -81,8 +84,9 @@ class AdvertisementMessage private constructor(
         var description: String? = null,
         var color: Int? = null,
         var message: String? = null,
+        var timestamp: Long? = null
     ) {
-        private val TAG: String = AdvertisementMessage.Builder::class.java.simpleName
+        private val TAG: String = Advertisement.Builder::class.java.simpleName
         fun type(type: MessageType) = apply { this.type = type }
         fun id(id: Char) = apply { this.id = id }
         fun hops(hops: Int) = apply { this.hops = hops }
@@ -94,6 +98,7 @@ class AdvertisementMessage private constructor(
         fun description(description: String) = apply { this.description = description }
         fun color(color: Int) = apply { this.color = color }
         fun message(message: String) = apply { this.message = message }
+        fun timestamp(timestamp: Long) = apply {this.timestamp = timestamp}
         fun rawMessage(rawMessage: String) = apply {
             try {
                 this.type = MessageType.values().first { it.type == rawMessage[1] }
@@ -112,6 +117,9 @@ class AdvertisementMessage private constructor(
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
                         this.message = rawMessage.substring(lastSeparator, nextSeparator)
@@ -163,7 +171,7 @@ class AdvertisementMessage private constructor(
         }
 
         fun build() =
-            AdvertisementMessage(
+            Advertisement(
                 type,
                 id,
                 hops,
@@ -174,7 +182,8 @@ class AdvertisementMessage private constructor(
                 name,
                 description,
                 color,
-                message
+                message,
+                timestamp
             )
     }
 }

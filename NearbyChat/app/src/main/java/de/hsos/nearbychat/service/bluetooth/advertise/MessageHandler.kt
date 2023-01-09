@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 
 class MessageHandler(
-    private val broadCaster: Advertiser,
+    private val broadCaster: Client,
     val period: Long,
     private val sizeLimit: Int
 ) {
