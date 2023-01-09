@@ -6,13 +6,14 @@ import android.bluetooth.le.*
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.util.forEach
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
 
 class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, private val advertisingInterval: Int) :
-    Advertiser {
+    Client, Advertiser {
     private val TAG: String = BluetoothAdvertiser::class.java.simpleName
     private var advertiseUUID: ParcelUuid =
         ParcelUuid(UUID.fromString("e889813c-5d19-49e2-8bc4-d4596b4f5250"))
@@ -45,10 +46,11 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
         Log.d(TAG, "init: maximum message length: " + this.maxMessageLength)
     }
 
-    fun start(initialMessage: String = ""): Boolean {
+
+    override fun start(): Boolean {
         this.currentAdvertisingData = AdvertiseData.Builder()
             .addServiceUuid(advertiseUUID)
-            .addServiceData(advertiseUUID, initialMessage.encodeToByteArray())
+            .addServiceData(advertiseUUID, "".encodeToByteArray())
             .build()
         Log.i(TAG, "startAdvertising: currentAdvertisingData: $currentAdvertisingData)")
         Log.i(
@@ -74,13 +76,15 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
         }
     }
 
-    fun stop(){
+    override fun stop(){
         try {
             this.advertiser.stopAdvertisingSet(this.advertisingSetCallback)
         }catch (e: SecurityException){
             Log.w(TAG, "stop: ", e)
         }
     }
+
+    override fun getMaxMessageSize(): Int = this.maxMessageLength
 
     override fun send(message: String): Boolean {
         Log.d(TAG, "send() called with: message = $message")

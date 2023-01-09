@@ -1,4 +1,4 @@
-package de.hsos.nearbychat
+package de.hsos.nearbychat.app
 
 import android.Manifest
 import android.app.Activity

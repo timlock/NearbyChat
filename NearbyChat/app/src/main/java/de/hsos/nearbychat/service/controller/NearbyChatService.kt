@@ -2,17 +2,19 @@ package de.hsos.nearbychat.service.controller
 
 import android.app.Service
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.AdvertisingSetParameters
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.provider.Settings
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.MeshObserver
-import de.hsos.nearbychat.service.bluetooth.util.AdvertisementMessage
+import de.hsos.nearbychat.service.bluetooth.advertise.BluetoothAdvertiser
+import de.hsos.nearbychat.service.bluetooth.scan.BluetoothScanner
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 
 class NearbyChatService: Service(), MeshObserver {
     private val TAG: String = NearbyChatService::class.java.simpleName
@@ -30,7 +32,12 @@ class NearbyChatService: Service(), MeshObserver {
 
    fun start(ownProfile: OwnProfile){
        val bluetoothManager: BluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-       this.meshController = MeshController(this, bluetoothManager.adapter,ownProfile)
+       var advertiser: Advertiser =
+           BluetoothAdvertiser(bluetoothManager.adapter, AdvertisingSetParameters.INTERVAL_MEDIUM)
+       var scanner: BluetoothScanner =
+           BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)
+       this.meshController = MeshController(this, advertiser,ownProfile,scanner)
+
    }
 
     fun close() {
@@ -42,17 +49,15 @@ class NearbyChatService: Service(), MeshObserver {
     }
 
 
-    override fun onMessage(advertisementMessage: AdvertisementMessage) {
-        val intent: Intent = Intent()
-        intent.action = NearbyChatService.MESSAGE_ACTION
-
+    override fun onMessage(advertisement: Advertisement) {
+        val message: Message = Message(advertisement.sender!!,advertisement.message!!,advertisement.timestamp!!)
     }
 
-    override fun onMessageAck(advertisementMessage: AdvertisementMessage) {
+    override fun onMessageAck(advertisement: Advertisement) {
         TODO("Not yet implemented")
     }
 
-    override fun onNeighbour(advertisementMessage: AdvertisementMessage) {
+    override fun onNeighbour(advertisement: Advertisement) {
         TODO("Not yet implemented")
     }
 

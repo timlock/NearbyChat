@@ -8,13 +8,13 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 
-class MessageHandler(
-    private val broadCaster: Advertiser,
+class AdvertisementExecutor(
+    private val broadCaster: Client,
     val period: Long,
     private val sizeLimit: Int
 ) {
-    private val TAG: String = MessageHandler::class.java.simpleName
-    private var messageExecutor: ScheduledExecutorService =
+    private val TAG: String = AdvertisementExecutor::class.java.simpleName
+    private var scheduledExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
     private var isActive: Boolean = false
     private var messageQueue: MutableList<String> = LinkedList()
@@ -27,7 +27,7 @@ class MessageHandler(
             false
         } else {
             Log.d(TAG, "start: ")
-            this.messageExecutor.scheduleAtFixedRate(
+            this.scheduledExecutor.scheduleAtFixedRate(
                 this::broadcast,
                 0,
                 this.period,
@@ -40,7 +40,7 @@ class MessageHandler(
     fun stop() {
         if (this.isActive) {
             Log.d(TAG, "stop: ")
-            this.messageExecutor.shutdown()
+            this.scheduledExecutor.shutdown()
         } else {
             Log.d(TAG, "stop: could not stop is inactive")
         }
