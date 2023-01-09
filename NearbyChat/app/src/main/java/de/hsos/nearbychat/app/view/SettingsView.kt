@@ -1,6 +1,5 @@
 package de.hsos.nearbychat.app.view
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Switch
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import de.hsos.nearbychat.R
 

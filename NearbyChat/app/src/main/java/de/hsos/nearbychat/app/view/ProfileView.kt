@@ -110,7 +110,7 @@ class ProfileView : Fragment() {
 
     private fun changeColor(id: Int, profile: OwnProfile) {
         profile.color = id
-        colorPreview.setBackgroundColor(ContextCompat.getColor(requireContext(), MainActivity.getUserColorRes(id)))
+        colorPreview.setBackgroundColor(ContextCompat.getColor(requireContext(), Application.getUserColorRes(id)))
     }
 
     companion object {

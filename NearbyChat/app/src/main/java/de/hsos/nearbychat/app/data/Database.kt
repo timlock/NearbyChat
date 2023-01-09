@@ -7,7 +7,7 @@ import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 
-@androidx.room.Database(entities = arrayOf(Message::class, Profile::class, OwnProfile::class), version = 1, exportSchema = false)
+@androidx.room.Database(entities = [Message::class, Profile::class, OwnProfile::class], version = 1, exportSchema = false)
 abstract class Database: RoomDatabase() {
     abstract fun messageDao(): MessageDao
     abstract fun profileDao(): ProfileDao

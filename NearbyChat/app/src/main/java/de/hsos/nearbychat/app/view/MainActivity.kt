@@ -4,13 +4,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.PermissionManager
@@ -190,35 +188,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.deleteSavedProfile("address-$i")
             viewModel.deleteMessages("address-$i")
             if(i % 2 == 0) viewModel.deleteAvailableProfile("address-$i")
-        }
-    }
-
-    companion object {
-        fun getUserColorRes(id: Int): Int {
-            var color = R.color.profile_0
-            when(id) {
-                1 -> color = R.color.profile_1
-                2 -> color = R.color.profile_2
-                3 -> color = R.color.profile_3
-                4 -> color = R.color.profile_4
-                5 -> color = R.color.profile_5
-                6 -> color = R.color.profile_6
-                7 -> color = R.color.profile_7
-                8 -> color = R.color.profile_8
-                9 -> color = R.color.profile_9
-            }
-            return color
-        }
-
-        fun getSignalStrengthIcon(id: Int): Int {
-            var drawable = R.drawable.ic_baseline_signal_wifi_0_bar_24
-            when(id) {
-                1 -> drawable = R.drawable.ic_baseline_network_wifi_1_bar_24
-                2 -> drawable = R.drawable.ic_baseline_network_wifi_2_bar_24
-                3 -> drawable = R.drawable.ic_baseline_network_wifi_3_bar_24
-                4 -> drawable = R.drawable.ic_baseline_signal_wifi_4_bar_24
-            }
-            return drawable
         }
     }
 }

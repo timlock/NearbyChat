@@ -3,7 +3,6 @@ package de.hsos.nearbychat.app.view
 import MessageAdapter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -44,12 +43,12 @@ class ChatActivity : AppCompatActivity() {
                     val signalStrength = findViewById<ImageView>(R.id.chat_user_signal_strength)
                     symbol.setColorFilter(
                         ResourcesCompat.getColor(resources,
-                            MainActivity.getUserColorRes(profile.color), null
+                            Application.getUserColorRes(profile.color), null
                         ))
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
-                            MainActivity.getSignalStrengthIcon(profile.signalStrength0to4())
+                            Application.getSignalStrengthIcon(profile.signalStrength0to4())
                         )
                     )
                 }

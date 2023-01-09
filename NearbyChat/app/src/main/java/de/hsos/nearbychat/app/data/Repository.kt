@@ -1,10 +1,8 @@
 package de.hsos.nearbychat.app.data
 
-import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
