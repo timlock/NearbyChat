@@ -105,7 +105,6 @@ class Repository(database: Database) {
                     updateProfile(savedProfile)
                 }
                 foundProfile = true
-                return@forEach
             }
         }
         if(!foundProfile) {
@@ -114,7 +113,6 @@ class Repository(database: Database) {
             availableList.forEach { availableProfile ->
                 if(message.address == availableProfile.address) {
                     profile = availableProfile
-                    return@forEach
                 }
             }
             if(profile == null) {
