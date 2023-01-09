@@ -63,7 +63,9 @@ class ChatActivity : AppCompatActivity() {
         val adapter = MessageAdapter(this)
 
         viewModel.getMessages(address).observe(this) { messages ->
-            messages.let { adapter.messages = messages }
+            messages.let {
+                adapter.messages = messages
+            }
         }
 
         recyclerView.adapter = adapter
