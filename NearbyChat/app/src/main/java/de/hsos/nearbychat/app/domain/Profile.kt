@@ -13,6 +13,8 @@ class Profile(@PrimaryKey val address: String) {
     var color: Int = 0
     var lastInteraction: Long = Long.MIN_VALUE
     @Ignore
+    var unread: Boolean = false
+    @Ignore
     var rssi: Int = Int.MIN_VALUE
     @Ignore
     var hopCount: Int = 0

@@ -22,7 +22,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
     }
 
     fun getSavedProfile(macAddress: String): LiveData<Profile> {
-        return repository.getProfile(macAddress)
+        return repository.getSavedProfile(macAddress)
     }
 
     fun deleteSavedProfile(macAddress: String) = viewModelScope.launch {
