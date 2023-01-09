@@ -28,27 +28,26 @@ class ChatActivity : AppCompatActivity() {
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
         val recyclerView: RecyclerView = findViewById(R.id.chat_messages_recycler)
 
-        viewModel.getSavedProfile(address).observe(this) {
+        viewModel.savedProfiles.observe(this) {
+            it.forEach {
+                if(it.address == address) {
+                    findViewById<TextView>(R.id.chat_user_name).text = it.name
+                    findViewById<TextView>(R.id.chat_user_message).text = it.description
 
-            findViewById<TextView>(R.id.chat_user_name).text = it.name
-            findViewById<TextView>(R.id.chat_user_message).text = it.description
-
-            val symbol = findViewById<ImageView>(R.id.chat_user_symbol)
-            val signalStrength = findViewById<ImageView>(R.id.chat_user_signal_strength)
-            symbol.setColorFilter(
-                ResourcesCompat.getColor(resources,
-                    MainActivity.getUserColorRes(it.color), null
-                ))
-            signalStrength.setImageDrawable(
-                AppCompatResources.getDrawable(
-                    this,
-                    MainActivity.getSignalStrengthIcon(it.signalStrength0to4())
-                )
-            )
-        }
-
-        viewModel.availableProfiles.observe(this) { profiles ->
-            profiles.let {} //TODO: profile, wenn verfügbar angepasst anzeigen
+                    val symbol = findViewById<ImageView>(R.id.chat_user_symbol)
+                    val signalStrength = findViewById<ImageView>(R.id.chat_user_signal_strength)
+                    symbol.setColorFilter(
+                        ResourcesCompat.getColor(resources,
+                            MainActivity.getUserColorRes(it.color), null
+                        ))
+                    signalStrength.setImageDrawable(
+                        AppCompatResources.getDrawable(
+                            this,
+                            MainActivity.getSignalStrengthIcon(it.signalStrength0to4())
+                        )
+                    )
+                }
+            }
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)

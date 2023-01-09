@@ -1,17 +1,20 @@
+import android.annotation.SuppressLint
 import android.content.Context
 import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.view.MainActivity
+
 
 class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<ChatUserAdapter.ViewHolder>()
 {
@@ -28,6 +31,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
         val userLastInteraction: TextView = itemView.findViewById(R.id.chats_user_last_interaction)
         val symbol: ImageView = itemView.findViewById(R.id.chats_user_symbol)
         val signalStrength: ImageView = itemView.findViewById(R.id.chats_user_signal_strength)
+        val layout: View = itemView.findViewById(R.id.chats_user_layout)
         var profile: Profile? = null
 
         init {
@@ -63,6 +67,23 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
                 context,
                 MainActivity.getSignalStrengthIcon(profile.signalStrength0to4())
             )
+        )
+        val typedValue = TypedValue()
+        if(profile.unread) {
+            context.theme.resolveAttribute(
+                com.google.android.material.R.attr.colorPrimary,
+                typedValue,
+                true
+            )
+        } else {
+            context.theme.resolveAttribute(
+                com.google.android.material.R.attr.colorOnPrimary,
+                typedValue,
+                true
+            )
+        }
+        viewHolder.layout.setBackgroundColor(
+            typedValue.data
         )
         viewHolder.profile = profile
     }

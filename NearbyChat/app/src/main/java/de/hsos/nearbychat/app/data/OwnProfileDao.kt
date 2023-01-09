@@ -13,5 +13,5 @@ interface OwnProfileDao {
     fun get(): LiveData<OwnProfile?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(ownProfile: OwnProfile)
+    suspend fun update(ownProfile: OwnProfile)
 }

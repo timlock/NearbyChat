@@ -14,33 +14,15 @@ class ViewModel(private val repository: Repository) : ViewModel(){
     val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
 
     fun updateOwnProfile(ownProfile: OwnProfile) = viewModelScope.launch {
-        repository.insertOwnProfile(ownProfile)
+        repository.updateOwnProfile(ownProfile)
     }
 
     fun updateSavedProfile(profile: Profile) = viewModelScope.launch {
         repository.insertProfile(profile)
     }
 
-    fun getSavedProfile(macAddress: String): LiveData<Profile> {
-        return repository.getSavedProfile(macAddress)
-    }
-
     fun deleteSavedProfile(macAddress: String) = viewModelScope.launch {
         repository.deleteProfile(macAddress)
-    }
-
-    fun getAvailableProfile(macAddress: String, lifecycleOwner: LifecycleOwner) : LiveData<Profile?> { //TODO: Funktioniert vermutlich nicht, daher löschen
-        val profile: LiveData<Profile?> = MutableLiveData()
-        availableProfiles.observe(lifecycleOwner) { profiles ->
-            profiles.let {
-                for(p in it) {
-                    if(p.address == macAddress) {
-                        (profile as MutableLiveData<Profile?>).value = p
-                    }
-                }
-            }
-        }
-        return profile
     }
 
     fun updateAvailableProfile(profile: Profile) {
@@ -52,12 +34,12 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         for (i in 0 until list.size) {
             if(list[i].address == profile.address) {
                 list[i] = profile
-                (availableProfiles as MutableLiveData<List<Profile>>).value = list
+                (availableProfiles as MutableLiveData).value = list
                 return
             }
         }
         list.add(profile)
-        (availableProfiles as MutableLiveData<List<Profile>>).value = list
+        (availableProfiles as MutableLiveData).value = list
 
     }
 

@@ -15,11 +15,11 @@ interface ProfileDao {
     @Query("SELECT * FROM Profile WHERE address = :macAddress")
     fun get(macAddress: String): LiveData<Profile>
 
-    @Query("SELECT * FROM Profile WHERE address = :macAddress")
-    fun getNonLive(macAddress: String): Profile
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(profile: Profile)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(profile: Profile)
+    suspend fun update(profile: Profile)
 
     @Query("DELETE FROM Profile WHERE address = :macAddress")
     suspend fun delete(macAddress: String)
