@@ -16,7 +16,11 @@ class Repository(database: Database) {
     val savedProfiles: LiveData<List<Profile>> = profileDao.get()
     val ownProfile: LiveData<OwnProfile?> = ownProfileDao.get()
 
-    fun getProfile(macAddress: String): LiveData<Profile> {
+    fun getSavedProfileNonLive(macAddress: String): Profile {
+        return profileDao.getNonLive(macAddress)
+    }
+
+    fun getSavedProfile(macAddress: String): LiveData<Profile> {
         return profileDao.get(macAddress)
     }
 
