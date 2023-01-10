@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit
 class AdvertisementExecutor(
     private val broadCaster: Client,
     val period: Long,
-    private val sizeLimit: Int
+    private val sizeLimit: Int,
+    private val advertisementQueue: AdvertisementQueue
 ) {
     private val TAG: String = AdvertisementExecutor::class.java.simpleName
     private var scheduledExecutor: ScheduledExecutorService =
@@ -48,19 +49,27 @@ class AdvertisementExecutor(
     }
 
     private fun broadcast() {
-        var sendCounter: Int = 0
-        val packageBuilder: StringBuilder = StringBuilder()
-            .append(this.idGenerator.next())
-            .append(':')
-        while (packageBuilder.length < this.sizeLimit && this.messageQueue.isNotEmpty()) {
-            val msg = this.messageQueue.removeFirst()
+        var counter: Int = 0
+        var advertisementCounter: Int = 0
+        val packageBuilder = StringBuilder().append(this.idGenerator.next()).append(':')
+        while (packageBuilder.length < this.sizeLimit
+            && (this.messageQueue.isNotEmpty()
+            || (advertisementCounter < this.advertisementQueue.getSize()))
+        ) {
+            var msg: String? = null
+            if (this.messageQueue.isNotEmpty()) {
+                msg = this.messageQueue.removeFirst()
+            } else {
+                msg = this.advertisementQueue.getNextElement()!!.advertisement.toString()
+                advertisementCounter++
+            }
             if (msg.length + packageBuilder.length > this.sizeLimit) {
                 this.messageQueue.add(0, msg.substring(this.sizeLimit - packageBuilder.length))
                 packageBuilder.append(msg.substring(0, this.sizeLimit - packageBuilder.length))
             } else {
                 packageBuilder.append(msg)
             }
-            sendCounter++
+            counter++
 
         }
         if (packageBuilder.length > 2) {
@@ -68,12 +77,13 @@ class AdvertisementExecutor(
         }
         Log.d(
             TAG,
-            "broadcast: Send $sendCounter messages, ${this.messageQueue.size} messages are remaining"
+            "broadcast: Send $counter messages, ${this.messageQueue.size} messages are remaining"
         )
+        Log.d(TAG, "broadcast: Send $advertisementCounter advertisements")
 
     }
 
-    fun send(message: String) {
+    fun addToQueue(message: String) {
         Log.d(TAG, "send: $message")
         this.messageQueue.add(message)
     }

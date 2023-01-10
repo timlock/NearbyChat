@@ -27,7 +27,8 @@ class MeshController(
         this.advertisementExecutor = AdvertisementExecutor(
             this.advertiser as Client,
             AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
-            this.advertiser.getMaxMessageSize()
+            this.advertiser.getMaxMessageSize(),
+            this.neighbourTable
         )
         this.scanner.subscribe(this)
     }
@@ -54,7 +55,7 @@ class MeshController(
     }
 
     fun sendMessage(message: Message) {
-        this.advertisementExecutor.send(
+        this.advertisementExecutor.addToQueue(
             Advertisement.Builder()
                 .type(MessageType.MESSAGE_MESSAGE)
                 .id(this.idGenerator.next())
@@ -133,7 +134,7 @@ class MeshController(
                 )
             } else {
                 advertisement.address = nextTarget
-                this.advertisementExecutor.send(advertisement.toString())
+                this.advertisementExecutor.addToQueue(advertisement.toString())
             }
         }
     }
@@ -152,7 +153,7 @@ class MeshController(
                 )
             } else {
                 advertisement.address = nextTarget
-                this.advertisementExecutor.send(advertisement.toString())
+                this.advertisementExecutor.addToQueue(advertisement.toString())
             }
         }
     }
@@ -162,18 +163,19 @@ class MeshController(
         closestNeighbour: Neighbour?
     ) {
         advertisement.decrementHop()
-        val neighbour: Neighbour = Neighbour(
-            advertisement.address!!,
-            advertisement.rssi!!,
-            MAX_HOPS - advertisement.hops!!,
-            closestNeighbour!!.lastSeen,
-            closestNeighbour
-        )
-        this.neighbourTable.updateNeighbour(neighbour)
-        this.observer.onNeighbour(advertisement)
-        advertisement.decrementHop()
-        if(advertisement.hops!! >= 0){
-            this.advertisementExecutor.send(advertisement.toString())
+        if(advertisement.hops!! < 0) {
+            return
+        }else {
+            val neighbour: Neighbour = Neighbour(
+                advertisement.address!!,
+                advertisement.rssi!!,
+                advertisement.hops!!,
+                closestNeighbour!!.lastSeen,
+                closestNeighbour,
+                advertisement
+            )
+            this.neighbourTable.updateNeighbour(neighbour)
+            this.observer.onNeighbour(advertisement)
         }
     }
 
@@ -181,6 +183,4 @@ class MeshController(
         const val MAX_HOPS: Int = 10
         const val TIMEOUT: Long = 5000L
     }
-
-
 }
