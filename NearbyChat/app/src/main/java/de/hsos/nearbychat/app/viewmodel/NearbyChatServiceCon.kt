@@ -27,6 +27,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun startService(context: Context, ownProfile: OwnProfile) {
+        Log.d(TAG, "startService: ")
         val filterServiceStarted: IntentFilter =  IntentFilter(NearbyChatService.PROFILE_ACTION)
         context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
         this.ownProfile = ownProfile

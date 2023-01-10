@@ -141,7 +141,9 @@ class Repository(database: Database) {
         ownProfileDao.update(ownProfile)
     }
 
-    fun getOwnProfile(): OwnProfile? {
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getOwnProfile(): OwnProfile? {
         return ownProfileDao.getRaw()
     }
 

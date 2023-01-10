@@ -8,7 +8,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.domain.Profile
 
 class AvailableUserAdapter (private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<AvailableUserAdapter.ViewHolder>()
@@ -49,9 +49,9 @@ class AvailableUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Rec
         viewHolder.userDesc.text = profile.description
         viewHolder.symbol.setColorFilter(
             ResourcesCompat.getColor(context.resources,
-                Application.getUserColorRes(profile.color), null
+                NearbyApplication.getUserColorRes(profile.color), null
             ))
-        viewHolder.signalStrength.setImageDrawable(AppCompatResources.getDrawable(context, Application.getSignalStrengthIcon(profile.signalStrength0to4())))
+        viewHolder.signalStrength.setImageDrawable(AppCompatResources.getDrawable(context, NearbyApplication.getSignalStrengthIcon(profile.signalStrength0to4())))
         viewHolder.profile = profile
     }
 

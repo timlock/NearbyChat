@@ -12,15 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 
 class ChatsView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
         ViewModel.ViewModelFactory(
-            (activity?.application as Application).repository,
-            activity?.application as Application
+            (activity?.application as NearbyApplication).repository,
+            activity?.application as NearbyApplication
         )
     }
 

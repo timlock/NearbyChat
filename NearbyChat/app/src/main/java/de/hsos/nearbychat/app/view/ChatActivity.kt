@@ -2,8 +2,6 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -13,12 +11,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
@@ -29,7 +25,7 @@ import java.time.Instant
 class ChatActivity : AppCompatActivity() {
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((application as Application).repository, application)
+        ViewModel.ViewModelFactory((application as NearbyApplication).repository, application)
     }
 
 
@@ -60,13 +56,13 @@ class ChatActivity : AppCompatActivity() {
                     symbol.setColorFilter(
                         ResourcesCompat.getColor(
                             resources,
-                            Application.getUserColorRes(profile.color), null
+                            NearbyApplication.getUserColorRes(profile.color), null
                         )
                     )
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
-                            Application.getSignalStrengthIcon(profile.signalStrength0to4())
+                            NearbyApplication.getSignalStrengthIcon(profile.signalStrength0to4())
                         )
                     )
                 }

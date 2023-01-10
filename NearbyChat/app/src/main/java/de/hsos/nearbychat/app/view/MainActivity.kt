@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.PermissionManager
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: String? = null
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((application as Application).repository, application)
+        ViewModel.ViewModelFactory((application as NearbyApplication).repository, application)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

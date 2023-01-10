@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
@@ -25,7 +25,7 @@ class NearbyChatService : Service(), MeshObserver {
     private val TAG: String = NearbyChatService::class.java.simpleName
     private val binder = LocalBinder()
     private lateinit var meshController: MeshController
-    private var repository: Repository = (application as Application).repository
+    private var repository: Repository = (application as NearbyApplication).repository
 
     inner class LocalBinder : Binder() {
         fun getService(): NearbyChatService = this@NearbyChatService

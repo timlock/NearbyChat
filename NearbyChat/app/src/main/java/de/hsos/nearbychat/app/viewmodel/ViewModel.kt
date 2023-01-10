@@ -5,6 +5,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.data.OwnProfileDao
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
@@ -15,26 +16,10 @@ import kotlinx.coroutines.runBlocking
 import kotlin.math.log
 
 
-class ViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application), NearbyChatObserver{
+class ViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application){
     val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
     val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
-    private val chatServiceCon : NearbyChatServiceCon = NearbyChatServiceCon(this)
-    val TAG: String = ViewModel::class.java.simpleName
-
-    init{
-        runBlocking {
-            launch {
-                var ownProfile: OwnProfile? = this@ViewModel.repository.getOwnProfile()
-                if(ownProfile == null) {
-                    ownProfile = OwnProfile(Settings.Secure.getString(getApplication<Application>().getContentResolver(), Settings.Secure.ANDROID_ID))
-                    repository.updateOwnProfile(ownProfile)
-                }
-                this@ViewModel.chatServiceCon.startService(application.applicationContext,ownProfile)
-
-            }
-        }
-    }
 
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
         val profile = repository.ownProfile.value!!
@@ -89,7 +74,7 @@ class ViewModel(private val repository: Repository, application: Application) : 
 
     fun addMessage(message: Message) = viewModelScope.launch {
         repository.insertMessage(message)
-        this@ViewModel.chatServiceCon.sendMessage(message)
+        getApplication<NearbyApplication>().chatServiceCon.sendMessage(message)
     }
 
     fun deleteMessages(macAddress: String) = viewModelScope.launch {
@@ -102,16 +87,4 @@ class ViewModel(private val repository: Repository, application: Application) : 
             return ViewModel(repository, application) as T
         }
     }
-
-    override fun onBound() {
-        Log.d(TAG, "onBound: ")
-    }
-
-    override fun onProfile(profile: Profile) {
-        Log.d(TAG, "onProfile() called with: profile = $profile")
-        val tmpList = this.repository.availableProfiles.value as MutableList
-        tmpList.add(profile)
-        (this.repository.availableProfiles as MutableLiveData).value = tmpList
-    }
-
 }
