@@ -2,14 +2,18 @@ package de.hsos.nearbychat.app.viewmodel
 
 import android.app.Application
 import android.provider.Settings
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
+import de.hsos.nearbychat.app.application.NearbyApplication
+import de.hsos.nearbychat.app.data.OwnProfileDao
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.runBlocking
+import kotlin.math.log
 
 
 class ViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application){
@@ -18,10 +22,7 @@ class ViewModel(private val repository: Repository, application: Application) : 
     val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
 
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
-        var profile = repository.ownProfile.value
-        if(profile == null) {
-            profile = OwnProfile(Settings.Secure.getString(getApplication<Application>().getContentResolver(), Settings.Secure.ANDROID_ID))
-        }
+        val profile = repository.ownProfile.value!!
         profile.name = name
         profile.description = description
         profile.color = color
@@ -73,6 +74,7 @@ class ViewModel(private val repository: Repository, application: Application) : 
 
     fun addMessage(message: Message) = viewModelScope.launch {
         repository.insertMessage(message)
+        getApplication<NearbyApplication>().chatServiceCon.sendMessage(message)
     }
 
     fun deleteMessages(macAddress: String) = viewModelScope.launch {
@@ -85,5 +87,4 @@ class ViewModel(private val repository: Repository, application: Application) : 
             return ViewModel(repository, application) as T
         }
     }
-
 }

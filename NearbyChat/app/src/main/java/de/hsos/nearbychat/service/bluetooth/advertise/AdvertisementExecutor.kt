@@ -1,6 +1,7 @@
 package de.hsos.nearbychat.service.bluetooth.advertise
 
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
 import java.util.*
 import java.util.concurrent.Executors
@@ -12,7 +13,7 @@ class AdvertisementExecutor(
     private val broadCaster: Client,
     val period: Long,
     private val sizeLimit: Int,
-    private val advertisementQueue: AdvertisementQueue
+    private val advertisementQueue: AdvertisementQueue,
 ) {
     private val TAG: String = AdvertisementExecutor::class.java.simpleName
     private var scheduledExecutor: ScheduledExecutorService =
@@ -54,7 +55,7 @@ class AdvertisementExecutor(
         val packageBuilder = StringBuilder().append(this.idGenerator.next()).append(':')
         while (packageBuilder.length < this.sizeLimit
             && (this.messageQueue.isNotEmpty()
-            || (advertisementCounter < this.advertisementQueue.getSize()))
+                    || (advertisementCounter < this.advertisementQueue.getSize()))
         ) {
             var msg: String? = null
             if (this.messageQueue.isNotEmpty()) {

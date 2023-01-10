@@ -27,6 +27,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun startService(context: Context, ownProfile: OwnProfile) {
+        Log.d(TAG, "startService: ")
         val filterServiceStarted: IntentFilter =  IntentFilter(NearbyChatService.PROFILE_ACTION)
         context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
         this.ownProfile = ownProfile
@@ -37,7 +38,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun closeService(context: Context){
-        this.nearbyChatService.close()
+        this.nearbyChatService.stop()
         context.unbindService(this)
         context.unregisterReceiver(this.broadcastReceiver)
     }
@@ -62,7 +63,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                         val advertisement: Advertisement = Advertisement.Builder()
                             .rawMessage(param)
                             .build()
-                        var profile: Profile = Profile(advertisement.address!!)
+                        val profile: Profile = Profile(advertisement.address!!)
                         profile.name = advertisement.name!!
                         profile.description = advertisement.description!!
                         profile.hopCount = advertisement.hops!!

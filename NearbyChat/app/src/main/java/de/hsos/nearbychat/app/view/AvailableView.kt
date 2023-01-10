@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
 
@@ -18,8 +18,8 @@ import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
 class AvailableView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
-        ViewModelFactory((activity?.application as Application).repository,
-            activity?.application as Application
+        ViewModelFactory((activity?.application as NearbyApplication).repository,
+            activity?.application as NearbyApplication
         )
     }
 

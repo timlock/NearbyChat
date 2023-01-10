@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 
 
@@ -27,8 +27,8 @@ class ProfileView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
         ViewModel.ViewModelFactory(
-            (activity?.application as Application).repository,
-            activity?.application as Application
+            (activity?.application as NearbyApplication).repository,
+            activity?.application as NearbyApplication
         )
     }
 

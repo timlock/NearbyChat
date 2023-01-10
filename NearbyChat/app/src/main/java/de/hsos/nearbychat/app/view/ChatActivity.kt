@@ -14,7 +14,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
@@ -25,7 +25,7 @@ import java.time.Instant
 class ChatActivity : AppCompatActivity() {
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((application as Application).repository, application)
+        ViewModel.ViewModelFactory((application as NearbyApplication).repository, application)
     }
 
 
@@ -59,13 +59,13 @@ class ChatActivity : AppCompatActivity() {
                     symbol.setColorFilter(
                         ResourcesCompat.getColor(
                             resources,
-                            Application.getUserColorRes(profile.color), null
+                            NearbyApplication.getUserColorRes(profile.color), null
                         )
                     )
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
-                            Application.getSignalStrengthIcon(profile.getSignalStrength0to4())
+                            NearbyApplication.getSignalStrengthIcon(profile.getSignalStrength0to4())
                         )
                     )
                 }

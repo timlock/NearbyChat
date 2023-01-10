@@ -50,6 +50,8 @@ class Advertisement private constructor(
                     .append(sender)
                     .append(';')
                     .append(receiver)
+                    .append(';')
+                    .append(timestamp)
             }
             MessageType.MESSAGE_MESSAGE -> {
                 builder.append(id)
@@ -127,17 +129,19 @@ class Advertisement private constructor(
                     MessageType.ACKNOWLEDGE_MESSAGE -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.id =
-                            rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        this.id = rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf('}')
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                     }
                     MessageType.NEIGHBOUR_MESSAGE -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1

@@ -37,8 +37,9 @@ class AdvertisementTest {
             .address("address")
             .sender("sender")
             .receiver("receiver")
+            .timestamp(0L)
             .build()
-        var excepted: String = "{A:0;address;sender;receiver}"
+        var excepted: String = "{A:0;address;sender;receiver;0}"
         var actual: String = advertisement.toString()
         assertEquals(excepted, actual)
         actual = Advertisement.Builder().rawMessage(excepted).build().toString()
