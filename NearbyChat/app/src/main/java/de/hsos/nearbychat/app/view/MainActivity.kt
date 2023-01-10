@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
             profile.name = "name-$i"
             profile.color = i
             profile.description = "description-$i"
-            if(i % 5 == 0) profile.unread = true
+            if(i % 5 == 0) profile.isUnread = true
             for(j in 0..19) {
                 val offset: Long = Timestamp.valueOf("2020-01-01 00:00:00").time
                 val end: Long = Timestamp.valueOf("2020-03-03 00:00:00").time

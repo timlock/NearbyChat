@@ -2,7 +2,6 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
-import android.widget.AbsListView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -90,8 +89,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun checkUnread() {
-        if (profile != null && profile!!.unread) {
-            profile!!.unread = false
+        if (profile != null && profile!!.isUnread) {
+            profile!!.isUnread = false
             viewModel.updateSavedProfile(profile!!)
         }
     }

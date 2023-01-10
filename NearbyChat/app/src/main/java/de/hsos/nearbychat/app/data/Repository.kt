@@ -101,7 +101,7 @@ class Repository(database: Database) {
             if(message.address == savedProfile.address) {
                 if(!message.isSelfAuthored) {
                     // set unread if message is not self authored
-                    savedProfile.unread = true
+                    savedProfile.isUnread = true
                     updateProfile(savedProfile)
                 }
                 foundProfile = true
@@ -121,7 +121,7 @@ class Repository(database: Database) {
             }
             if(!message.isSelfAuthored) {
                 // set unread if message is not self authored
-                profile!!.unread = true
+                profile!!.isUnread = true
                 insertProfile(profile!!)
             }
         }
