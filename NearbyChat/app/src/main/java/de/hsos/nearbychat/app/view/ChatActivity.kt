@@ -2,6 +2,7 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
+import android.widget.AbsListView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -14,6 +15,7 @@ import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
+
 
 class ChatActivity : AppCompatActivity() {
 
@@ -68,20 +70,30 @@ class ChatActivity : AppCompatActivity() {
             messages.let {
                 adapter.messages = messages
                 if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
-                    recyclerView.scrollToPosition(messages.size - 1)
+                    recyclerView.scrollToPosition(adapter.messages.size - 1)
+                    checkUnread()
                 }
             }
         }
 
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                    checkUnread()
+                }
+            }
+
+        })
+
         recyclerView.adapter = adapter
     }
 
-    override fun onPause() {
+    private fun checkUnread() {
         if (profile != null && profile!!.unread) {
             profile!!.unread = false
             viewModel.updateSavedProfile(profile!!)
         }
-        super.onPause()
     }
 
     companion object {
