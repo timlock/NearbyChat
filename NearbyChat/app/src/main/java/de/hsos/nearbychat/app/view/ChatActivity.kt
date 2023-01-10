@@ -4,6 +4,8 @@ import MessageAdapter
 import android.opengl.Visibility
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,8 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
+import java.sql.Timestamp
+import java.time.Instant
 
 
 class ChatActivity : AppCompatActivity() {
@@ -95,6 +100,16 @@ class ChatActivity : AppCompatActivity() {
         }
 
         recyclerView.adapter = adapter
+
+        findViewById<ImageButton>(R.id.chat_send_message).setOnClickListener {
+            val editText = findViewById<EditText>(R.id.chat_new_message)
+            if(editText.text.toString().isNotEmpty() && profile != null) {
+                val message = Message(profile!!.address, editText.text.toString(), Timestamp.from(Instant.now()).time)
+                message.isSelfAuthored = true
+                viewModel.addMessage(message)
+                editText.text.clear()
+            }
+        }
     }
 
     private fun updateScrollPos(recyclerView: RecyclerView) {

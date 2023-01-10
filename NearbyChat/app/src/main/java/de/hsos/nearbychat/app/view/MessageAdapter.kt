@@ -57,12 +57,12 @@ class MessageAdapter (private val context: Context?) : RecyclerView.Adapter<Mess
         if(message.isSelfAuthored) {
             contentView = viewHolder.textOut
             timeView = viewHolder.timeOut
-            viewHolder.messageIn?.visibility = View.INVISIBLE
+            viewHolder.messageIn?.visibility = View.GONE
             viewHolder.messageOut?.visibility = View.VISIBLE
         } else {
             contentView = viewHolder.textIn
             timeView = viewHolder.timeIn
-            viewHolder.messageOut?.visibility = View.INVISIBLE
+            viewHolder.messageOut?.visibility = View.GONE
             viewHolder.messageIn?.visibility = View.VISIBLE
         }
 
@@ -75,15 +75,16 @@ class MessageAdapter (private val context: Context?) : RecyclerView.Adapter<Mess
         timeView?.text = timeFormat.format(message.timeStamp)
 
         if(position > 0 && internFormat.format(message.timeStamp) == internFormat.format(messages[position - 1].timeStamp)) {
-            viewHolder.date?.text = ""
+            viewHolder.date?.visibility = View.GONE
         } else {
+            viewHolder.date?.visibility = View.VISIBLE
             viewHolder.date?.text = dateFormat.format(message.timeStamp)
         }
 
         if(message.isReceived) {
             viewHolder.received?.visibility = View.VISIBLE
         } else {
-            viewHolder.received?.visibility = View.INVISIBLE
+            viewHolder.received?.visibility = View.GONE
         }
     }
 

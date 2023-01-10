@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferences = getSharedPreferences("APP_SETTINGS", MODE_PRIVATE)
         currentFragment = savedInstanceState?.getString("currentFragmentName")
+
+        toolbar = supportActionBar!!
         
         clearDatabaseFromTestData()
         fillDatabaseWithTestData()
@@ -53,30 +55,24 @@ class MainActivity : AppCompatActivity() {
             openFragment(AvailableView.newInstance())
         }
 
-        toolbar = supportActionBar!!
-        toolbar.setSubtitle(R.string.available_desc)
 
         bottomNavView = findViewById(R.id.bottom_navigation_view)
         bottomNavView.setOnItemSelectedListener {
             supportFragmentManager.popBackStackImmediate() // prevent something remaining on backstack
             when (it.itemId) {
                 R.id.available_tab -> {
-                    toolbar.setSubtitle(R.string.available_desc)
                     openFragment(AvailableView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.chats_tab -> {
-                    toolbar.setSubtitle(R.string.chats_desc)
                     openFragment(ChatsView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.profile_tab -> {
-                    toolbar.setSubtitle(R.string.profile_desc)
                     openFragment(ProfileView.newInstance())
                     return@setOnItemSelectedListener true
                 }
                 R.id.settings_tab -> {
-                    toolbar.setSubtitle(R.string.settings_desc)
                     openFragment(SettingsView.newInstance())
                     return@setOnItemSelectedListener true
                 }
@@ -96,6 +92,12 @@ class MainActivity : AppCompatActivity() {
         transaction.replace(R.id.nav_host_layout, fragment)
         transaction.commit()
         currentFragment = fragment::class.simpleName!!
+        when(fragment) {
+            is AvailableView -> toolbar.setSubtitle(R.string.available_desc)
+            is ChatsView -> toolbar.setSubtitle(R.string.chats_desc)
+            is ProfileView -> toolbar.setSubtitle(R.string.profile_desc)
+            is SettingsView -> toolbar.setSubtitle(R.string.settings_desc)
+        }
     }
 
     fun openChat(profile: Profile) {
