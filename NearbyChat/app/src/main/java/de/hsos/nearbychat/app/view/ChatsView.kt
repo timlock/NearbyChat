@@ -34,7 +34,9 @@ class ChatsView : Fragment() {
         }
 
         viewModel.savedProfiles.observe(viewLifecycleOwner) { profiles ->
-            profiles.let { adapter.savedProfiles = profiles }
+            profiles.let {
+                adapter.savedProfiles = profiles
+            }
         }
 
         recyclerView.adapter = adapter

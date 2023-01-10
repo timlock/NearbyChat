@@ -2,7 +2,9 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
-import android.widget.Button
+import android.os.Handler
+import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -11,8 +13,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Message
@@ -28,7 +32,10 @@ class ChatActivity : AppCompatActivity() {
         ViewModel.ViewModelFactory((application as Application).repository)
     }
 
+
     private var profile: Profile? = null
+    private var scrollButton: ImageButton? = null
+    private var unreadDot: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +44,8 @@ class ChatActivity : AppCompatActivity() {
 
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
         val recyclerView: RecyclerView = findViewById(R.id.chat_messages_recycler)
+        scrollButton = findViewById(R.id.chat_scroll_down)
+        unreadDot = findViewById(R.id.chat_unread_dot)
 
         viewModel.savedProfiles.observe(this) {
             it.forEach { profile ->
@@ -73,23 +82,25 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let {
                 adapter.messages = messages
-                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                if(pos < 0 || pos > adapter.messages.size - 3) {
                     recyclerView.scrollToPosition(adapter.messages.size - 1)
-                    checkUnread()
                 }
+                updateScrollPos(recyclerView)
             }
         }
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
-                    checkUnread()
-                }
+                updateScrollPos(recyclerView)
             }
 
         })
 
+        scrollButton?.setOnClickListener {
+            recyclerView.smoothScrollToPosition(adapter.messages.size - 1)
+        }
         recyclerView.adapter = adapter
 
         findViewById<ImageButton>(R.id.chat_send_message).setOnClickListener {
@@ -97,16 +108,34 @@ class ChatActivity : AppCompatActivity() {
             if(editText.text.toString().isNotEmpty() && profile != null) {
                 val message = Message(profile!!.address, editText.text.toString(), Timestamp.from(Instant.now()).time)
                 message.isSelfAuthored = true
-                viewModel.addMessage(message)
                 editText.text.clear()
+                viewModel.addMessage(message)
+            }
+        }
+    }
+
+    private fun updateScrollPos(recyclerView: RecyclerView) {
+        val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        if(pos > (recyclerView.adapter as MessageAdapter).messages.size - 2) {
+            checkUnread()
+            scrollButton?.visibility = View.INVISIBLE
+            unreadDot?.visibility = View.INVISIBLE
+        } else {
+            scrollButton?.visibility = View.VISIBLE
+            if(profile == null || !profile!!.isUnread) {
+                unreadDot?.visibility = View.INVISIBLE
+            } else {
+                unreadDot?.visibility = View.VISIBLE
             }
         }
     }
 
     private fun checkUnread() {
-        if (profile != null && profile!!.isUnread) {
-            profile!!.isUnread = false
-            viewModel.updateSavedProfile(profile!!)
+        if (profile != null) {
+            if(profile!!.isUnread) {
+                profile!!.isUnread = false
+                viewModel.updateSavedProfile(profile!!)
+            }
         }
     }
 

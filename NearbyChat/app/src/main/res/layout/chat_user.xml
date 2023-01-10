@@ -58,12 +58,11 @@
 
     <ImageView
         android:id="@+id/chats_user_unread_dot"
-        android:layout_width="0dp"
+        android:layout_width="8dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/chats_user_symbol"
         app:layout_constraintEnd_toStartOf="@+id/chats_user_symbol"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/chats_user_symbol"
         app:srcCompat="@drawable/ic_baseline_circle_24"
-        app:tint="?colorPrimary"/>
+        app:tint="?colorPrimary" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -122,6 +122,7 @@ class Repository(database: Database) {
             if(!message.isSelfAuthored) {
                 // set unread if message is not self authored
                 profile!!.isUnread = true
+                profile!!.lastInteraction = message.timeStamp
                 insertProfile(profile!!)
             }
         }

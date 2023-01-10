@@ -154,10 +154,10 @@ class MainActivity : AppCompatActivity() {
     private fun fillDatabaseWithTestData() {
         var profile: Profile
         var message: Message
-        for(i in 0..9) {
+        for(i in 0..19) {
             profile = Profile("address-$i")
             profile.name = "name-$i"
-            profile.color = i
+            profile.color = i % 10
             profile.description = "description-$i"
             if(i % 5 == 0) profile.isUnread = true
             for(j in 0..19) {
@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearDatabaseFromTestData() {
-        for(i in 0..9) {
+        for(i in 0..19) {
             viewModel.deleteSavedProfile("address-$i")
             viewModel.deleteMessages("address-$i")
             if(i % 2 == 0) viewModel.deleteAvailableProfile("address-$i")

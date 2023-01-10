@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chat_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -54,23 +55,21 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_messages_recycler"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/chat_new_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_user_message">
-
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@+id/chat_user_message" />
 
     <EditText
         android:id="@+id/chat_new_message"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="@string/message"
+        android:inputType="textPersonName"
         android:maxLength="64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chat_send_message"
@@ -81,8 +80,28 @@
         android:id="@+id/chat_send_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="?colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_baseline_send_24" />
+
+    <ImageButton
+        android:id="@+id/chat_scroll_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/chat_send_message"
+        app:layout_constraintEnd_toEndOf="@+id/chat_messages_recycler"
+        app:srcCompat="@drawable/ic_baseline_arrow_circle_down_24" />
+
+    <ImageView
+        android:id="@+id/chat_unread_dot"
+        android:layout_width="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/chat_send_message"
+        app:layout_constraintEnd_toStartOf="@+id/chat_scroll_down"
+        app:layout_constraintTop_toTopOf="@+id/chat_scroll_down"
+        app:srcCompat="@drawable/ic_baseline_circle_24"
+        app:tint="?colorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,7 @@ import de.hsos.nearbychat.app.domain.Profile
 
 @Dao
 interface ProfileDao {
-    @Query("SELECT * FROM Profile ORDER BY lastInteraction ASC")
+    @Query("SELECT * FROM Profile ORDER BY lastInteraction DESC")
     fun get(): LiveData<List<Profile>>
 
     @Query("SELECT * FROM Profile WHERE address = :macAddress")
