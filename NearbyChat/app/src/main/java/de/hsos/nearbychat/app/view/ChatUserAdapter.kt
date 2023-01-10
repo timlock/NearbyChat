@@ -68,7 +68,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
         if(profile.isUnread) {
             viewHolder.unreadDot.visibility = View.VISIBLE
         } else {
-            viewHolder.unreadDot.visibility = View.INVISIBLE
+            viewHolder.unreadDot.visibility = View.GONE
         }
         viewHolder.profile = profile
     }
