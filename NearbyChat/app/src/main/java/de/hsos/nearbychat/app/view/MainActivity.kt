@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         toolbar = supportActionBar!!
         
         clearDatabaseFromTestData()
-        fillDatabaseWithTestData()
+//        fillDatabaseWithTestData()
 
         updateLanguage()
         updateNightMode()

@@ -24,11 +24,11 @@ class Repository(database: Database) {
 
     init {
         // register for changes in available profiles
-        availableProfiles.observeForever{
+        availableProfiles.observeForever {
             availableList = it.toMutableList()
             availableList.forEach { availableProfile ->
                 savedList.forEach { savedProfile ->
-                    if(availableProfile.address == savedProfile.address) {
+                    if (availableProfile.address == savedProfile.address) {
                         if (availableProfile != savedProfile) {
                             // update saved profile because it differs from the saved one
                             savedList[savedList.indexOf(savedProfile)] = availableProfile
@@ -47,11 +47,11 @@ class Repository(database: Database) {
         }
 
         // register for changes in saved profiles
-        savedProfilesRaw.observeForever{
+        savedProfilesRaw.observeForever {
             savedList = it.toMutableList()
             savedList.forEach { savedProfile ->
                 availableList.forEach { availableProfile ->
-                    if(availableProfile.address == savedProfile.address) {
+                    if (availableProfile.address == savedProfile.address) {
                         // take signal information from available
                         savedList[savedList.indexOf(savedProfile)].updateSignal(availableProfile)
                     }
@@ -98,8 +98,8 @@ class Repository(database: Database) {
         // check if profile to message is saved
         var foundProfile = false
         savedList.forEach { savedProfile ->
-            if(message.address == savedProfile.address) {
-                if(!message.isSelfAuthored) {
+            if (message.address == savedProfile.address) {
+                if (!message.isSelfAuthored) {
                     // set unread if message is not self authored
                     savedProfile.isUnread = true
                     updateProfile(savedProfile)
@@ -107,19 +107,19 @@ class Repository(database: Database) {
                 foundProfile = true
             }
         }
-        if(!foundProfile) {
+        if (!foundProfile) {
             // profile not found, search if profile is available
             var profile: Profile? = null
             availableList.forEach { availableProfile ->
-                if(message.address == availableProfile.address) {
+                if (message.address == availableProfile.address) {
                     profile = availableProfile
                 }
             }
-            if(profile == null) {
+            if (profile == null) {
                 // profile not available so use empty profile just with address and let it update later
                 profile = Profile(message.address)
             }
-            if(!message.isSelfAuthored) {
+            if (!message.isSelfAuthored) {
                 // set unread if message is not self authored
                 profile!!.isUnread = true
                 profile!!.lastInteraction = message.timeStamp
@@ -140,4 +140,9 @@ class Repository(database: Database) {
     suspend fun updateOwnProfile(ownProfile: OwnProfile) {
         ownProfileDao.update(ownProfile)
     }
+
+    fun getOwnProfile(): OwnProfile? {
+        return ownProfileDao.getRaw()
+    }
+
 }

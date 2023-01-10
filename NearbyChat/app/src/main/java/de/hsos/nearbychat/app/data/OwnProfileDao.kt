@@ -12,6 +12,9 @@ interface OwnProfileDao {
     @Query("SELECT * FROM OwnProfile")
     fun get(): LiveData<OwnProfile?>
 
+    @Query("SELECT * FROM OwnProfile")
+    fun getRaw(): OwnProfile?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(ownProfile: OwnProfile)
 }
