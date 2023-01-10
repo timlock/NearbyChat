@@ -18,10 +18,14 @@ class Profile(@PrimaryKey val address: String) {
     @Ignore
     var hopCount: Int = 0
 
-    fun signalStrength0to4(): Int {
+    fun getSignalStrength0to4(): Int {
+        return min(max(getSignalStrength() / 60, 0), 4)
+    }
+
+    fun getSignalStrength(): Int {
         var strength = rssi + 140
         strength -= hopCount * 20
-        return min(max(strength / 60, 0), 4)
+        return strength
     }
 
     fun updateSignal(profile: Profile) {

@@ -23,12 +23,14 @@ class AvailableView : Fragment() {
         )
     }
 
+    private lateinit var recyclerView: RecyclerView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_available_view, container, false)
-        val recyclerView: RecyclerView = view.findViewById(R.id.available_user_recycler)
+        recyclerView = view.findViewById(R.id.available_user_recycler)
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
@@ -38,7 +40,9 @@ class AvailableView : Fragment() {
 
         viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->
             profiles.let {
-                adapter.availableProfiles = profiles
+                adapter.availableProfiles = profiles.sortedByDescending {
+                    it.getSignalStrength()
+                }
             }
         }
 

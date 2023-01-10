@@ -62,7 +62,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
         viewHolder.signalStrength.setImageDrawable(
             AppCompatResources.getDrawable(
                 context,
-                Application.getSignalStrengthIcon(profile.signalStrength0to4())
+                Application.getSignalStrengthIcon(profile.getSignalStrength0to4())
             )
         )
         if(profile.isUnread) {

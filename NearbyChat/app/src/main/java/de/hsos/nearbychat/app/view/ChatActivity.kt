@@ -2,8 +2,6 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -13,10 +11,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Message
@@ -36,14 +32,17 @@ class ChatActivity : AppCompatActivity() {
     private var profile: Profile? = null
     private var scrollButton: ImageButton? = null
     private var unreadDot: ImageView? = null
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         supportActionBar!!.setSubtitle(R.string.chat_desc)
 
+        val scrollPos = savedInstanceState?.getInt("CHAT_SCROLL_POS")
+
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
-        val recyclerView: RecyclerView = findViewById(R.id.chat_messages_recycler)
+        recyclerView = findViewById(R.id.chat_messages_recycler)
         scrollButton = findViewById(R.id.chat_scroll_down)
         unreadDot = findViewById(R.id.chat_unread_dot)
 
@@ -66,7 +65,7 @@ class ChatActivity : AppCompatActivity() {
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
-                            Application.getSignalStrengthIcon(profile.signalStrength0to4())
+                            Application.getSignalStrengthIcon(profile.getSignalStrength0to4())
                         )
                     )
                 }
@@ -82,9 +81,13 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let {
                 adapter.messages = messages
-                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                if(pos < 0 || pos > adapter.messages.size - 3) {
-                    recyclerView.scrollToPosition(adapter.messages.size - 1)
+                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                if(pos < 0) {
+                    if(scrollPos != null) {
+                        recyclerView.scrollToPosition(scrollPos)
+                    }
+                }else if(pos > adapter.itemCount - 3) {
+                    recyclerView.scrollToPosition(adapter.itemCount - 1)
                 }
                 updateScrollPos(recyclerView)
             }
@@ -99,7 +102,7 @@ class ChatActivity : AppCompatActivity() {
         })
 
         scrollButton?.setOnClickListener {
-            recyclerView.smoothScrollToPosition(adapter.messages.size - 1)
+            recyclerView.smoothScrollToPosition(adapter.itemCount - 1)
         }
         recyclerView.adapter = adapter
 
@@ -114,9 +117,14 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("CHAT_SCROLL_POS", (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition())
+        super.onSaveInstanceState(outState)
+    }
+
     private fun updateScrollPos(recyclerView: RecyclerView) {
-        val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-        if(pos > (recyclerView.adapter as MessageAdapter).messages.size - 2) {
+        val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+        if(pos > (recyclerView.adapter as MessageAdapter).itemCount - 2) {
             checkUnread()
             scrollButton?.visibility = View.INVISIBLE
             unreadDot?.visibility = View.INVISIBLE

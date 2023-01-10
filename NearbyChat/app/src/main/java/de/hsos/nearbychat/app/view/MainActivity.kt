@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: ActionBar
     private lateinit var bottomNavView: BottomNavigationView
     private lateinit var sharedPreferences: SharedPreferences
-    private var currentFragment: String? = null
 
     private val viewModel: ViewModel by viewModels {
         ViewModel.ViewModelFactory((application as Application).repository, application)
@@ -33,25 +32,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferences = getSharedPreferences("APP_SETTINGS", MODE_PRIVATE)
-        currentFragment = savedInstanceState?.getString("currentFragmentName")
 
         toolbar = supportActionBar!!
         
-        clearDatabaseFromTestData()
-        fillDatabaseWithTestData()
+        //clearDatabaseFromTestData()
+        //fillDatabaseWithTestData()
 
         updateLanguage()
         updateNightMode()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if(currentFragment != null) {
-            when(currentFragment) {
-                AvailableView::class.simpleName -> openFragment(AvailableView.newInstance())
-                ChatsView::class.simpleName -> openFragment(ChatsView.newInstance())
-                ProfileView::class.simpleName -> openFragment(ProfileView.newInstance())
-                SettingsView::class.simpleName -> openFragment(SettingsView.newInstance())
-            }
-        } else {
+        if(savedInstanceState == null) {
             openFragment(AvailableView.newInstance())
         }
 
@@ -82,16 +73,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("currentFragmentName", currentFragment)
-        super.onSaveInstanceState(outState)
-    }
-
     private fun openFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.nav_host_layout, fragment)
         transaction.commit()
-        currentFragment = fragment::class.simpleName!!
         when(fragment) {
             is AvailableView -> toolbar.setSubtitle(R.string.available_desc)
             is ChatsView -> toolbar.setSubtitle(R.string.chats_desc)
@@ -154,7 +139,7 @@ class MainActivity : AppCompatActivity() {
     private fun fillDatabaseWithTestData() {
         var profile: Profile
         var message: Message
-        for(i in 0..19) {
+        for(i in 0..29) {
             profile = Profile("address-$i")
             profile.name = "name-$i"
             profile.color = i % 10
@@ -186,7 +171,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clearDatabaseFromTestData() {
-        for(i in 0..19) {
+        for(i in 0..29) {
             viewModel.deleteSavedProfile("address-$i")
             viewModel.deleteMessages("address-$i")
             if(i % 2 == 0) viewModel.deleteAvailableProfile("address-$i")

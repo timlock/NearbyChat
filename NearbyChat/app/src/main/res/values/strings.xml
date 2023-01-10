@@ -18,6 +18,7 @@
     <string name="color_label">color:</string>
     <string name="save">save</string>
     <string name="saved_profile">saved profile</string>
+    <string name="profile_parts_empty">name and description can not be empty</string>
     <string name="night_mode">night mode</string>
     <string name="language_label">language:</string>
     <string name="language_en">English</string>
