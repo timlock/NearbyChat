@@ -2,10 +2,10 @@ package de.hsos.nearbychat.app.view
 
 import AvailableUserAdapter
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +13,7 @@ import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
+
 
 class AvailableView : Fragment() {
 
@@ -29,12 +30,14 @@ class AvailableView : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
-        val adapter = AvailableUserAdapter() {
+        val adapter = AvailableUserAdapter {
             (activity as MainActivity).openChat(it!!)
         }
 
         viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->
-            profiles.let { adapter.availableProfiles = profiles }
+            profiles.let {
+                adapter.availableProfiles = profiles
+            }
         }
 
         recyclerView.adapter = adapter

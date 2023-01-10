@@ -1,10 +1,8 @@
 package de.hsos.nearbychat.app.view
 
 import MessageAdapter
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -98,7 +96,6 @@ class ChatActivity : AppCompatActivity() {
         scrollButton?.setOnClickListener {
             recyclerView.smoothScrollToPosition(adapter.messages.size - 1)
         }
-
         recyclerView.adapter = adapter
 
         findViewById<ImageButton>(R.id.chat_send_message).setOnClickListener {
