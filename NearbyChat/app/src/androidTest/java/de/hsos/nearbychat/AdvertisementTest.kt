@@ -13,8 +13,6 @@ import org.junit.runner.RunWith
 class AdvertisementTest {
     @Test
     fun message() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.MESSAGE_MESSAGE)
             .id('0')
@@ -33,8 +31,6 @@ class AdvertisementTest {
     }
     @Test
     fun ack() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.ACKNOWLEDGE_MESSAGE)
             .id('0')
@@ -52,8 +48,6 @@ class AdvertisementTest {
 
     @Test
     fun neighbour() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .hops(10)
