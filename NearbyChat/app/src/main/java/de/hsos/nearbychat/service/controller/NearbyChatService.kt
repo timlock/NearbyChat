@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
@@ -36,6 +37,7 @@ class NearbyChatService : Service(), MeshObserver {
 
 
     fun start(ownProfile: OwnProfile) {
+        Log.d(TAG, "start: ")
         val bluetoothManager: BluetoothManager =
             getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val advertiser: Advertiser =
@@ -43,20 +45,27 @@ class NearbyChatService : Service(), MeshObserver {
         val scanner: BluetoothScanner =
             BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)
         this.meshController = MeshController(this, advertiser, ownProfile, scanner)
-
+        this.meshController.startScan()
+        this.meshController.startAdvertise()
     }
 
-    fun close() {
+
+    fun stop() {
+        Log.d(TAG, "stop: ")
+        this.meshController.stopAdvertising()
+        this.meshController.stopScan()
         stopSelf()
     }
 
     fun sendMessage(message: Message) {
+        Log.d(TAG, "sendMessage() called with: message = $message")
         this.meshController.sendMessage(message)
     }
 
 
     override fun onMessage(advertisement: Advertisement): Unit = runBlocking {
         launch {
+            Log.d(TAG, "onMessage() called: advertisement = $advertisement")
             val message: Message =
                 Message(advertisement.sender!!, advertisement.message!!, advertisement.timestamp!!)
             repository.insertMessage(message)
@@ -65,11 +74,15 @@ class NearbyChatService : Service(), MeshObserver {
 
     }
 
-    override fun onMessageAck(advertisement: Advertisement) {
-        TODO("Not yet implemented")
+    override fun onMessageAck(advertisement: Advertisement) : Unit = runBlocking {
+        launch {
+            Log.d(TAG, "onMessageAck() called: advertisement = $advertisement")
+            repository.ackReceivedMessage(advertisement.sender!!,advertisement.timestamp!!)
+        }
     }
 
     override fun onNeighbour(advertisement: Advertisement) {
+        Log.d(TAG, "onNeighbour() called with: advertisement = $advertisement")
         val intent: Intent = Intent()
         intent.action = NearbyChatService.PROFILE_ACTION
         intent.putExtra(PROFILE_PARAM, advertisement.toString())

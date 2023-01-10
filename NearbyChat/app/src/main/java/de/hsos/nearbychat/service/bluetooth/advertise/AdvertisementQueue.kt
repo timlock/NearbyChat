@@ -1,5 +1,6 @@
 package de.hsos.nearbychat.service.bluetooth.advertise
 
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
 
 interface AdvertisementQueue {
