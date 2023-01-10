@@ -1,7 +1,10 @@
 package de.hsos.nearbychat.app.view
 
 import MessageAdapter
+import android.opengl.Visibility
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -22,7 +25,10 @@ class ChatActivity : AppCompatActivity() {
         ViewModel.ViewModelFactory((application as Application).repository)
     }
 
+
     private var profile: Profile? = null
+    private var scrollButton: ImageButton? = null
+    private var unreadDot: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +37,8 @@ class ChatActivity : AppCompatActivity() {
 
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
         val recyclerView: RecyclerView = findViewById(R.id.chat_messages_recycler)
+        scrollButton = findViewById(R.id.chat_scroll_down)
+        unreadDot = findViewById(R.id.chat_unread_dot)
 
         viewModel.savedProfiles.observe(this) {
             it.forEach { profile ->
@@ -60,7 +68,6 @@ class ChatActivity : AppCompatActivity() {
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
-        //layoutManager.reverseLayout = true
         recyclerView.layoutManager = layoutManager
 
         val adapter = MessageAdapter(this)
@@ -70,28 +77,47 @@ class ChatActivity : AppCompatActivity() {
                 adapter.messages = messages
                 if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
                     recyclerView.scrollToPosition(adapter.messages.size - 1)
-                    checkUnread()
                 }
+                updateScrollPos(recyclerView)
             }
         }
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
-                    checkUnread()
-                }
+                updateScrollPos(recyclerView)
             }
 
         })
 
+        scrollButton?.setOnClickListener {
+            recyclerView.smoothScrollToPosition(adapter.messages.size - 1)
+        }
+
         recyclerView.adapter = adapter
     }
 
+    private fun updateScrollPos(recyclerView: RecyclerView) {
+        if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+            checkUnread()
+            scrollButton?.visibility = View.INVISIBLE
+            unreadDot?.visibility = View.INVISIBLE
+        } else {
+            scrollButton?.visibility = View.VISIBLE
+            if(profile == null || !profile!!.isUnread) {
+                unreadDot?.visibility = View.INVISIBLE
+            } else {
+                unreadDot?.visibility = View.VISIBLE
+            }
+        }
+    }
+
     private fun checkUnread() {
-        if (profile != null && profile!!.isUnread) {
-            profile!!.isUnread = false
-            viewModel.updateSavedProfile(profile!!)
+        if (profile != null) {
+            if(profile!!.isUnread) {
+                profile!!.isUnread = false
+                viewModel.updateSavedProfile(profile!!)
+            }
         }
     }
 

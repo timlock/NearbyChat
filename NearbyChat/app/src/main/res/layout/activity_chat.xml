@@ -83,6 +83,26 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_baseline_send_24" />
+        app:srcCompat="@drawable/ic_baseline_send_24"
+        android:backgroundTint="?colorPrimary"/>
+
+    <ImageButton
+        android:id="@+id/chat_scroll_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/chat_send_message"
+        app:layout_constraintEnd_toEndOf="@+id/chat_messages_recycler"
+        app:srcCompat="@drawable/ic_baseline_arrow_circle_down_24"
+        android:backgroundTint="?colorPrimary"/>
+
+    <ImageView
+        android:id="@+id/chat_unread_dot"
+        android:layout_width="8dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/chat_send_message"
+        app:layout_constraintEnd_toStartOf="@+id/chat_scroll_down"
+        app:layout_constraintTop_toTopOf="@+id/chat_scroll_down"
+        app:srcCompat="@drawable/ic_baseline_circle_24"
+        app:tint="?colorPrimary"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
