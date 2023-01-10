@@ -29,7 +29,7 @@ import java.time.Instant
 class ChatActivity : AppCompatActivity() {
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((application as Application).repository)
+        ViewModel.ViewModelFactory((application as Application).repository, application)
     }
 
 

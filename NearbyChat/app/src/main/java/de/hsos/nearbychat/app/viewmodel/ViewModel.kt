@@ -1,5 +1,7 @@
 package de.hsos.nearbychat.app.viewmodel
 
+import android.app.Application
+import android.provider.Settings
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
 import de.hsos.nearbychat.app.data.Repository
@@ -8,13 +10,22 @@ import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 import kotlinx.coroutines.launch
 
-class ViewModel(private val repository: Repository) : ViewModel(){
+
+
+class ViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application){
     val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
     val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
 
-    fun updateOwnProfile(ownProfile: OwnProfile) = viewModelScope.launch {
-        repository.updateOwnProfile(ownProfile)
+    fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
+        var profile = repository.ownProfile.value
+        if(profile == null) {
+            profile = OwnProfile(Settings.Secure.getString(getApplication<Application>().getContentResolver(), Settings.Secure.ANDROID_ID))
+        }
+        profile.name = name
+        profile.description = description
+        profile.color = color
+        repository.updateOwnProfile(profile)
     }
 
     fun updateSavedProfile(profile: Profile) = viewModelScope.launch {
@@ -68,10 +79,10 @@ class ViewModel(private val repository: Repository) : ViewModel(){
         repository.deleteMessages(macAddress)
     }
 
-    class ViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
+    class ViewModelFactory(private val repository: Repository, private val application: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return ViewModel(repository) as T
+            return ViewModel(repository, application) as T
         }
     }
 

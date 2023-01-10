@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: String? = null
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((this.application as Application).repository)
+        ViewModel.ViewModelFactory((application as Application).repository, application)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

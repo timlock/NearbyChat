@@ -15,7 +15,6 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
-import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 
 
@@ -29,8 +28,15 @@ class ProfileView : Fragment() {
     private lateinit var colorPreview: Button
 
     private val viewModel: ViewModel by viewModels {
-        ViewModel.ViewModelFactory((activity?.application as Application).repository)
+        ViewModel.ViewModelFactory(
+            (activity?.application as Application).repository,
+            activity?.application as Application
+        )
     }
+
+    var name: String = ""
+    var description: String = ""
+    var color: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,78 +44,98 @@ class ProfileView : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile_view, container, false)
 
-
-        viewModel.ownProfile.observe(viewLifecycleOwner) { profiles ->
-            profiles.let {
-                lateinit var profile: OwnProfile
-                if(it != null) {
-                    profile = it
-                } else {
-                    profile = OwnProfile()
-                }
-                val nameView = view.findViewById<TextView>(R.id.profile_name)
-                nameView.text = profile.name
-                nameView.addTextChangedListener {
-                    profile.name = it.toString()
-                }
-
-                val descView = view.findViewById<TextView>(R.id.profile_desc)
-                descView.text = profile.description
-                descView.addTextChangedListener {
-                    profile.description = it.toString()
-                }
-
-                colorPreview = view.findViewById(R.id.profile_color)
-                changeColor(profile.color, profile)
-
-                view.findViewById<Button>(R.id.profile_color_0).setOnClickListener{
-                    changeColor(0, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_1).setOnClickListener{
-                    changeColor(1, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_2).setOnClickListener{
-                    changeColor(2, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_3).setOnClickListener{
-                    changeColor(3, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_4).setOnClickListener{
-                    changeColor(4, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_5).setOnClickListener{
-                    changeColor(5, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_6).setOnClickListener{
-                    changeColor(6, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_7).setOnClickListener{
-                    changeColor(7, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_8).setOnClickListener{
-                    changeColor(8, profile)
-                }
-                view.findViewById<Button>(R.id.profile_color_9).setOnClickListener{
-                    changeColor(9, profile)
-                }
-
-                view.findViewById<Button>(R.id.profile_save).setOnClickListener{
-                    viewModel.updateOwnProfile(profile)
-                    // hide keyboard
-                    val inputMethodManager: InputMethodManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                    if (inputMethodManager.isAcceptingText) {
-                        inputMethodManager.hideSoftInputFromWindow( requireActivity().currentFocus!!.windowToken, 0)
+        if(savedInstanceState == null) {
+            viewModel.ownProfile.observe(viewLifecycleOwner) { profiles ->
+                profiles.let {
+                    if (it != null) {
+                        name = it.name
+                        description = it.description
+                        color = it.color
                     }
-                    Snackbar.make(view, R.string.saved_profile, Snackbar.LENGTH_LONG).show()
+                    loadProfile(view)
                 }
             }
+        } else {
+            name = savedInstanceState.getString("PROFILE_NAME")!!
+            description = savedInstanceState.getString("PROFILE_DESCRIPTION")!!
+            color = savedInstanceState.getInt("PROFILE_COLOR")
+            loadProfile(view)
         }
 
         return view
     }
 
-    private fun changeColor(id: Int, profile: OwnProfile) {
-        profile.color = id
+    private fun loadProfile( view: View) {
+        val nameView = view.findViewById<TextView>(R.id.profile_name)
+        nameView.text = name
+        nameView.addTextChangedListener {
+            name = it.toString()
+        }
+
+        val descView = view.findViewById<TextView>(R.id.profile_desc)
+        descView.text = description
+        descView.addTextChangedListener {
+            description = it.toString()
+        }
+
+        colorPreview = view.findViewById(R.id.profile_color)
+        changeColor(color)
+
+        view.findViewById<Button>(R.id.profile_color_0).setOnClickListener{
+            changeColor(0)
+        }
+        view.findViewById<Button>(R.id.profile_color_1).setOnClickListener{
+            changeColor(1)
+        }
+        view.findViewById<Button>(R.id.profile_color_2).setOnClickListener{
+            changeColor(2)
+        }
+        view.findViewById<Button>(R.id.profile_color_3).setOnClickListener{
+            changeColor(3)
+        }
+        view.findViewById<Button>(R.id.profile_color_4).setOnClickListener{
+            changeColor(4)
+        }
+        view.findViewById<Button>(R.id.profile_color_5).setOnClickListener{
+            changeColor(5)
+        }
+        view.findViewById<Button>(R.id.profile_color_6).setOnClickListener{
+            changeColor(6)
+        }
+        view.findViewById<Button>(R.id.profile_color_7).setOnClickListener{
+            changeColor(7)
+        }
+        view.findViewById<Button>(R.id.profile_color_8).setOnClickListener{
+            changeColor(8)
+        }
+        view.findViewById<Button>(R.id.profile_color_9).setOnClickListener{
+            changeColor(9)
+        }
+
+        view.findViewById<Button>(R.id.profile_save).setOnClickListener {
+            viewModel.updateOwnProfile(name, description, color)
+            // hide keyboard
+            val inputMethodManager: InputMethodManager =
+                requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            if (inputMethodManager.isAcceptingText) {
+                inputMethodManager.hideSoftInputFromWindow(
+                    requireActivity().currentFocus!!.windowToken,
+                    0
+                )
+            }
+            Snackbar.make(view, R.string.saved_profile, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("PROFILE_NAME", name)
+        outState.putString("PROFILE_DESCRIPTION", description)
+        outState.putInt("PROFILE_COLOR", color)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun changeColor(id: Int) {
+        color = id
         colorPreview.setBackgroundColor(ContextCompat.getColor(requireContext(), Application.getUserColorRes(id)))
     }
 

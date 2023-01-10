@@ -8,9 +8,7 @@ import androidx.room.PrimaryKey
  * val androidID : String = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)
  */
 @Entity
-class OwnProfile {
-    @PrimaryKey
-    var address: String = ""
+class OwnProfile(@PrimaryKey var address: String = "") {
     var name: String = ""
     var description: String = ""
     var color: Int = 0

@@ -18,7 +18,9 @@ import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
 class AvailableView : Fragment() {
 
     private val viewModel: ViewModel by viewModels {
-        ViewModelFactory((activity?.application as Application).repository)
+        ViewModelFactory((activity?.application as Application).repository,
+            activity?.application as Application
+        )
     }
 
     override fun onCreateView(
