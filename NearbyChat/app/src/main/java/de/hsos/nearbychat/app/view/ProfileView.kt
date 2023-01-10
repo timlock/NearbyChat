@@ -35,7 +35,7 @@ class ProfileView : Fragment() {
     private lateinit var colorPreview: Button
     var color: Int = 0
     set(value) {
-        colorPreview.setBackgroundColor(ContextCompat.getColor(requireContext(), Application.getUserColorRes(value)))
+        colorPreview.setBackgroundColor(ContextCompat.getColor(requireContext(), NearbyApplication.getUserColorRes(value)))
         field = value
     }
 
