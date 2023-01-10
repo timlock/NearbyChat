@@ -16,7 +16,7 @@ class MeshController(
     private var advertiser: Advertiser,
     private var ownProfile: OwnProfile,
     private var scanner: Scanner
-    ) : ScannerObserver {
+) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
@@ -24,6 +24,18 @@ class MeshController(
     private var messageBuffer: MessageBuffer = MessageBuffer()
 
     init {
+        val selfAdvertisement: Advertisement = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .hops(MeshController.MAX_HOPS)
+            .rssi(0)
+            .address(ownProfile.address)
+            .name(ownProfile.name)
+            .description(ownProfile.description)
+            .color(ownProfile.color)
+            .build()
+        val self: Neighbour =
+            Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
+        this.neighbourTable.updateNeighbour(self)
         this.advertisementExecutor = AdvertisementExecutor(
             this.advertiser as Client,
             AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
@@ -37,7 +49,8 @@ class MeshController(
         Log.d(TAG, "startScan: ")
         this.scanner.start()
     }
-    fun stopScan(){
+
+    fun stopScan() {
         Log.d(TAG, "stopScan: ")
         this.scanner.stop()
     }
@@ -163,9 +176,9 @@ class MeshController(
         closestNeighbour: Neighbour?
     ) {
         advertisement.decrementHop()
-        if(advertisement.hops!! < 0) {
+        if (advertisement.hops!! < 0) {
             return
-        }else {
+        } else {
             val neighbour: Neighbour = Neighbour(
                 advertisement.address!!,
                 advertisement.rssi!!,
