@@ -14,6 +14,10 @@ import de.hsos.nearbychat.app.domain.Message
 class MessageAdapter (private val context: Context?) : RecyclerView.Adapter<MessageAdapter.ViewHolder>()
 {
     var messages: List<Message> = mutableListOf()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var messageIn: ConstraintLayout? = null

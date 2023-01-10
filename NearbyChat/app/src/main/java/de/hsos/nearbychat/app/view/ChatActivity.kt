@@ -2,6 +2,8 @@ package de.hsos.nearbychat.app.view
 
 import MessageAdapter
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -11,8 +13,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
 import de.hsos.nearbychat.app.domain.Message
@@ -78,7 +82,8 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let {
                 adapter.messages = messages
-                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                if(pos < 0 || pos > adapter.messages.size - 3) {
                     recyclerView.scrollToPosition(adapter.messages.size - 1)
                 }
                 updateScrollPos(recyclerView)
@@ -103,14 +108,15 @@ class ChatActivity : AppCompatActivity() {
             if(editText.text.toString().isNotEmpty() && profile != null) {
                 val message = Message(profile!!.address, editText.text.toString(), Timestamp.from(Instant.now()).time)
                 message.isSelfAuthored = true
-                viewModel.addMessage(message)
                 editText.text.clear()
+                viewModel.addMessage(message)
             }
         }
     }
 
     private fun updateScrollPos(recyclerView: RecyclerView) {
-        if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+        val pos = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        if(pos > (recyclerView.adapter as MessageAdapter).messages.size - 2) {
             checkUnread()
             scrollButton?.visibility = View.INVISIBLE
             unreadDot?.visibility = View.INVISIBLE
