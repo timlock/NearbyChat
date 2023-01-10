@@ -1,6 +1,5 @@
 import android.content.Context
 import android.icu.text.SimpleDateFormat
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +28,7 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
         val userLastInteraction: TextView = itemView.findViewById(R.id.chats_user_last_interaction)
         val symbol: ImageView = itemView.findViewById(R.id.chats_user_symbol)
         val signalStrength: ImageView = itemView.findViewById(R.id.chats_user_signal_strength)
-        val layout: View = itemView.findViewById(R.id.chats_user_layout)
+        val unreadDot: ImageView = itemView.findViewById(R.id.chats_user_unread_dot)
         var profile: Profile? = null
 
         init {
@@ -66,23 +65,11 @@ class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : Recycler
                 Application.getSignalStrengthIcon(profile.signalStrength0to4())
             )
         )
-        val typedValue = TypedValue()
-        if(profile.unread) {
-            context.theme.resolveAttribute(
-                com.google.android.material.R.attr.colorPrimary,
-                typedValue,
-                true
-            )
+        if(profile.isUnread) {
+            viewHolder.unreadDot.visibility = View.VISIBLE
         } else {
-            context.theme.resolveAttribute(
-                com.google.android.material.R.attr.colorOnPrimary,
-                typedValue,
-                true
-            )
+            viewHolder.unreadDot.visibility = View.GONE
         }
-        viewHolder.layout.setBackgroundColor(
-            typedValue.data
-        )
         viewHolder.profile = profile
     }
 

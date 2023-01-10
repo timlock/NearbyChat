@@ -18,7 +18,7 @@ class ViewModel(private val repository: Repository) : ViewModel(){
     }
 
     fun updateSavedProfile(profile: Profile) = viewModelScope.launch {
-        repository.insertProfile(profile)
+        repository.updateProfile(profile)
     }
 
     fun deleteSavedProfile(macAddress: String) = viewModelScope.launch {

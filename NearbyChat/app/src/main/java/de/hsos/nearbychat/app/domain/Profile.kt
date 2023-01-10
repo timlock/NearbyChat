@@ -12,7 +12,7 @@ class Profile(@PrimaryKey val address: String) {
     lateinit var description: String
     var color: Int = 0
     var lastInteraction: Long = Long.MIN_VALUE
-    var unread: Boolean = false
+    var isUnread: Boolean = false
     @Ignore
     var rssi: Int = Int.MIN_VALUE
     @Ignore

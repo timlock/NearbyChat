@@ -1,19 +1,26 @@
 package de.hsos.nearbychat.app.view
 
 import MessageAdapter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.Application
+import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
+import java.sql.Timestamp
+import java.time.Instant
+
 
 class ChatActivity : AppCompatActivity() {
 
@@ -33,7 +40,7 @@ class ChatActivity : AppCompatActivity() {
 
         viewModel.savedProfiles.observe(this) {
             it.forEach { profile ->
-                if(profile.address == address) {
+                if (profile.address == address) {
                     this.profile = profile
 
                     findViewById<TextView>(R.id.chat_user_name).text = profile.name
@@ -42,9 +49,11 @@ class ChatActivity : AppCompatActivity() {
                     val symbol = findViewById<ImageView>(R.id.chat_user_symbol)
                     val signalStrength = findViewById<ImageView>(R.id.chat_user_signal_strength)
                     symbol.setColorFilter(
-                        ResourcesCompat.getColor(resources,
+                        ResourcesCompat.getColor(
+                            resources,
                             Application.getUserColorRes(profile.color), null
-                        ))
+                        )
+                    )
                     signalStrength.setImageDrawable(
                         AppCompatResources.getDrawable(
                             this,
@@ -64,18 +73,41 @@ class ChatActivity : AppCompatActivity() {
         viewModel.getMessages(address).observe(this) { messages ->
             messages.let {
                 adapter.messages = messages
+                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                    recyclerView.scrollToPosition(adapter.messages.size - 1)
+                    checkUnread()
+                }
             }
         }
 
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if( recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset() < 50) {
+                    checkUnread()
+                }
+            }
+
+        })
+
         recyclerView.adapter = adapter
+
+        findViewById<ImageButton>(R.id.chat_send_message).setOnClickListener {
+            val editText = findViewById<EditText>(R.id.chat_new_message)
+            if(editText.text.toString().isNotEmpty() && profile != null) {
+                val message = Message(profile!!.address, editText.text.toString(), Timestamp.from(Instant.now()).time)
+                message.isSelfAuthored = true
+                viewModel.addMessage(message)
+                editText.text.clear()
+            }
+        }
     }
 
-    override fun onPause() {
-        if(profile != null && profile!!.unread) {
-            profile!!.unread = false
+    private fun checkUnread() {
+        if (profile != null && profile!!.isUnread) {
+            profile!!.isUnread = false
             viewModel.updateSavedProfile(profile!!)
         }
-        super.onPause()
     }
 
     companion object {

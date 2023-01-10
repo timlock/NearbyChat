@@ -101,11 +101,10 @@ class Repository(database: Database) {
             if(message.address == savedProfile.address) {
                 if(!message.isSelfAuthored) {
                     // set unread if message is not self authored
-                    savedProfile.unread = true
+                    savedProfile.isUnread = true
                     updateProfile(savedProfile)
                 }
                 foundProfile = true
-                return@forEach
             }
         }
         if(!foundProfile) {
@@ -114,7 +113,6 @@ class Repository(database: Database) {
             availableList.forEach { availableProfile ->
                 if(message.address == availableProfile.address) {
                     profile = availableProfile
-                    return@forEach
                 }
             }
             if(profile == null) {
@@ -123,7 +121,7 @@ class Repository(database: Database) {
             }
             if(!message.isSelfAuthored) {
                 // set unread if message is not self authored
-                profile!!.unread = true
+                profile!!.isUnread = true
                 insertProfile(profile!!)
             }
         }
