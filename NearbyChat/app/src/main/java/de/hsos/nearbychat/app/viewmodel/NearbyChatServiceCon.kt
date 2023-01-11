@@ -12,13 +12,13 @@ import de.hsos.nearbychat.service.controller.NearbyChatService
 class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceConnection {
     private val TAG: String = NearbyChatServiceCon::class.java.simpleName
     private lateinit var nearbyChatService: NearbyChatService
-    private lateinit var ownProfile: OwnProfile
+    private lateinit var ownAddress: String
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.d(TAG, "onServiceConnected() called with: name = $name, service = $service")
         val binder: NearbyChatService.LocalBinder = service as NearbyChatService.LocalBinder
         this.nearbyChatService = binder.getService()
-        this.nearbyChatService.start(this.ownProfile)
+        this.nearbyChatService.start(this.ownAddress)
         this.observer.onBound()
     }
 
@@ -26,11 +26,11 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
         Log.d(TAG, "onServiceDisconnected() called with: name = $name")
     }
 
-    fun startService(context: Context, ownProfile: OwnProfile) {
+    fun startService(context: Context, ownAddress: String) {
         Log.d(TAG, "startService: ")
         val filterServiceStarted: IntentFilter =  IntentFilter(NearbyChatService.PROFILE_ACTION)
         context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
-        this.ownProfile = ownProfile
+        this.ownAddress = ownAddress
         val startServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
         context.startService(startServiceIntent)
         val bindToServiceIntent: Intent = Intent(context, NearbyChatService::class.java)

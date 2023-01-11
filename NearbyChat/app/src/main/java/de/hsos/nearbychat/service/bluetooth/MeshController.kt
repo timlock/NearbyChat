@@ -14,7 +14,7 @@ import de.hsos.nearbychat.service.bluetooth.util.*
 class MeshController(
     private var observer: MeshObserver,
     private var advertiser: Advertiser,
-    private var ownProfile: OwnProfile,
+    var ownProfile: OwnProfile,
     private var scanner: Scanner
 ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName

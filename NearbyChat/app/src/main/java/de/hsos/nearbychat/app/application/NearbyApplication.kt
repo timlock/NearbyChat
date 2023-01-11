@@ -2,46 +2,36 @@ package de.hsos.nearbychat.app.application
 
 import android.app.Application
 import android.provider.Settings
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.data.Database
 import de.hsos.nearbychat.app.data.Repository
-import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
-import de.hsos.nearbychat.app.viewmodel.NearbyChatObserver
-import de.hsos.nearbychat.app.viewmodel.NearbyChatServiceCon
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
-class NearbyApplication: android.app.Application(), NearbyChatObserver {
+class NearbyApplication: Application() {
     private val database by lazy { Database.getDatabase(this) }
     val repository by lazy { Repository(database) }
-
+    val ownAddress: String = Settings.Secure.getString(this.contentResolver,Settings.Secure.ANDROID_ID)
     val TAG: String = Application::class.java.simpleName
 
-    val chatServiceCon : NearbyChatServiceCon = NearbyChatServiceCon(this)
-
-    init{
-        repository.ownProfile.observeForever {
-            var ownProfile: OwnProfile? = it
-            if (ownProfile == null) {
-                ownProfile = OwnProfile(
-                    Settings.Secure.getString(
-                        this.getContentResolver(),
-                        Settings.Secure.ANDROID_ID
-                    )
-                )
-                GlobalScope.launch {
-                    repository.updateOwnProfile(ownProfile)
-                }
-            }
-            this.chatServiceCon.startService(
-                applicationContext,
-                ownProfile
-            )
-        }
-    }
+//    init{
+//        repository.ownProfile.observeForever {
+//            var ownProfile: OwnProfile? = it
+//            if (ownProfile == null) {
+//                ownProfile = OwnProfile(
+//                    Settings.Secure.getString(
+//                        this.getContentResolver(),
+//                        Settings.Secure.ANDROID_ID
+//                    )
+//                )
+//                GlobalScope.launch {
+//                    repository.updateOwnProfile(ownProfile)
+//                }
+//            }
+//            this.chatServiceCon.startService(
+//                applicationContext,
+//                ownProfile
+//            )
+//        }
+//    }
 
     companion object {
         fun getUserColorRes(id: Int): Int {
@@ -72,14 +62,5 @@ class NearbyApplication: android.app.Application(), NearbyChatObserver {
         }
     }
 
-    override fun onBound() {
-        Log.d(TAG, "onBound: ")
-    }
 
-    override fun onProfile(profile: Profile) {
-        Log.d(TAG, "onProfile() called with: profile = $profile")
-        val tmpList = this.repository.availableProfiles.value as MutableList
-        tmpList.add(profile)
-        (this.repository.availableProfiles as MutableLiveData).value = tmpList
-    }
 }

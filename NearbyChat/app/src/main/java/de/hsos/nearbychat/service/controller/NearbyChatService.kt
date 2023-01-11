@@ -8,6 +8,10 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
@@ -26,6 +30,20 @@ class NearbyChatService : Service(), MeshObserver {
     private val binder = LocalBinder()
     private lateinit var meshController: MeshController
     private var repository: Repository = (application as NearbyApplication).repository
+    private var ownProfile: LiveData<OwnProfile?> = repository.ownProfile
+    private val ownProfileObserver = Observer<OwnProfile?> { p ->
+        if (p != null) {
+            this.meshController.ownProfile = p
+        }
+    }
+
+    override fun onCreate() {
+        this.ownProfile.observeForever(this.ownProfileObserver)
+    }
+
+    override fun onDestroy() {
+        this.ownProfile.removeObserver(this.ownProfileObserver)
+    }
 
     inner class LocalBinder : Binder() {
         fun getService(): NearbyChatService = this@NearbyChatService
@@ -36,17 +54,30 @@ class NearbyChatService : Service(), MeshObserver {
     }
 
 
-    fun start(ownProfile: OwnProfile) {
-        Log.d(TAG, "start: ")
-        val bluetoothManager: BluetoothManager =
-            getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val advertiser: Advertiser =
-            BluetoothAdvertiser(bluetoothManager.adapter, AdvertisingSetParameters.INTERVAL_MEDIUM)
-        val scanner: BluetoothScanner =
-            BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)
-        this.meshController = MeshController(this, advertiser, ownProfile, scanner)
-        this.meshController.startScan()
-        this.meshController.startAdvertise()
+    fun start(ownAddress: String) {
+        if (this::meshController.isInitialized) {
+            Log.d(TAG, "start: service is already running")
+        } else {
+            Log.d(TAG, "start: ")
+            val bluetoothManager: BluetoothManager =
+                getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+            val advertiser: Advertiser =
+                BluetoothAdvertiser(
+                    bluetoothManager.adapter,
+                    AdvertisingSetParameters.INTERVAL_MEDIUM
+                )
+            val scanner: BluetoothScanner =
+                BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)
+            var self: OwnProfile? = this.ownProfile.value
+            if(this.ownProfile.value == null){
+                self = OwnProfile(ownAddress)
+                self.name = applicationContext.resources.getString(R.string.error_name_missing)
+                self.description = applicationContext.resources.getString(R.string.error_desc_missing)
+            }
+            this.meshController = MeshController(this, advertiser, self!!, scanner)
+            this.meshController.startScan()
+            this.meshController.startAdvertise()
+        }
     }
 
 
@@ -74,10 +105,10 @@ class NearbyChatService : Service(), MeshObserver {
 
     }
 
-    override fun onMessageAck(advertisement: Advertisement) : Unit = runBlocking {
+    override fun onMessageAck(advertisement: Advertisement): Unit = runBlocking {
         launch {
             Log.d(TAG, "onMessageAck() called: advertisement = $advertisement")
-            repository.ackReceivedMessage(advertisement.sender!!,advertisement.timestamp!!)
+            repository.ackReceivedMessage(advertisement.sender!!, advertisement.timestamp!!)
         }
     }
 
