@@ -15,6 +15,9 @@ interface MessageDao {
     @Query("SELECT * FROM Message WHERE address = :address AND timeStamp = :timestamp AND isSelfAuthored = :isSelfAuthored")
     fun get(address: String, timestamp: Long, isSelfAuthored: Boolean): List<Message>
 
+    @Query("SELECT * FROM Message WHERE isSelfAuthored = 1 AND isReceived = 0")
+    fun getUnsentMessages(): List<Message>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(message: Message)
 
