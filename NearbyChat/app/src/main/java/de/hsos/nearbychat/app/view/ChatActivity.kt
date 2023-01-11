@@ -121,9 +121,6 @@ class ChatActivity : AppCompatActivity() {
                 message.isSelfAuthored = true
                 editText.text.clear()
                 viewModel.addMessage(message)
-                if(fromAvailable) {
-                    viewModel.updateSavedProfile(profile!!)
-                }
             }
         }
     }

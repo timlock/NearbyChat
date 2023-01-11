@@ -123,8 +123,9 @@ class Repository(database: Database) {
                 // set unread if message is not self authored
                 profile!!.isUnread = true
                 profile!!.lastInteraction = message.timeStamp
-                insertProfile(profile!!)
+
             }
+            insertProfile(profile!!)
         }
         messageDao.insert(message)
     }
