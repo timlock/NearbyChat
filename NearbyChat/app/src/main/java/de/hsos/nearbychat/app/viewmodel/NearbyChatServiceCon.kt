@@ -40,38 +40,41 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     private fun registerReceiver(context: Context) {
-        val filterServiceStarted: IntentFilter = IntentFilter(NearbyChatService.PROFILE_ACTION)
+        val filterServiceStarted: IntentFilter = IntentFilter(NearbyChatService.ON_PROFILE_ACTION)
         context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
     }
 
-    fun disconnect(context: Context){
+    fun disconnect(context: Context) {
         Log.d(TAG, "disconnect: ")
         context.unbindService(this)
         context.unregisterReceiver(this.broadcastReceiver)
     }
 
-    fun closeService(context: Context){
+    fun closeService(context: Context) {
         this.nearbyChatService.stop()
         this.disconnect(context)
     }
 
-    fun sendMessage(message: Message): Boolean{
-        return if (this::nearbyChatService.isInitialized){
+    fun sendMessage(message: Message): Boolean {
+        return if (this::nearbyChatService.isInitialized) {
             false
-        }else{
+        } else {
             this.nearbyChatService.sendMessage(message)
             true
         }
     }
 
-    private val broadcastReceiver : BroadcastReceiver = object : BroadcastReceiver() {
+    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                NearbyChatService.PROFILE_PARAM ->{
-                    val param:String? = intent.getStringExtra(NearbyChatService.PROFILE_PARAM)
-                    if(param == null){
-                        Log.w(TAG, "onReceive: received ${NearbyChatService.PROFILE_ACTION} intent without content")
-                    }else {
+                NearbyChatService.ON_PROFILE_ACTION -> {
+                    val param: String? = intent.getStringExtra(NearbyChatService.PROFILE_PARAM)
+                    if (param == null) {
+                        Log.w(
+                            TAG,
+                            "onReceive: received ${NearbyChatService.ON_PROFILE_ACTION} intent without content"
+                        )
+                    } else {
                         val advertisement: Advertisement = Advertisement.Builder()
                             .rawMessage(param)
                             .build()
@@ -85,9 +88,21 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                         this@NearbyChatServiceCon.observer.onProfile(profile)
                     }
                 }
+                NearbyChatService.ON_PROFILE_TIMEOUT_ACTION -> {
+                    val param: List<String>? =
+                        intent.getStringArrayListExtra(NearbyChatService.PROFILE_LIST_PARAM)
+                    if (param == null) {
+                        Log.w(
+                            TAG,
+                            "onReceive: received ${NearbyChatService.ON_PROFILE_TIMEOUT_ACTION} intent without content"
+                        )
+                    } else {
+                        param.forEach{this@NearbyChatServiceCon.observer.onProfileTimeout(it) }
+                    }
+                }
             }
-
         }
-    }
 
+    }
 }
+

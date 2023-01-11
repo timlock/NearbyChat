@@ -10,6 +10,9 @@ import de.hsos.nearbychat.service.bluetooth.advertise.Client
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class MeshController(
     private var observer: MeshObserver,
@@ -23,6 +26,9 @@ class MeshController(
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
     private var slidingWindowTable: SlidingWindow = SlidingWindow()
+    private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
+    private val messageExecutor: ScheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor()
 
     init {
         this.updateOwnProfile(this.ownProfile)
@@ -33,6 +39,18 @@ class MeshController(
             this.neighbourTable
         )
         this.scanner.subscribe(this)
+        this.messageExecutor.scheduleAtFixedRate(
+            this::refresh,
+            0,
+            MeshController.TIMEOUT,
+            TimeUnit.SECONDS
+        )
+    }
+    private fun refresh(){
+        val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
+        this.observer.onNeighbourTimeout(timeoutList)
+        val unsentMessages = this.unacknowledgedMessageList.getMessages()
+        unsentMessages.forEach{ this@MeshController.advertisementExecutor.addToQueue(it.toString())}
     }
 
     fun startScan() {
@@ -142,8 +160,10 @@ class MeshController(
 
     private fun handleAcknowledgment(advertisement: Advertisement) {
         if (this.ownProfile.address == advertisement.receiver) {
-            Log.d(TAG, "onMessage: received ack for this device")
-            this.observer.onMessageAck(advertisement)
+            if(this.unacknowledgedMessageList.acknowledge(advertisement.sender!!,advertisement.timestamp!!)){
+                Log.d(TAG, "onMessage: received ack for this device")
+                this.observer.onMessageAck(advertisement)
+            }
         } else {
             val nextTarget: String? =
                 this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)

@@ -1,6 +1,7 @@
 package de.hsos.nearbychat.app.viewmodel
 
 import android.app.Application
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.*
@@ -108,11 +109,18 @@ class ViewModel(private val repository: Repository, application: Application) :
     override fun onBound() {
         Log.d(TAG, "onBound: ")
     }
-
+    @Synchronized
     override fun onProfile(profile: Profile) {
         Log.d(TAG, "onProfile() called with: profile = $profile")
         val tmpList = this.repository.availableProfiles.value as MutableList
         tmpList.add(profile)
-        (this.repository.availableProfiles as MutableLiveData).value = tmpList
+        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
+    }
+    @Synchronized
+    override fun onProfileTimeout(address: String) {
+        Log.d(TAG, "onProfileTimeout() called with: address = $address")
+        val tmpList = this.repository.availableProfiles.value as MutableList
+        tmpList.removeIf{it.address == address}
+        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
     }
 }

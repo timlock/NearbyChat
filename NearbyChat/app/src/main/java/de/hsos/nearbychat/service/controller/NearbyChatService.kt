@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.hsos.nearbychat.R
@@ -121,18 +120,26 @@ class NearbyChatService : Service(), MeshObserver {
     override fun onNeighbour(advertisement: Advertisement) {
         Log.d(TAG, "onNeighbour() called with: advertisement = $advertisement")
         val intent: Intent = Intent()
-        intent.action = NearbyChatService.PROFILE_ACTION
+        intent.action = NearbyChatService.ON_PROFILE_ACTION
         intent.putExtra(PROFILE_PARAM, advertisement.toString())
         this.sendBroadcast(intent)
     }
 
     override fun onNeighbourTimeout(timeoutList: List<String>) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "onNeighbourTimeout() called with: timeoutList = $timeoutList")
+        val intent: Intent = Intent()
+        intent.action = NearbyChatService.ON_PROFILE_TIMEOUT_ACTION
+        val param: ArrayList<String> = ArrayList()
+        param.addAll(timeoutList)
+        intent.putStringArrayListExtra(NearbyChatService.PROFILE_LIST_PARAM, param)
+        this.sendBroadcast(intent)
     }
 
     companion object {
         const val PROFILE_PARAM: String = "PROFILE_PARAM"
-        const val PROFILE_ACTION: String = "PROFILE_ACTION"
+        const val PROFILE_LIST_PARAM: String = "PROFILE_LIST_PARAM"
+        const val ON_PROFILE_ACTION: String = "ON_PROFILE_ACTION"
+        const val ON_PROFILE_TIMEOUT_ACTION: String = "ON_PROFILE_TIMEOUT_ACTION"
     }
 
 }
