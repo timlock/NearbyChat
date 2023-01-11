@@ -3,6 +3,8 @@ package de.hsos.nearbychat.service.bluetooth.advertise
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.*
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.util.forEach
@@ -12,7 +14,10 @@ import java.nio.ByteOrder
 import java.util.*
 
 
-class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, private val advertisingInterval: Int) :
+class BluetoothAdvertiser(
+    private var bluetoothAdapter: BluetoothAdapter,
+    private val advertisingInterval: Int
+) :
     Advertiser {
     private val TAG: String = BluetoothAdvertiser::class.java.simpleName
     private var advertiseUUID: ParcelUuid =
@@ -28,17 +33,17 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
 
     init {
         Log.d(TAG, "init: ")
-        this.maxMessageLength = this.bluetoothAdapter.leMaximumAdvertisingDataLength
+        this.maxTotalLength = this.bluetoothAdapter.leMaximumAdvertisingDataLength
         Log.d(TAG, "init: leMaximumAdvertisingDataLength: " + this.maxMessageLength)
         this.currentAdvertisingParameters = AdvertisingSetParameters.Builder()
             .setLegacyMode(false)
             .setInterval(this.advertisingInterval)
             .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_HIGH)
-            .setPrimaryPhy(BluetoothDevice.PHY_LE_CODED)
+            .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
             .setSecondaryPhy(BluetoothDevice.PHY_LE_2M)
             .build()
         Log.d(TAG, "init: currentAdvertisingParameters: $currentAdvertisingParameters")
-        val dummyData : AdvertiseData = AdvertiseData.Builder()
+        val dummyData: AdvertiseData = AdvertiseData.Builder()
             .addServiceUuid(advertiseUUID)
             .addServiceData(advertiseUUID, "".encodeToByteArray())
             .build()
@@ -76,10 +81,10 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
         }
     }
 
-    override fun stop(){
+    override fun stop() {
         try {
             this.advertiser.stopAdvertisingSet(this.advertisingSetCallback)
-        }catch (e: SecurityException){
+        } catch (e: SecurityException) {
             Log.w(TAG, "stop: ", e)
         }
     }
@@ -88,26 +93,32 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
 
     override fun send(message: String): Boolean {
         Log.d(TAG, "send() called with: message = $message")
-        val advertiseData: AdvertiseData = AdvertiseData.Builder()
-            .addServiceUuid(advertiseUUID)
-            .addServiceData(this.advertiseUUID, message.encodeToByteArray())
-            .build()
-        if (this.totalBytes(advertiseData) > this.maxMessageLength) {
-            Log.w(TAG, "changeAdvertisingData: message: $message is too large")
-            return false
-        } else {
-            this.currentAdvertisingData = advertiseData
-            return try {
-                Log.d(TAG, "changeAdvertisingData: message: $message")
-                this.currentAdvertisingSet.setAdvertisingData(
-                    this.currentAdvertisingData
-                )
-                true
-            } catch (e: SecurityException) {
-                Log.w(TAG, "initAdvertiser: ", e)
+        Handler(Looper.getMainLooper()).post {
+            val advertiseData: AdvertiseData = AdvertiseData.Builder()
+                .addServiceUuid(advertiseUUID)
+                .addServiceData(this.advertiseUUID, message.encodeToByteArray())
+                .build()
+            if (this.totalBytes(advertiseData) > this.maxMessageLength) {
+                Log.w(TAG, "changeAdvertisingData: message: $message is too large")
                 false
+            } else if (!this::currentAdvertisingSet.isInitialized) {
+                Log.w(TAG, "send: currentAdvertisingSet is not initialized")
+                false
+            } else {
+                this.currentAdvertisingData = advertiseData
+                try {
+                    Log.d(TAG, "changeAdvertisingData: message: $message")
+                    this.currentAdvertisingSet.setAdvertisingData(
+                        this.currentAdvertisingData
+                    )
+                    true
+                } catch (e: SecurityException) {
+                    Log.w(TAG, "initAdvertiser: ", e)
+                    false
+                }
             }
         }
+        return true
     }
 
     private var advertisingSetCallback: AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -144,14 +155,14 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
             }
         }
         data.serviceData.keys.forEach { uuid ->
-                val msb: Long = uuid.uuid.mostSignificantBits
-                val lsb: Long = uuid.uuid.leastSignificantBits
-                val uuidBytes: ByteArray = ByteArray(16)
-                val buf: ByteBuffer = ByteBuffer.wrap(uuidBytes).order(ByteOrder.LITTLE_ENDIAN)
-                buf.putLong(8, msb)
-                buf.putLong(0, lsb)
-                val uuidLen: Int = uuidBytes.size
-                size += 2 + uuidLen + ((data.serviceData[uuid])?.size ?: 0)
+            val msb: Long = uuid.uuid.mostSignificantBits
+            val lsb: Long = uuid.uuid.leastSignificantBits
+            val uuidBytes: ByteArray = ByteArray(16)
+            val buf: ByteBuffer = ByteBuffer.wrap(uuidBytes).order(ByteOrder.LITTLE_ENDIAN)
+            buf.putLong(8, msb)
+            buf.putLong(0, lsb)
+            val uuidLen: Int = uuidBytes.size
+            size += 2 + uuidLen + ((data.serviceData[uuid])?.size ?: 0)
         }
         data.manufacturerSpecificData.forEach { _, c -> size += 2 + 2 + c.size }
         if (data.includeTxPowerLevel) {

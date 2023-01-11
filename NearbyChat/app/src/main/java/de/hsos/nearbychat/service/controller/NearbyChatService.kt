@@ -69,7 +69,7 @@ class NearbyChatService : Service(), MeshObserver {
             val advertiser: Advertiser =
                 BluetoothAdvertiser(
                     bluetoothManager.adapter,
-                    AdvertisingSetParameters.INTERVAL_MEDIUM
+                    MeshController.ADVERTISING_INTERVAL.toInt()
                 )
             val scanner: BluetoothScanner =
                 BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)

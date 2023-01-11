@@ -34,7 +34,7 @@ class AdvertisementTest {
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.ACKNOWLEDGE_MESSAGE)
             .id('0')
-            .address("address")
+            .nextHop("address")
             .sender("sender")
             .receiver("receiver")
             .timestamp(0L)

@@ -29,7 +29,7 @@ class Neighbour(
     }
 
     override fun toString(): String {
-        return "Neighbour(address='$address', rssi=$rssi, hops=$hops, lastSeen=$lastSeen, closestNeighbour=$closestNeighbour, advertisement=$advertisement)"
+        return "Neighbour(address='$address', rssi=$rssi, hops=$hops, lastSeen=$lastSeen, closestNeighbour=${closestNeighbour?.address}, advertisement=$advertisement)"
     }
 
 

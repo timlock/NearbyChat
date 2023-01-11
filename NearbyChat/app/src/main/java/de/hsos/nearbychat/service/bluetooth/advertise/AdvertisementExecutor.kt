@@ -40,6 +40,7 @@ class AdvertisementExecutor(
             true
         }
     }
+
     @Synchronized
     fun stop() {
         if (this.isActive) {
@@ -50,6 +51,7 @@ class AdvertisementExecutor(
         }
 
     }
+
     @Synchronized
     private fun broadcast() {
         var counter: Int = 0
@@ -57,7 +59,7 @@ class AdvertisementExecutor(
         val packageBuilder = StringBuilder().append(this.idGenerator.next()).append(':')
         while (packageBuilder.length < this.sizeLimit
             && (this.messageQueue.isNotEmpty()
-                    || (advertisementCounter < this.advertisementQueue.getSize()))
+                    || advertisementCounter < this.advertisementQueue.getSize())
         ) {
             var msg: String? = null
             if (this.messageQueue.isNotEmpty()) {
@@ -76,13 +78,19 @@ class AdvertisementExecutor(
 
         }
         if (packageBuilder.length > 2) {
-            this.broadCaster.send(packageBuilder.toString())
+            if (this.broadCaster.send(packageBuilder.toString())) {
+                Log.i(TAG, "broadcast: $packageBuilder")
+            }else{
+                Log.w(TAG, "broadcast failed")
+                this.messageQueue.add(packageBuilder.toString())
+            }
         }
         Log.d(
             TAG,
-            "broadcast: Send $counter messages and $advertisementCounter advertisements, ${this.messageQueue.size} messages are remaining"
+            "broadcast: Send $counter messages including $advertisementCounter advertisements, ${this.messageQueue.size} messages are remaining"
         )
     }
+
     @Synchronized
     fun addToQueue(message: String) {
         Log.d(TAG, "send: $message")
