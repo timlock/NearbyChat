@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Switch
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import de.hsos.nearbychat.R
+
 
 /**
  * A simple [Fragment] subclass.
@@ -24,62 +23,36 @@ class SettingsView : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings_view, container, false);
 
-        // dark mode
-        val switch = view.findViewById<Switch>(R.id.settings_night_mode)
-        val nightMode = (activity as MainActivity).getNightMode()
-        switch.isChecked = nightMode
-        switch.setOnClickListener {
-            (activity as MainActivity).toggleNightMode(!nightMode)
-            (activity as MainActivity).updateNightMode()
+        when((activity as MainActivity).getAppTheme()) {
+            "dark" -> view.findViewById<RadioButton>(R.id.settings_theme_dark).isChecked = true
+            "light" -> view.findViewById<RadioButton>(R.id.settings_theme_light).isChecked = true
+            else -> view.findViewById<RadioButton>(R.id.settings_theme_default).isChecked = true
         }
 
-        // language
-        val spinner = view.findViewById<Spinner>(R.id.settings_language)
-        var language = (activity as MainActivity).getLanguage()
-        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item)
-        when(language) {
-            "en" -> {
-                adapter.add(getString(R.string.language_en))
-                adapter.add(getString(R.string.language_de))
-                adapter.add(getString(R.string.system_default))
-            }
-            "de" -> {
-                adapter.add(getString(R.string.language_de))
-                adapter.add(getString(R.string.language_en))
-                adapter.add(getString(R.string.system_default))
-            }
-            else -> {
-                adapter.add(getString(R.string.system_default))
-                adapter.add(getString(R.string.language_de))
-                adapter.add(getString(R.string.language_en))
-            }
-        }
-        spinner.adapter = adapter
-        spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                language = if(adapter.getItem(position) == getString(R.string.language_de)) {
-                    "de"
-                } else if(adapter.getItem(position) == getString(R.string.language_en)) {
-                    "en"
-                } else {
-                    "default"
-                }
-                (activity as MainActivity).setLanguage(language)
-            }
-
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
+        when((activity as MainActivity).getAppLanguage()) {
+            "en" -> view.findViewById<RadioButton>(R.id.settings_language_en).isChecked = true
+            "de" -> view.findViewById<RadioButton>(R.id.settings_language_de).isChecked = true
+            else -> view.findViewById<RadioButton>(R.id.settings_language_default).isChecked = true
         }
 
+        val themeRadio = view.findViewById<RadioGroup>(R.id.settings_theme)
+        val languageRadio = view.findViewById<RadioGroup>(R.id.settings_language)
+
+        themeRadio.setOnCheckedChangeListener {_, id ->
+            when(id) {
+                R.id.settings_theme_dark -> (activity as MainActivity).setAppTheme("dark")
+                R.id.settings_theme_light -> (activity as MainActivity).setAppTheme("light")
+                else -> (activity as MainActivity).setAppTheme("default")
+            }
+        }
+
+        languageRadio.setOnCheckedChangeListener {_, id ->
+            when(id) {
+                R.id.settings_language_en -> (activity as MainActivity).setAppLanguage("en")
+                R.id.settings_language_de-> (activity as MainActivity).setAppLanguage("de")
+                else -> (activity as MainActivity).setAppLanguage("default")
+            }
+        }
 
         return view
     }

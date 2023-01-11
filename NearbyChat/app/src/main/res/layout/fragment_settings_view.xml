@@ -18,15 +18,39 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Switch
-                android:id="@+id/settings_night_mode"
+            <TextView
+                android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:minHeight="48dp"
-                android:text="@string/night_mode" />
+                android:text="@string/theme_label" />
+
+            <RadioGroup
+                android:id="@+id/settings_theme"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <RadioButton
+                    android:id="@+id/settings_theme_dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dark_mode" />
+
+                <RadioButton
+                    android:id="@+id/settings_theme_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/light_mode" />
+
+                <RadioButton
+                    android:id="@+id/settings_theme_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/system_default" />
+            </RadioGroup>
 
             <TextView
                 android:id="@+id/textView"
@@ -36,13 +60,32 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/language_label" />
 
-            <Spinner
+            <RadioGroup
                 android:id="@+id/settings_language"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:minHeight="48dp" />
+                android:layout_marginEnd="16dp">
+
+                <RadioButton
+                    android:id="@+id/settings_language_en"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_en" />
+
+                <RadioButton
+                    android:id="@+id/settings_language_de"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_de" />
+
+                <RadioButton
+                    android:id="@+id/settings_language_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/system_default" />
+
+            </RadioGroup>
 
             <TextView
                 android:id="@+id/textView2"

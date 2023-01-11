@@ -38,8 +38,9 @@ class MainActivity : AppCompatActivity() {
         //clearDatabaseFromTestData()
         //fillDatabaseWithTestData()
 
-        updateLanguage()
-        updateNightMode()
+        updateAppLanguage()
+        updateAppTheme()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if(savedInstanceState == null) {
@@ -91,36 +92,36 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun getNightMode(): Boolean  {
-        return sharedPreferences.getBoolean("night_mode", false)
+    fun getAppTheme(): String?  {
+        return sharedPreferences.getString("theme", "default")
     }
 
-    fun toggleNightMode(boolean: Boolean) {
+    fun setAppTheme(theme: String) {
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
-        editor.putBoolean("night_mode", boolean)
+        editor.putString("theme", theme)
         editor.apply()
-        updateNightMode()
+        updateAppTheme()
     }
 
-    fun updateNightMode() {
-        if (sharedPreferences.getBoolean("night_mode", false)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+    fun updateAppTheme() {
+        when(getAppTheme()) {
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
     }
 
-    fun getLanguage(): String {
-        return sharedPreferences.getString("language", "default")!!
+    fun getAppLanguage(): String? {
+        return sharedPreferences.getString("language", "default")
     }
 
-    fun setLanguage(code: String) {
+    fun setAppLanguage(code: String) {
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
         editor.putString("language", code)
         editor.apply()
     }
 
-    private fun updateLanguage() {
+    private fun updateAppLanguage() {
         val languageSetting = sharedPreferences.getString("language", "default")
         val locale = if(languageSetting == null || languageSetting == "default") {
             Locale.getDefault()

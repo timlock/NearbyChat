@@ -20,7 +20,9 @@
     <string name="save">Speichern</string>
     <string name="saved_profile">Profil gespeichert</string>
     <string name="profile_parts_empty">Name und Beschreibung dürfen nicht leer sein</string>
-    <string name="night_mode">Nachtmodus</string>
+    <string name="theme_label">Darstellung</string>
+    <string name="dark_mode">Dunkler Modus</string>
+    <string name="light_mode">Heller Modus</string>
     <string name="language_label">Sprache:</string>
     <string name="language_en">Englisch</string>
     <string name="language_de">Deutsch</string>
