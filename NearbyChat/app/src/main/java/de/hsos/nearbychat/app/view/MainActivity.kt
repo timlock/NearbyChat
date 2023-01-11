@@ -38,13 +38,14 @@ class MainActivity : AppCompatActivity() {
         //clearDatabaseFromTestData()
         //fillDatabaseWithTestData()
 
+        updateAppLanguage()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if(savedInstanceState == null) {
             openFragment(AvailableView.newInstance())
         }
 
-        updateAppLanguage()
         updateAppTheme()
 
         bottomNavView = findViewById(R.id.bottom_navigation_view)
