@@ -10,7 +10,8 @@ import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.Scanner
 import java.util.*
 
-class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback(),Scanner  {
+class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback(),
+    Scanner {
     private val TAG: String = BluetoothScanner::class.java.simpleName
     private var observer: ScannerObserver? = null
     private var scanning = false
@@ -37,7 +38,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
         }
         if (!this.scanning) {
             return try {
-                this.bluetoothLeScanner.startScan(this.scanFilters,this.scanSettings, this)
+                this.bluetoothLeScanner.startScan(this.scanFilters, this.scanSettings, this)
                 this.scanning = true
                 true
             } catch (e: SecurityException) {
@@ -48,7 +49,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
         return false
     }
 
-   override fun stop(): Boolean {
+    override fun stop(): Boolean {
         Log.d(TAG, "stopScan: ")
         if (this.scanning) {
             return try {
@@ -69,8 +70,11 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
             var stringLog: String = result.device.name + " " + result.device.address + " "
             result.scanRecord?.serviceData?.forEach { (uuid, data) -> stringLog += " " + uuid.toString() + " " + data.decodeToString() }
             Log.i(TAG, "onScanResult: $stringLog")
-            val message: String? = result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
-            this.observer?.onPackage(result.device.address, result.rssi,message ?: "")
+            val message: String? =
+                result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
+            if (message!!.length > 2) {
+                this.observer?.onPackage(result.device.address, result.rssi, message ?: "")
+            }
         } catch (e: SecurityException) {
             Log.w(TAG, "startScan: ", e)
         }

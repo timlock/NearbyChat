@@ -18,7 +18,7 @@ class MeshController(
     private var advertiser: Advertiser,
     private var scanner: Scanner,
     var ownProfile: OwnProfile,
-    ) : ScannerObserver {
+) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
@@ -42,26 +42,38 @@ class MeshController(
             this::refresh,
             0,
             MeshController.TIMEOUT,
-            TimeUnit.SECONDS
+            TimeUnit.MILLISECONDS
         )
     }
-    private fun refresh(){
+
+    private fun refresh() {
         Log.d(TAG, "refresh() called")
         val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
         this.observer.onNeighbourTimeout(timeoutList)
         val unsentMessages = this.unacknowledgedMessageList.getMessages()
         Log.d(TAG, "Timeout for: $unsentMessages")
-        unsentMessages.forEach{ this@MeshController.advertisementExecutor.addToQueue(it.toString())}
+        unsentMessages.forEach { this@MeshController.advertisementExecutor.addToQueue(it.toString()) }
     }
 
-    fun connect(){
+    fun connect() :Boolean{
         Log.d(TAG, "connect() called")
-        this.scanner.start()
-        this.advertiser.start()
-        this.advertisementExecutor.start()
+        if (!this.scanner.start()) {
+            Log.w(TAG, "connect: scanner failed")
+            return false
+        }
+        if (!this.advertiser.start()
+        ) {
+            Log.w(TAG, "connect: advertiser failed")
+            return false
+        }
+        if(!this.advertisementExecutor.start()){
+            Log.w(TAG, "connect: advertisementExecutor failed")
+            return false
+        }
+        return true
     }
 
-    fun disconnect(){
+    fun disconnect() {
         Log.d(TAG, "disconnect() called")
         this.meshExecutor.shutdown()
         this.advertisementExecutor.stop()
@@ -73,7 +85,7 @@ class MeshController(
     fun sendMessage(message: Message) {
         this.advertisementExecutor.addToQueue(
             Advertisement.Builder()
-                .type(MessageType.MESSAGE_MESSAGE)
+                .type(MessageType.MESSAGE_MESSAGE.type)
                 .id(this.idGenerator.next())
                 .message(message.content)
                 .build()
@@ -85,7 +97,7 @@ class MeshController(
         Log.d(TAG, "updateOwnProfile() called with: ownProfile = $ownProfile")
         this.ownProfile = ownProfile
         val selfAdvertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .hops(MeshController.MAX_HOPS)
             .rssi(0)
             .address(ownProfile.address)
@@ -104,22 +116,18 @@ class MeshController(
             "onPackage() called with: macAddress = $macAddress, rssi = $rssi, advertisementPackage = $advertisementPackage"
         )
         Handler(Looper.getMainLooper()).post {
-            val timeStamp: Long = System.currentTimeMillis()
-            val closestNeighbour: Neighbour? = this.neighbourTable.getDirectNeighbour(macAddress)
-            closestNeighbour?.rssi = rssi
-            closestNeighbour?.lastSeen = timeStamp
             val packageID: Char = advertisementPackage[0]
             var lastSeparator: Int = advertisementPackage.indexOf(':') + 1
-            var nextSeparator: Int = advertisementPackage.indexOf('}')
+            var nextSeparator: Int = advertisementPackage.indexOf('}') + 1
             do {
                 var message: String = advertisementPackage.substring(lastSeparator, nextSeparator)
                 if (!message.contains('{') && !message.contains('}')) {
                     message = this.messageBuffer.add(packageID, message) ?: message
                 }
-                this.parseMessage(message, closestNeighbour, advertisementPackage)
+                this.parseMessage(message)
                 lastSeparator = nextSeparator + 1
-                nextSeparator = advertisementPackage.indexOf('}', nextSeparator)
-                if (nextSeparator == -1) {
+                nextSeparator = advertisementPackage.indexOf('}', nextSeparator + 1)
+                if (nextSeparator == -1 && lastSeparator < advertisementPackage.length) {
                     this.messageBuffer.add(packageID, advertisementPackage.substring(lastSeparator))
                 }
             } while (nextSeparator != -1)
@@ -127,26 +135,24 @@ class MeshController(
     }
 
     private fun parseMessage(
-        message: String,
-        closestNeighbour: Neighbour?,
-        advertisementPackage: String
+        message: String
     ) {
         val advertisement =
             Advertisement.Builder().rawMessage(message).build()
         when (advertisement.type) {
-            MessageType.MESSAGE_MESSAGE -> {
+            MessageType.MESSAGE_MESSAGE.type -> {
                 handleMessage(advertisement)
             }
-            MessageType.ACKNOWLEDGE_MESSAGE -> {
+            MessageType.ACKNOWLEDGE_MESSAGE.type -> {
                 handleAcknowledgment(advertisement)
             }
-            MessageType.NEIGHBOUR_MESSAGE -> {
-                handleNeighbour(advertisement, closestNeighbour)
+            MessageType.NEIGHBOUR_MESSAGE.type -> {
+                handleNeighbour(advertisement)
             }
             else -> {
                 Log.w(
                     TAG,
-                    "onMessage: received faulty message: $advertisementPackage from: $closestNeighbour"
+                    "onMessage: received faulty message: $message"
                 )
             }
         }
@@ -155,7 +161,11 @@ class MeshController(
 
     private fun handleAcknowledgment(advertisement: Advertisement) {
         if (this.ownProfile.address == advertisement.receiver) {
-            if(this.unacknowledgedMessageList.acknowledge(advertisement.sender!!,advertisement.timestamp!!)){
+            if (this.unacknowledgedMessageList.acknowledge(
+                    advertisement.sender!!,
+                    advertisement.timestamp!!
+                )
+            ) {
                 Log.d(TAG, "onMessage: received ack for this device")
                 this.observer.onMessageAck(advertisement)
             }
@@ -196,21 +206,24 @@ class MeshController(
     }
 
     private fun handleNeighbour(
-        advertisement: Advertisement,
-        closestNeighbour: Neighbour?
+        advertisement: Advertisement
     ) {
         advertisement.decrementHop()
         if (advertisement.hops!! < 0) {
             return
         } else {
+            val timeStamp: Long = System.currentTimeMillis()
             val neighbour: Neighbour = Neighbour(
                 advertisement.address!!,
                 advertisement.rssi!!,
                 advertisement.hops!!,
-                closestNeighbour!!.lastSeen,
-                closestNeighbour,
+                timeStamp,
+                null,
                 advertisement
             )
+            if(advertisement.hops!! >= MeshController.MAX_HOPS - 1){
+                neighbour.closestNeighbour = neighbour
+            }
             this.neighbourTable.updateNeighbour(neighbour)
             this.observer.onNeighbour(advertisement)
         }
@@ -219,6 +232,6 @@ class MeshController(
     companion object {
         const val MAX_HOPS: Int = 10
         const val TIMEOUT: Long = 5000L
-        const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MEDIUM.toLong()
+        const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_HIGH.toLong()
     }
 }

@@ -4,9 +4,10 @@ import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.MessageType
 
 class Advertisement private constructor(
-    var type: MessageType? = null,
+    var type: Char? = null,
     var id: Char? = null,
     var hops: Int? = null,
+    var nextHop: String? = null,
     var rssi: Int? = null,
     var address: String? = null,
     var sender: String? = null,
@@ -26,10 +27,10 @@ class Advertisement private constructor(
     override fun toString(): String {
         val builder: StringBuilder = StringBuilder()
             .append("{")
-            .append(type?.type)
+            .append(type)
             .append(":")
         when (type) {
-            MessageType.NEIGHBOUR_MESSAGE -> {
+            MessageType.NEIGHBOUR_MESSAGE.type -> {
                 builder.append(hops)
                     .append(';')
                     .append(rssi)
@@ -42,10 +43,10 @@ class Advertisement private constructor(
                     .append(';')
                     .append(color)
             }
-            MessageType.ACKNOWLEDGE_MESSAGE -> {
+            MessageType.ACKNOWLEDGE_MESSAGE.type -> {
                 builder.append(id)
                     .append(';')
-                    .append(address)
+                    .append(nextHop)
                     .append(';')
                     .append(sender)
                     .append(';')
@@ -53,7 +54,7 @@ class Advertisement private constructor(
                     .append(';')
                     .append(timestamp)
             }
-            MessageType.MESSAGE_MESSAGE -> {
+            MessageType.MESSAGE_MESSAGE.type -> {
                 builder.append(id)
                     .append(';')
                     .append(address)
@@ -75,9 +76,10 @@ class Advertisement private constructor(
     }
 
     data class Builder(
-        var type: MessageType? = null,
+        var type: Char? = null,
         var id: Char? = null,
         var hops: Int? = null,
+        var nextHop: String? = null,
         var rssi: Int? = null,
         var address: String? = null,
         var sender: String? = null,
@@ -89,9 +91,10 @@ class Advertisement private constructor(
         var timestamp: Long? = null
     ) {
         private val TAG: String = Advertisement.Builder::class.java.simpleName
-        fun type(type: MessageType) = apply { this.type = type }
+        fun type(type: Char) = apply { this.type = type }
         fun id(id: Char) = apply { this.id = id }
         fun hops(hops: Int) = apply { this.hops = hops }
+        fun nextHop(nextHop: String) = apply { this.nextHop = nextHop }
         fun rssi(rssi: Int) = apply { this.rssi = rssi }
         fun address(address: String) = apply { this.address = address }
         fun sender(sender: String) = apply { this.sender = sender }
@@ -103,16 +106,16 @@ class Advertisement private constructor(
         fun timestamp(timestamp: Long) = apply {this.timestamp = timestamp}
         fun rawMessage(rawMessage: String) = apply {
             try {
-                this.type = MessageType.values().first { it.type == rawMessage[1] }
+                this.type = rawMessage[1]
                 when (this.type) {
-                    MessageType.MESSAGE_MESSAGE -> {
+                    MessageType.MESSAGE_MESSAGE.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id =
                             rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
@@ -126,13 +129,13 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf('}')
                         this.message = rawMessage.substring(lastSeparator, nextSeparator)
                     }
-                    MessageType.ACKNOWLEDGE_MESSAGE -> {
+                    MessageType.ACKNOWLEDGE_MESSAGE.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id = rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
@@ -143,7 +146,7 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                     }
-                    MessageType.NEIGHBOUR_MESSAGE -> {
+                    MessageType.NEIGHBOUR_MESSAGE.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.hops = rawMessage.substring(lastSeparator, nextSeparator).toInt()
@@ -179,6 +182,7 @@ class Advertisement private constructor(
                 type,
                 id,
                 hops,
+                nextHop,
                 rssi,
                 address,
                 sender,
