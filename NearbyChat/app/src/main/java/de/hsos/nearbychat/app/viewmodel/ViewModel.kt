@@ -37,12 +37,7 @@ class ViewModel(private val repository: Repository, application: Application) :
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
         var profile = repository.ownProfile.value
         if (profile == null) {
-            profile = OwnProfile(
-                Settings.Secure.getString(
-                    getApplication<NearbyApplication>().getContentResolver(),
-                    Settings.Secure.ANDROID_ID
-                )
-            )
+            profile = OwnProfile(getApplication<NearbyApplication>().ownAddress)
         }
         profile.name = name
         profile.description = description
