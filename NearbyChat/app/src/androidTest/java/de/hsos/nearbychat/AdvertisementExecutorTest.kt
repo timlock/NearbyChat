@@ -4,6 +4,7 @@ package de.hsos.nearbychat
 import android.util.Log
 import androidx.core.graphics.blue
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MessageType
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
@@ -23,9 +24,23 @@ class AdvertisementExecutorTest {
         var actual: String = ""
         var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual = message.substring(2)
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual = message.substring(2)
+                    return true
+                }
             },
             1000L,
             10,
@@ -42,10 +57,23 @@ class AdvertisementExecutorTest {
         var actual: String = ""
         var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual += message.substring(2)
-                Log.d("Test", "messageCutOff: $message")
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual = message.substring(2)
+                    return true
+                }
             },
             1000L,
             4,
@@ -72,9 +100,23 @@ class AdvertisementExecutorTest {
         neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual.add(message.substring(2))
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual.add(message.substring(2))
+                    return true
+                }
             },
             1000L,
             50,
@@ -101,9 +143,23 @@ class AdvertisementExecutorTest {
         val message = "test"
         var actual: MutableList<String> = mutableListOf()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            {
-                actual.add(it.substring(2))
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual.add(message.substring(2))
+                    return true
+                }
             },
             1000L,
             50,

@@ -80,7 +80,7 @@ class NearbyChatService : Service(), MeshObserver {
                 self.description =
                     applicationContext.resources.getString(R.string.error_desc_missing)
             }
-            this.meshController = MeshController(this, advertiser, self!!, scanner)
+            this.meshController = MeshController(this, advertiser, scanner, self!!)
             this.meshController.connect()
         }
     }

@@ -13,7 +13,7 @@ import java.util.*
 
 
 class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, private val advertisingInterval: Int) :
-    Client, Advertiser {
+    Advertiser {
     private val TAG: String = BluetoothAdvertiser::class.java.simpleName
     private var advertiseUUID: ParcelUuid =
         ParcelUuid(UUID.fromString("e889813c-5d19-49e2-8bc4-d4596b4f5250"))

@@ -6,7 +6,6 @@ import android.os.Looper
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.service.bluetooth.advertise.Client
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.*
@@ -17,9 +16,9 @@ import java.util.concurrent.TimeUnit
 class MeshController(
     private var observer: MeshObserver,
     private var advertiser: Advertiser,
+    private var scanner: Scanner,
     var ownProfile: OwnProfile,
-    private var scanner: Scanner
-) : ScannerObserver {
+    ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
@@ -33,8 +32,8 @@ class MeshController(
     init {
         this.updateOwnProfile(this.ownProfile)
         this.advertisementExecutor = AdvertisementExecutor(
-            this.advertiser as Client,
-            AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
+            this.advertiser,
+            MeshController.ADVERTISING_INTERVAL,
             this.advertiser.getMaxMessageSize(),
             this.neighbourTable
         )
@@ -47,9 +46,11 @@ class MeshController(
         )
     }
     private fun refresh(){
+        Log.d(TAG, "refresh() called")
         val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
         this.observer.onNeighbourTimeout(timeoutList)
         val unsentMessages = this.unacknowledgedMessageList.getMessages()
+        Log.d(TAG, "Timeout for: $unsentMessages")
         unsentMessages.forEach{ this@MeshController.advertisementExecutor.addToQueue(it.toString())}
     }
 
@@ -93,7 +94,7 @@ class MeshController(
             .color(ownProfile.color)
             .build()
         val self: Neighbour =
-            Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, -1, null, selfAdvertisement)
+            Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
         this.neighbourTable.updateNeighbour(self)
     }
 
@@ -218,5 +219,6 @@ class MeshController(
     companion object {
         const val MAX_HOPS: Int = 10
         const val TIMEOUT: Long = 5000L
+        const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MEDIUM.toLong()
     }
 }

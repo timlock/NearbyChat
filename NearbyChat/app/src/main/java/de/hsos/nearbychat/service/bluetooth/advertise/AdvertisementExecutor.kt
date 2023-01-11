@@ -1,6 +1,7 @@
 package de.hsos.nearbychat.service.bluetooth.advertise
 
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
 import java.util.*
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 
 class AdvertisementExecutor(
-    private val broadCaster: Client,
+    private val broadCaster: Advertiser,
     val period: Long,
     private val sizeLimit: Int,
     private val advertisementQueue: AdvertisementQueue,
