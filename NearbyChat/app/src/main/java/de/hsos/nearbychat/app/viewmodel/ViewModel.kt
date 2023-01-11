@@ -112,15 +112,12 @@ class ViewModel(private val repository: Repository, application: Application) :
     @Synchronized
     override fun onProfile(profile: Profile) {
         Log.d(TAG, "onProfile() called with: profile = $profile")
-        val tmpList = this.repository.availableProfiles.value as MutableList
-        tmpList.add(profile)
-        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
+        this.updateAvailableProfile(profile)
+
     }
     @Synchronized
     override fun onProfileTimeout(address: String) {
         Log.d(TAG, "onProfileTimeout() called with: address = $address")
-        val tmpList = this.repository.availableProfiles.value as MutableList
-        tmpList.removeIf{it.address == address}
-        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
+        this.deleteAvailableProfile(address)
     }
 }

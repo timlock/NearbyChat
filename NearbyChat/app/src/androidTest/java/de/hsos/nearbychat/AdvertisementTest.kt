@@ -14,7 +14,7 @@ class AdvertisementTest {
     @Test
     fun message() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.MESSAGE_MESSAGE)
+            .type(MessageType.MESSAGE_MESSAGE.type)
             .id('0')
             .address("address")
             .sender("sender")
@@ -32,7 +32,7 @@ class AdvertisementTest {
     @Test
     fun ack() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.ACKNOWLEDGE_MESSAGE)
+            .type(MessageType.ACKNOWLEDGE_MESSAGE.type)
             .id('0')
             .nextHop("address")
             .sender("sender")
@@ -50,7 +50,7 @@ class AdvertisementTest {
     @Test
     fun neighbour() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .hops(10)
             .rssi(-50)
             .address("address")
