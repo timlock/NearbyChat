@@ -24,18 +24,7 @@ class MeshController(
     private var messageBuffer: MessageBuffer = MessageBuffer()
 
     init {
-        val selfAdvertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
-            .hops(MeshController.MAX_HOPS)
-            .rssi(0)
-            .address(ownProfile.address)
-            .name(ownProfile.name)
-            .description(ownProfile.description)
-            .color(ownProfile.color)
-            .build()
-        val self: Neighbour =
-            Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
-        this.neighbourTable.updateNeighbour(self)
+        this.updateOwnProfile(this.ownProfile)
         this.advertisementExecutor = AdvertisementExecutor(
             this.advertiser as Client,
             AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
@@ -76,6 +65,23 @@ class MeshController(
                 .build()
                 .toString()
         )
+    }
+
+    fun updateOwnProfile(ownProfile: OwnProfile){
+        Log.d(TAG, "updateOwnProfile() called with: ownProfile = $ownProfile")
+        this.ownProfile = ownProfile
+        val selfAdvertisement: Advertisement = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .hops(MeshController.MAX_HOPS)
+            .rssi(0)
+            .address(ownProfile.address)
+            .name(ownProfile.name)
+            .description(ownProfile.description)
+            .color(ownProfile.color)
+            .build()
+        val self: Neighbour =
+            Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, -1, null, selfAdvertisement)
+        this.neighbourTable.updateNeighbour(self)
     }
 
     override fun onPackage(macAddress: String, rssi: Int, advertisementPackage: String) {

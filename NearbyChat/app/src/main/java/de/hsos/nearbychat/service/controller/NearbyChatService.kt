@@ -34,7 +34,7 @@ class NearbyChatService : Service(), MeshObserver {
 
     private val ownProfileObserver = Observer<OwnProfile?> { p ->
         if (p != null) {
-            this.meshController.ownProfile = p
+            this.meshController.updateOwnProfile(p)
         }
     }
 
@@ -45,10 +45,6 @@ class NearbyChatService : Service(), MeshObserver {
         this.ownProfile.observeForever(this.ownProfileObserver)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "onStartCommand: ")
-        return super.onStartCommand(intent, flags, startId)
-    }
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy: ")
