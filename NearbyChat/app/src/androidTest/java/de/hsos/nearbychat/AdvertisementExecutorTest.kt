@@ -21,7 +21,7 @@ class AdvertisementExecutorTest {
     @Test
     fun send() {
         var actual: String = ""
-        var expected : String ="test"
+        var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             { message ->
                 actual = message.substring(2)
@@ -34,12 +34,13 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
         Thread.sleep(advertisementExecutor.period * 2)
-        assertEquals(expected,actual)
+        assertEquals(expected, actual)
     }
+
     @Test
     fun messageCutOff() {
         var actual: String = ""
-        var expected : String ="test"
+        var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             { message ->
                 actual += message.substring(2)
@@ -53,10 +54,11 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
         Thread.sleep(advertisementExecutor.period * 2)
-        assertEquals(expected,actual)
+        assertEquals(expected, actual)
     }
+
     @Test
-    fun sendAdvertisements(){
+    fun sendAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .rssi(1)
@@ -66,8 +68,8 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable : NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins",1,1,1, advertisement = advertisement))
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             { message ->
@@ -84,7 +86,7 @@ class AdvertisementExecutorTest {
     }
 
     @Test
-    fun sendMessageAndAdvertisements(){
+    fun sendMessageAndAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .rssi(1)
@@ -94,13 +96,13 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable : NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins",1,1,1, advertisement = advertisement))
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         val message = "test"
-        var actual: MutableList<String> = LinkedList()
+        var actual: MutableList<String> = mutableListOf()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual.add(message.substring(2))
+            {
+                actual.add(it.substring(2))
                 true
             },
             1000L,
@@ -110,10 +112,12 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(message)
         Thread.sleep(advertisementExecutor.period * 2)
+        advertisementExecutor.stop()
+        Thread.sleep(advertisementExecutor.period)
         assertTrue(actual.contains(advertisement.toString()))
-        var result : Boolean = false
-        actual.forEach{
-            if(it.contains(message)) result = true
+        var result: Boolean = false
+        actual.forEach {
+            if (it.contains(message)) result = true
         }
         assertTrue(result)
     }

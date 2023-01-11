@@ -34,7 +34,7 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
     fun getEntry(address: String): Neighbour? =
         this.neighbourList.firstOrNull { item -> item.address == address }
 
-
+    @Synchronized
     override fun getNextElement(): Neighbour? {
         return if (this.neighbourList.isEmpty()) {
             null
@@ -54,5 +54,13 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
     }
 
     override fun getSize(): Int = this.neighbourList.size
+
+    @Synchronized
+    fun removeNeighboursWithTimeout(): List<String> {
+        val timeoutList =
+            this.neighbourList.filter { n -> System.currentTimeMillis() - n.lastSeen > this.timeout }
+        this.neighbourList.removeAll(timeoutList)
+        return timeoutList.map { it.address }
+    }
 
 }

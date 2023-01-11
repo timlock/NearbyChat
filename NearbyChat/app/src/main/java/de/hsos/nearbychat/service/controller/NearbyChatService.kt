@@ -126,6 +126,10 @@ class NearbyChatService : Service(), MeshObserver {
         this.sendBroadcast(intent)
     }
 
+    override fun onNeighbourTimeout(timeoutList: List<String>) {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val PROFILE_PARAM: String = "PROFILE_PARAM"
         const val PROFILE_ACTION: String = "PROFILE_ACTION"

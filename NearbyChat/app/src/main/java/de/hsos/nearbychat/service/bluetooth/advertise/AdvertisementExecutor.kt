@@ -35,10 +35,11 @@ class AdvertisementExecutor(
                 this.period,
                 TimeUnit.MILLISECONDS
             )
+            this.isActive = true
             true
         }
     }
-
+    @Synchronized
     fun stop() {
         if (this.isActive) {
             Log.d(TAG, "stop: ")
@@ -48,7 +49,7 @@ class AdvertisementExecutor(
         }
 
     }
-
+    @Synchronized
     private fun broadcast() {
         var counter: Int = 0
         var advertisementCounter: Int = 0
@@ -83,7 +84,7 @@ class AdvertisementExecutor(
         Log.d(TAG, "broadcast: Send $advertisementCounter advertisements")
 
     }
-
+    @Synchronized
     fun addToQueue(message: String) {
         Log.d(TAG, "send: $message")
         this.messageQueue.add(message)
