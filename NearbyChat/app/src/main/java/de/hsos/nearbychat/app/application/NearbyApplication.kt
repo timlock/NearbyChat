@@ -9,7 +9,7 @@ import de.hsos.nearbychat.app.data.Repository
 class NearbyApplication: Application() {
     private val database by lazy { Database.getDatabase(this) }
     val repository by lazy { Repository(database) }
-    val ownAddress: String = Settings.Secure.getString(this.contentResolver,Settings.Secure.ANDROID_ID)
+    val ownAddress: String by lazy { Settings.Secure.getString(this.getContentResolver(),Settings.Secure.ANDROID_ID) }
     val TAG: String = Application::class.java.simpleName
 
 //    init{
