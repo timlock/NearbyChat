@@ -71,7 +71,7 @@ class AdvertisementExecutorTest {
                 }
 
                 override fun send(message: String): Boolean {
-                    actual = message.substring(2)
+                    actual += message.substring(2)
                     return true
                 }
             },

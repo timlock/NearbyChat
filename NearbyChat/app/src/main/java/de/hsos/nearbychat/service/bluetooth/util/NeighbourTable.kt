@@ -6,8 +6,6 @@ import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementQueue
 class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
     private val TAG: String = NeighbourTable::class.java.simpleName
     private var neighbourList: MutableList<Neighbour> = mutableListOf()
-    private val directNeighbourTable: HashMap<String, Neighbour> =
-        HashMap()
     private var firstAddressToAdvertise: Int = 0
 
     @Synchronized
@@ -32,8 +30,6 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
         return entry?.closestNeighbour?.address
     }
 
-
-    fun getDirectNeighbour(macAddress: String): Neighbour? = this.directNeighbourTable[macAddress]
     fun getEntry(address: String): Neighbour? =
         this.neighbourList.firstOrNull { item -> item.address == address }
 
@@ -62,9 +58,9 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
     @Synchronized
     fun removeNeighboursWithTimeout(): List<String> {
         val timeoutList =
-            this.neighbourList.filter { n -> System.currentTimeMillis() - n.lastSeen > this.timeout && n.lastSeen != 0L  }
+            this.neighbourList.filter { n -> System.currentTimeMillis() - n.lastSeen > this.timeout && n.lastSeen != 0L }
         this.neighbourList.removeAll(timeoutList)
-        if(this.firstAddressToAdvertise >= this.neighbourList.size){
+        if (this.firstAddressToAdvertise >= this.neighbourList.size) {
             this.firstAddressToAdvertise = 0
         }
         return timeoutList.map { it.address }

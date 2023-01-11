@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         if(savedInstanceState == null) {
             openFragment(AvailableView.newInstance())
         }
+        PermissionManager.permissionCheck(this,this)
 
 
         bottomNavView = findViewById(R.id.bottom_navigation_view)
@@ -68,7 +69,6 @@ class MainActivity : AppCompatActivity() {
                     return@setOnItemSelectedListener true
                 }
             }
-            PermissionManager.permissionCheck(this,this)
             return@setOnItemSelectedListener false
         }
     }

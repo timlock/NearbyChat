@@ -69,12 +69,14 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
             when (intent?.action) {
                 NearbyChatService.ON_PROFILE_ACTION -> {
                     val param: String? = intent.getStringExtra(NearbyChatService.PROFILE_PARAM)
+                    Log.d(TAG, "onReceive() ON_PROFILE_ACTION param = $param")
                     if (param == null) {
                         Log.w(
                             TAG,
                             "onReceive: received ${NearbyChatService.ON_PROFILE_ACTION} intent without content"
                         )
                     } else {
+                        Advertisement.Builder()
                         val advertisement: Advertisement = Advertisement.Builder()
                             .rawMessage(param)
                             .build()
