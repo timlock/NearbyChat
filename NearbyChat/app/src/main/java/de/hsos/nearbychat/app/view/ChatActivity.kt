@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
@@ -42,11 +43,18 @@ class ChatActivity : AppCompatActivity() {
         val scrollPos = savedInstanceState?.getInt("CHAT_SCROLL_POS")
 
         val address = intent.extras?.getString(INTENT_ADDRESS) ?: return
+        val fromAvailable = intent.extras?.getBoolean(INTENT_FROM_AVAILABLE) ?: return
         recyclerView = findViewById(R.id.chat_messages_recycler)
         scrollButton = findViewById(R.id.chat_scroll_down)
         unreadDot = findViewById(R.id.chat_unread_dot)
 
-        viewModel.savedProfiles.observe(this) {
+        val liveData = if(fromAvailable) {
+            viewModel.availableProfiles
+        } else {
+            viewModel.savedProfiles
+        }
+
+        liveData.observe(this) {
             it.forEach { profile ->
                 if (profile.address == address) {
                     this.profile = profile
@@ -113,6 +121,9 @@ class ChatActivity : AppCompatActivity() {
                 message.isSelfAuthored = true
                 editText.text.clear()
                 viewModel.addMessage(message)
+                if(fromAvailable) {
+                    viewModel.updateSavedProfile(profile!!)
+                }
             }
         }
     }
@@ -149,5 +160,6 @@ class ChatActivity : AppCompatActivity() {
 
     companion object {
         const val INTENT_ADDRESS = "address"
+        const val INTENT_FROM_AVAILABLE = "fromAvailable"
     }
 }

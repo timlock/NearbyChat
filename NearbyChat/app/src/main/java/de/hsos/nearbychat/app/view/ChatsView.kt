@@ -33,7 +33,7 @@ class ChatsView : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val adapter = ChatUserAdapter(){
-            (activity as MainActivity).openChat(it!!)
+            (activity as MainActivity).openChat(it!!, false)
         }
 
         viewModel.savedProfiles.observe(viewLifecycleOwner) { profiles ->
