@@ -14,7 +14,7 @@ import de.hsos.nearbychat.app.viewmodel.NearbyChatServiceCon
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class NearbyApplication: android.app.Application(), NearbyChatObserver {
+class NearbyApplication: Application(), NearbyChatObserver {
     private val database by lazy { Database.getDatabase(this) }
     val repository by lazy { Repository(database) }
 
