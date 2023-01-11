@@ -12,9 +12,6 @@ interface ProfileDao {
     @Query("SELECT * FROM Profile ORDER BY lastInteraction DESC")
     fun get(): LiveData<List<Profile>>
 
-    @Query("SELECT * FROM Profile WHERE address = :macAddress")
-    fun get(macAddress: String): LiveData<Profile>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(profile: Profile)
 

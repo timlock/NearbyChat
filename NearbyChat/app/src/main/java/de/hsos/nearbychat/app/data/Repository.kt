@@ -143,8 +143,7 @@ class Repository(database: Database) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun getOwnProfile(): OwnProfile? {
-        return ownProfileDao.getRaw()
+    suspend fun getUnsentMessages(): List<Message> {
+        return messageDao.getUnsentMessages()
     }
-
 }
