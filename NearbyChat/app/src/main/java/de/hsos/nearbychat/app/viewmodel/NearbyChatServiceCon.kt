@@ -4,7 +4,6 @@ import android.content.*
 import android.os.IBinder
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.controller.NearbyChatService
@@ -26,21 +25,35 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
         Log.d(TAG, "onServiceDisconnected() called with: name = $name")
     }
 
-    fun startService(context: Context, ownAddress: String) {
+    fun connect(context: Context, ownAddress: String) {
         Log.d(TAG, "startService: ")
-        val filterServiceStarted: IntentFilter =  IntentFilter(NearbyChatService.PROFILE_ACTION)
-        context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
+        registerReceiver(context)
         this.ownAddress = ownAddress
+        startService(context)
+    }
+
+    private fun startService(context: Context) {
         val startServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
+        startServiceIntent.action = "a"
         context.startService(startServiceIntent)
         val bindToServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
         context.bindService(bindToServiceIntent, this, Context.BIND_AUTO_CREATE)
     }
 
-    fun closeService(context: Context){
-        this.nearbyChatService.stop()
+    private fun registerReceiver(context: Context) {
+        val filterServiceStarted: IntentFilter = IntentFilter(NearbyChatService.PROFILE_ACTION)
+        context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
+    }
+
+    fun disconnect(context: Context){
+        Log.d(TAG, "disconnect: ")
         context.unbindService(this)
         context.unregisterReceiver(this.broadcastReceiver)
+    }
+
+    fun closeService(context: Context){
+        this.nearbyChatService.stop()
+        this.disconnect(context)
     }
 
     fun sendMessage(message: Message): Boolean{

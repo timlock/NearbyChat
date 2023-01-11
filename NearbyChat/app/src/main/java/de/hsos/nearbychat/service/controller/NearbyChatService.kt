@@ -29,8 +29,9 @@ class NearbyChatService : Service(), MeshObserver {
     private val TAG: String = NearbyChatService::class.java.simpleName
     private val binder = LocalBinder()
     private lateinit var meshController: MeshController
-    private var repository: Repository = (application as NearbyApplication).repository
-    private var ownProfile: LiveData<OwnProfile?> = repository.ownProfile
+    private lateinit var repository: Repository
+    private lateinit var ownProfile: LiveData<OwnProfile?>
+
     private val ownProfileObserver = Observer<OwnProfile?> { p ->
         if (p != null) {
             this.meshController.ownProfile = p
@@ -38,10 +39,19 @@ class NearbyChatService : Service(), MeshObserver {
     }
 
     override fun onCreate() {
+        Log.d(TAG, "onCreate: ")
+        this.repository =  (application as NearbyApplication).repository
+        this.ownProfile = this.repository.ownProfile
         this.ownProfile.observeForever(this.ownProfileObserver)
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand: ")
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy: ")
         this.ownProfile.removeObserver(this.ownProfileObserver)
     }
 

@@ -3,19 +3,14 @@ package de.hsos.nearbychat.app.viewmodel
 import android.app.Application
 import android.provider.Settings
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
 import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.data.OwnProfileDao
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlin.math.log
 
 
 class ViewModel(private val repository: Repository, application: Application) :
@@ -27,11 +22,14 @@ class ViewModel(private val repository: Repository, application: Application) :
     val chatServiceCon: NearbyChatServiceCon = NearbyChatServiceCon(this)
 
     init {
-        this.chatServiceCon.startService(
+        this.chatServiceCon.connect(
             application,
             (application as NearbyApplication).ownAddress
         )
+    }
 
+    override fun onCleared() {
+        this.chatServiceCon.disconnect(getApplication())
     }
 
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
