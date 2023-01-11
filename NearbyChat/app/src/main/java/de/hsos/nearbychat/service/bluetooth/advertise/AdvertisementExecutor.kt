@@ -1,6 +1,7 @@
 package de.hsos.nearbychat.service.bluetooth.advertise
 
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
 import java.util.*
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 
 class AdvertisementExecutor(
-    private val broadCaster: Client,
+    private val broadCaster: Advertiser,
     val period: Long,
     private val sizeLimit: Int,
     private val advertisementQueue: AdvertisementQueue,
@@ -35,10 +36,11 @@ class AdvertisementExecutor(
                 this.period,
                 TimeUnit.MILLISECONDS
             )
+            this.isActive = true
             true
         }
     }
-
+    @Synchronized
     fun stop() {
         if (this.isActive) {
             Log.d(TAG, "stop: ")
@@ -48,7 +50,7 @@ class AdvertisementExecutor(
         }
 
     }
-
+    @Synchronized
     private fun broadcast() {
         var counter: Int = 0
         var advertisementCounter: Int = 0
@@ -78,12 +80,10 @@ class AdvertisementExecutor(
         }
         Log.d(
             TAG,
-            "broadcast: Send $counter messages, ${this.messageQueue.size} messages are remaining"
+            "broadcast: Send $counter messages and $advertisementCounter advertisements, ${this.messageQueue.size} messages are remaining"
         )
-        Log.d(TAG, "broadcast: Send $advertisementCounter advertisements")
-
     }
-
+    @Synchronized
     fun addToQueue(message: String) {
         Log.d(TAG, "send: $message")
         this.messageQueue.add(message)

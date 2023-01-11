@@ -6,4 +6,5 @@ interface MeshObserver {
     fun onMessage(advertisement: Advertisement)
     fun onMessageAck(advertisement: Advertisement)
     fun onNeighbour(advertisement: Advertisement)
+    fun onNeighbourTimeout(timeoutList: List<String>)
 }

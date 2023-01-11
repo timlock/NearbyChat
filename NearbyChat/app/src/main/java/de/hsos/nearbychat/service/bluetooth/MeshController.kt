@@ -6,24 +6,84 @@ import android.os.Looper
 import android.util.Log
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.service.bluetooth.advertise.Client
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class MeshController(
     private var observer: MeshObserver,
     private var advertiser: Advertiser,
-    private var ownProfile: OwnProfile,
-    private var scanner: Scanner
-) : ScannerObserver {
+    private var scanner: Scanner,
+    var ownProfile: OwnProfile,
+    ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
+    private var slidingWindowTable: SlidingWindow = SlidingWindow()
+    private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
+    private val meshExecutor: ScheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor()
 
     init {
+        this.updateOwnProfile(this.ownProfile)
+        this.advertisementExecutor = AdvertisementExecutor(
+            this.advertiser,
+            MeshController.ADVERTISING_INTERVAL,
+            this.advertiser.getMaxMessageSize(),
+            this.neighbourTable
+        )
+        this.scanner.subscribe(this)
+        this.meshExecutor.scheduleAtFixedRate(
+            this::refresh,
+            0,
+            MeshController.TIMEOUT,
+            TimeUnit.SECONDS
+        )
+    }
+    private fun refresh(){
+        Log.d(TAG, "refresh() called")
+        val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
+        this.observer.onNeighbourTimeout(timeoutList)
+        val unsentMessages = this.unacknowledgedMessageList.getMessages()
+        Log.d(TAG, "Timeout for: $unsentMessages")
+        unsentMessages.forEach{ this@MeshController.advertisementExecutor.addToQueue(it.toString())}
+    }
+
+    fun connect(){
+        Log.d(TAG, "connect() called")
+        this.scanner.start()
+        this.advertiser.start()
+        this.advertisementExecutor.start()
+    }
+
+    fun disconnect(){
+        Log.d(TAG, "disconnect() called")
+        this.meshExecutor.shutdown()
+        this.advertisementExecutor.stop()
+        this.advertiser.stop()
+        this.scanner.stop()
+    }
+
+
+    fun sendMessage(message: Message) {
+        this.advertisementExecutor.addToQueue(
+            Advertisement.Builder()
+                .type(MessageType.MESSAGE_MESSAGE)
+                .id(this.idGenerator.next())
+                .message(message.content)
+                .build()
+                .toString()
+        )
+    }
+
+    fun updateOwnProfile(ownProfile: OwnProfile) {
+        Log.d(TAG, "updateOwnProfile() called with: ownProfile = $ownProfile")
+        this.ownProfile = ownProfile
         val selfAdvertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .hops(MeshController.MAX_HOPS)
@@ -36,46 +96,6 @@ class MeshController(
         val self: Neighbour =
             Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
         this.neighbourTable.updateNeighbour(self)
-        this.advertisementExecutor = AdvertisementExecutor(
-            this.advertiser as Client,
-            AdvertisingSetParameters.INTERVAL_MEDIUM.toLong(),
-            this.advertiser.getMaxMessageSize(),
-            this.neighbourTable
-        )
-        this.scanner.subscribe(this)
-    }
-
-    fun startScan() {
-        Log.d(TAG, "startScan: ")
-        this.scanner.start()
-    }
-
-    fun stopScan() {
-        Log.d(TAG, "stopScan: ")
-        this.scanner.stop()
-    }
-
-    fun startAdvertise() {
-        Log.d(TAG, "startAdvertise: ")
-        this.advertiser.start()
-        this.advertisementExecutor.start()
-    }
-
-    fun stopAdvertising() {
-        Log.d(TAG, "stopAdvertising: ")
-        this.advertisementExecutor.stop()
-        this.advertiser.stop()
-    }
-
-    fun sendMessage(message: Message) {
-        this.advertisementExecutor.addToQueue(
-            Advertisement.Builder()
-                .type(MessageType.MESSAGE_MESSAGE)
-                .id(this.idGenerator.next())
-                .message(message.content)
-                .build()
-                .toString()
-        )
     }
 
     override fun onPackage(macAddress: String, rssi: Int, advertisementPackage: String) {
@@ -135,8 +155,10 @@ class MeshController(
 
     private fun handleAcknowledgment(advertisement: Advertisement) {
         if (this.ownProfile.address == advertisement.receiver) {
-            Log.d(TAG, "onMessage: received ack for this device")
-            this.observer.onMessageAck(advertisement)
+            if(this.unacknowledgedMessageList.acknowledge(advertisement.sender!!,advertisement.timestamp!!)){
+                Log.d(TAG, "onMessage: received ack for this device")
+                this.observer.onMessageAck(advertisement)
+            }
         } else {
             val nextTarget: String? =
                 this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
@@ -155,7 +177,9 @@ class MeshController(
     private fun handleMessage(advertisement: Advertisement) {
         if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
-            this.observer.onMessage(advertisement)
+            if (this.slidingWindowTable.add(advertisement.id!!)) {
+                this.observer.onMessage(advertisement)
+            }
         } else {
             val nextTarget: String? =
                 this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
@@ -195,5 +219,6 @@ class MeshController(
     companion object {
         const val MAX_HOPS: Int = 10
         const val TIMEOUT: Long = 5000L
+        const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MEDIUM.toLong()
     }
 }

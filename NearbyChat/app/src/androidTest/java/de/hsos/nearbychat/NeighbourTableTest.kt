@@ -96,12 +96,6 @@ class NeighbourTableTest {
         assertEquals(zwei, result)
     }
 
-//    @Test
-//    fun getNextElementsNoNeighbours() {
-//        val neighbourTable: NeighbourTable = NeighbourTable()
-//        val result = neighbourTable.getNextElements(50)
-//        assertEquals(0, result.size)
-//    }
 
     @Test
     fun getNextElementsEmptyTable() {
@@ -110,36 +104,6 @@ class NeighbourTableTest {
         assertNull(result)
     }
 
-//    @Test
-//    fun getNextElementsRequestMoreThanAvailable() {
-//        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-//        val eins: Neighbour = Neighbour("eins", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(eins)
-//        val zwei: Neighbour = Neighbour("zwei", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(zwei)
-//        var result = neighbourTable.getNextElements(4)
-//        assertEquals(2, result.size)
-//    }
-//
-//    @Test
-//    fun getNextElementsGetAllStartingFromCenter() {
-//        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-//        val eins: Neighbour = Neighbour("eins", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(eins)
-//        val zwei: Neighbour = Neighbour("zwei", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(zwei)
-//        val drei: Neighbour = Neighbour("drei", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(drei)
-//        val vier: Neighbour = Neighbour("vier", -50, 9, System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(vier)
-//        neighbourTable.getNextElements(1)
-//        val result = neighbourTable.getNextElements(4)
-//        assertEquals(4, result.size)
-//        assertEquals(zwei, result[0])
-//        assertEquals(drei, result[1])
-//        assertEquals(vier, result[2])
-//        assertEquals(eins, result[3])
-//    }
 
     @Test
     fun getEntry(){
@@ -148,5 +112,17 @@ class NeighbourTableTest {
         neighbourTable.updateNeighbour(expected)
         val result = neighbourTable.getEntry("eins")
         assertEquals(expected,result)
+    }
+
+    @Test
+    fun removeNeighboursWithTimeout(){
+        val neighbourTable: NeighbourTable = NeighbourTable()
+        val expected = Neighbour("eins",1,1,1)
+        val noTimeout = Neighbour("zwei",1,1,System.currentTimeMillis())
+        neighbourTable.updateNeighbour(expected)
+        neighbourTable.updateNeighbour(noTimeout)
+        val result = neighbourTable.removeNeighboursWithTimeout()
+        assertEquals(1, result.size)
+        assertEquals(expected.address,result[0])
     }
 }

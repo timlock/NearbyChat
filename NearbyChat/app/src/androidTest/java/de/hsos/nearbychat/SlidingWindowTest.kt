@@ -1,7 +1,7 @@
 package de.hsos.nearbychat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
-import de.hsos.nearbychat.service.bluetooth.util.SlidingWindowTable
+import de.hsos.nearbychat.service.bluetooth.util.SlidingWindow
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -10,68 +10,68 @@ import org.junit.runner.RunWith
 class SlidingWindowTest {
     @Test
     fun add() {
-        val slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        val result: Boolean = slidingWindow.add("a",'0')
+        val slidingWindow: SlidingWindow = SlidingWindow(2)
+        val result: Boolean = slidingWindow.add('0')
         assertTrue(result)
     }
 
     @Test
     fun idOutOfRange() {
-        val slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        slidingWindow.add("a", '0')
-        val result: Boolean = slidingWindow.add("a", 'a')
+        val slidingWindow: SlidingWindow = SlidingWindow(2)
+        slidingWindow.add('0')
+        val result: Boolean = slidingWindow.add('a')
         assertFalse(result)
     }
 
     @Test
     fun invalidID() {
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        val result: Boolean = slidingWindow.add("a", '!')
+        var slidingWindow: SlidingWindow = SlidingWindow(2)
+        val result: Boolean = slidingWindow.add('!')
         assertFalse(result)
     }
     @Test
     fun initialID(){
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        val result: Boolean = slidingWindow.add("a", 'A')
+        var slidingWindow: SlidingWindow = SlidingWindow(2)
+        val result: Boolean = slidingWindow.add('A')
         assertTrue(result)
     }
 
     @Test
     fun oldestMessageGetsRemoved() {
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        slidingWindow.add("a", '0')
-        slidingWindow.add("a", '1')
-        slidingWindow.add("a", '2')
-        assertEquals('1', slidingWindow.getOldestID("a"))
+        var slidingWindow: SlidingWindow = SlidingWindow(2)
+        slidingWindow.add('0')
+        slidingWindow.add('1')
+        slidingWindow.add('2')
+        assertEquals('1', slidingWindow.getOldestID())
     }
 
     @Test
     fun sameIDTwice() {
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(2)
-        slidingWindow.add("a", '0')
-        val result: Boolean = slidingWindow.add("a", '0')
+        var slidingWindow: SlidingWindow = SlidingWindow(2)
+        slidingWindow.add('0')
+        val result: Boolean = slidingWindow.add('0')
         assertFalse(result)
     }
 
     @Test
     fun oldestIDReset() {
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(5)
+        var slidingWindow: SlidingWindow = SlidingWindow(5)
         var idGenerator = AtomicIdGenerator()
         var id: Char = '0'
         while (id != 'z') {
             id = idGenerator.next()
-            assertTrue(slidingWindow.add("a", id))
+            assertTrue(slidingWindow.add(id))
         }
-        val result: Boolean = slidingWindow.add("a", '0')
+        val result: Boolean = slidingWindow.add('0')
         assertTrue(result)
     }
 
     @Test
     fun addIDsInMixedOrder(){
-        var slidingWindow: SlidingWindowTable = SlidingWindowTable(5)
-        slidingWindow.add("a", '1')
-        slidingWindow.add("a", '0')
-        slidingWindow.add("a", '4')
-        assertEquals('1',slidingWindow.getOldestID("a"))
+        var slidingWindow: SlidingWindow = SlidingWindow(5)
+        slidingWindow.add('1')
+        slidingWindow.add('0')
+        slidingWindow.add('4')
+        assertEquals('1',slidingWindow.getOldestID())
     }
 }

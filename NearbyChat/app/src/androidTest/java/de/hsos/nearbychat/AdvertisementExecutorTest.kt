@@ -4,6 +4,7 @@ package de.hsos.nearbychat
 import android.util.Log
 import androidx.core.graphics.blue
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MessageType
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
@@ -21,11 +22,25 @@ class AdvertisementExecutorTest {
     @Test
     fun send() {
         var actual: String = ""
-        var expected : String ="test"
+        var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual = message.substring(2)
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual = message.substring(2)
+                    return true
+                }
             },
             1000L,
             10,
@@ -34,17 +49,31 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
         Thread.sleep(advertisementExecutor.period * 2)
-        assertEquals(expected,actual)
+        assertEquals(expected, actual)
     }
+
     @Test
     fun messageCutOff() {
         var actual: String = ""
-        var expected : String ="test"
+        var expected: String = "test"
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual += message.substring(2)
-                Log.d("Test", "messageCutOff: $message")
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual = message.substring(2)
+                    return true
+                }
             },
             1000L,
             4,
@@ -53,10 +82,11 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
         Thread.sleep(advertisementExecutor.period * 2)
-        assertEquals(expected,actual)
+        assertEquals(expected, actual)
     }
+
     @Test
-    fun sendAdvertisements(){
+    fun sendAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .rssi(1)
@@ -66,13 +96,27 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable : NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins",1,1,1, advertisement = advertisement))
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual.add(message.substring(2))
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual.add(message.substring(2))
+                    return true
+                }
             },
             1000L,
             50,
@@ -84,7 +128,7 @@ class AdvertisementExecutorTest {
     }
 
     @Test
-    fun sendMessageAndAdvertisements(){
+    fun sendMessageAndAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE)
             .rssi(1)
@@ -94,14 +138,28 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable : NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins",1,1,1, advertisement = advertisement))
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         val message = "test"
-        var actual: MutableList<String> = LinkedList()
+        var actual: MutableList<String> = mutableListOf()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
-            { message ->
-                actual.add(message.substring(2))
-                true
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual.add(message.substring(2))
+                    return true
+                }
             },
             1000L,
             50,
@@ -110,10 +168,12 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(message)
         Thread.sleep(advertisementExecutor.period * 2)
+        advertisementExecutor.stop()
+        Thread.sleep(advertisementExecutor.period)
         assertTrue(actual.contains(advertisement.toString()))
-        var result : Boolean = false
-        actual.forEach{
-            if(it.contains(message)) result = true
+        var result: Boolean = false
+        actual.forEach {
+            if (it.contains(message)) result = true
         }
         assertTrue(result)
     }

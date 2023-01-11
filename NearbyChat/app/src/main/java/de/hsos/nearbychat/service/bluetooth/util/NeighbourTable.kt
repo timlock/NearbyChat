@@ -1,5 +1,6 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
+import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementQueue
 
 class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
@@ -9,17 +10,19 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
         HashMap()
     private var firstAddressToAdvertise: Int = 0
 
-
+    @Synchronized
     fun updateNeighbour(neighbour: Neighbour) {
         val entry: Neighbour? =
             this.neighbourList.firstOrNull { item -> item.address == neighbour.address }
         if (entry == null) {
+            Log.d(TAG, "updateNeighbour() discovered new neighbour = $neighbour")
             this.neighbourList.add(neighbour)
         } else if ((System.currentTimeMillis() - entry.lastSeen > this.timeout
                     && entry.lastSeen != 0L)
             || entry.hops < neighbour.hops
             || entry.hops == neighbour.hops && entry.rssi > neighbour.rssi
         ) {
+            Log.d(TAG, "updateNeighbour() updated neighbour = $neighbour")
             this.neighbourList[this.neighbourList.indexOf(entry)] = neighbour
         }
     }
@@ -34,7 +37,7 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
     fun getEntry(address: String): Neighbour? =
         this.neighbourList.firstOrNull { item -> item.address == address }
 
-
+    @Synchronized
     override fun getNextElement(): Neighbour? {
         return if (this.neighbourList.isEmpty()) {
             null
@@ -53,6 +56,18 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
         }
     }
 
+    @Synchronized
     override fun getSize(): Int = this.neighbourList.size
+
+    @Synchronized
+    fun removeNeighboursWithTimeout(): List<String> {
+        val timeoutList =
+            this.neighbourList.filter { n -> System.currentTimeMillis() - n.lastSeen > this.timeout && n.lastSeen != 0L  }
+        this.neighbourList.removeAll(timeoutList)
+        if(this.firstAddressToAdvertise >= this.neighbourList.size){
+            this.firstAddressToAdvertise = 0
+        }
+        return timeoutList.map { it.address }
+    }
 
 }

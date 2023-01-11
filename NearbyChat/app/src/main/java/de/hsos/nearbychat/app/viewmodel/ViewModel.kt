@@ -1,25 +1,37 @@
 package de.hsos.nearbychat.app.viewmodel
 
 import android.app.Application
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
 import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.data.OwnProfileDao
 import de.hsos.nearbychat.app.data.Repository
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlin.math.log
 
 
-class ViewModel(private val repository: Repository, application: Application) : AndroidViewModel(application){
+class ViewModel(private val repository: Repository, application: Application) :
+    AndroidViewModel(application), NearbyChatObserver {
+    private val TAG: String = ViewModel::class.java.simpleName
     val ownProfile: LiveData<OwnProfile?> = repository.ownProfile
     val savedProfiles: LiveData<List<Profile>> = repository.savedProfiles
     val availableProfiles: LiveData<List<Profile>> = repository.availableProfiles
+    val chatServiceCon: NearbyChatServiceCon = NearbyChatServiceCon(this)
+
+    init {
+        this.chatServiceCon.connect(
+            application,
+            (application as NearbyApplication).ownAddress
+        )
+    }
+
+    override fun onCleared() {
+        this.chatServiceCon.disconnect(getApplication())
+    }
 
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
         var profile = repository.ownProfile.value
@@ -41,13 +53,13 @@ class ViewModel(private val repository: Repository, application: Application) : 
     }
 
     fun updateAvailableProfile(profile: Profile) {
-        val list: MutableList<Profile> = if(availableProfiles.value != null) {
+        val list: MutableList<Profile> = if (availableProfiles.value != null) {
             availableProfiles.value!!.toMutableList()
         } else {
             mutableListOf()
         }
         for (i in 0 until list.size) {
-            if(list[i].address == profile.address) {
+            if (list[i].address == profile.address) {
                 list[i] = profile
                 (availableProfiles as MutableLiveData).value = list
                 return
@@ -59,10 +71,10 @@ class ViewModel(private val repository: Repository, application: Application) : 
     }
 
     fun deleteAvailableProfile(macAddress: String) {
-        if(availableProfiles.value != null) {
+        if (availableProfiles.value != null) {
             val list: MutableList<Profile> = availableProfiles.value!!.toMutableList()
             for (i in 0 until availableProfiles.value!!.size) {
-                if(list[i].address == macAddress) {
+                if (list[i].address == macAddress) {
                     list.removeAt(i)
                     (availableProfiles as MutableLiveData<List<Profile>>).value = list
                     return
@@ -77,17 +89,38 @@ class ViewModel(private val repository: Repository, application: Application) : 
 
     fun addMessage(message: Message) = viewModelScope.launch {
         repository.insertMessage(message)
-        getApplication<NearbyApplication>().chatServiceCon.sendMessage(message)
+        chatServiceCon.sendMessage(message)
     }
 
     fun deleteMessages(macAddress: String) = viewModelScope.launch {
         repository.deleteMessages(macAddress)
     }
 
-    class ViewModelFactory(private val repository: Repository, private val application: Application) : ViewModelProvider.Factory {
+    class ViewModelFactory(
+        private val repository: Repository,
+        private val application: Application
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
             return ViewModel(repository, application) as T
         }
+    }
+
+    override fun onBound() {
+        Log.d(TAG, "onBound: ")
+    }
+    @Synchronized
+    override fun onProfile(profile: Profile) {
+        Log.d(TAG, "onProfile() called with: profile = $profile")
+        val tmpList = this.repository.availableProfiles.value as MutableList
+        tmpList.add(profile)
+        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
+    }
+    @Synchronized
+    override fun onProfileTimeout(address: String) {
+        Log.d(TAG, "onProfileTimeout() called with: address = $address")
+        val tmpList = this.repository.availableProfiles.value as MutableList
+        tmpList.removeIf{it.address == address}
+        (this.repository.availableProfiles as MutableLiveData).postValue(tmpList)
     }
 }
