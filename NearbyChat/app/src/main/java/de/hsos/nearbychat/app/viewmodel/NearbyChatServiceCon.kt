@@ -34,7 +34,6 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
 
     private fun startService(context: Context) {
         val startServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
-        startServiceIntent.action = "a"
         context.startService(startServiceIntent)
         val bindToServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
         context.bindService(bindToServiceIntent, this, Context.BIND_AUTO_CREATE)

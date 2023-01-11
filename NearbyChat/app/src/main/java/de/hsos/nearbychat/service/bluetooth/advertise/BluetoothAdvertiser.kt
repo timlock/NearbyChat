@@ -34,7 +34,7 @@ class BluetoothAdvertiser(private var bluetoothAdapter: BluetoothAdapter, privat
             .setLegacyMode(false)
             .setInterval(this.advertisingInterval)
             .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_HIGH)
-            .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+            .setPrimaryPhy(BluetoothDevice.PHY_LE_CODED)
             .setSecondaryPhy(BluetoothDevice.PHY_LE_2M)
             .build()
         Log.d(TAG, "init: currentAdvertisingParameters: $currentAdvertisingParameters")
