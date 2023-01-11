@@ -79,10 +79,8 @@ class AdvertisementExecutor(
         }
         Log.d(
             TAG,
-            "broadcast: Send $counter messages, ${this.messageQueue.size} messages are remaining"
+            "broadcast: Send $counter messages and $advertisementCounter advertisements, ${this.messageQueue.size} messages are remaining"
         )
-        Log.d(TAG, "broadcast: Send $advertisementCounter advertisements")
-
     }
     @Synchronized
     fun addToQueue(message: String) {

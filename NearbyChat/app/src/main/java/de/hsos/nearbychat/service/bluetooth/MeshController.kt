@@ -27,7 +27,7 @@ class MeshController(
     private var messageBuffer: MessageBuffer = MessageBuffer()
     private var slidingWindowTable: SlidingWindow = SlidingWindow()
     private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
-    private val messageExecutor: ScheduledExecutorService =
+    private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
 
     init {
@@ -39,7 +39,7 @@ class MeshController(
             this.neighbourTable
         )
         this.scanner.subscribe(this)
-        this.messageExecutor.scheduleAtFixedRate(
+        this.meshExecutor.scheduleAtFixedRate(
             this::refresh,
             0,
             MeshController.TIMEOUT,
@@ -53,27 +53,21 @@ class MeshController(
         unsentMessages.forEach{ this@MeshController.advertisementExecutor.addToQueue(it.toString())}
     }
 
-    fun startScan() {
-        Log.d(TAG, "startScan: ")
+    fun connect(){
+        Log.d(TAG, "connect() called")
         this.scanner.start()
-    }
-
-    fun stopScan() {
-        Log.d(TAG, "stopScan: ")
-        this.scanner.stop()
-    }
-
-    fun startAdvertise() {
-        Log.d(TAG, "startAdvertise: ")
         this.advertiser.start()
         this.advertisementExecutor.start()
     }
 
-    fun stopAdvertising() {
-        Log.d(TAG, "stopAdvertising: ")
+    fun disconnect(){
+        Log.d(TAG, "disconnect() called")
+        this.meshExecutor.shutdown()
         this.advertisementExecutor.stop()
         this.advertiser.stop()
+        this.scanner.stop()
     }
+
 
     fun sendMessage(message: Message) {
         this.advertisementExecutor.addToQueue(

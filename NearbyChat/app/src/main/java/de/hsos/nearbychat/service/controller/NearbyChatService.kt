@@ -39,7 +39,7 @@ class NearbyChatService : Service(), MeshObserver {
 
     override fun onCreate() {
         Log.d(TAG, "onCreate: ")
-        this.repository =  (application as NearbyApplication).repository
+        this.repository = (application as NearbyApplication).repository
         this.ownProfile = this.repository.ownProfile
         this.ownProfile.observeForever(this.ownProfileObserver)
     }
@@ -74,22 +74,21 @@ class NearbyChatService : Service(), MeshObserver {
             val scanner: BluetoothScanner =
                 BluetoothScanner(bluetoothManager.adapter.bluetoothLeScanner)
             var self: OwnProfile? = this.ownProfile.value
-            if(this.ownProfile.value == null){
+            if (this.ownProfile.value == null) {
                 self = OwnProfile(ownAddress)
                 self.name = applicationContext.resources.getString(R.string.error_name_missing)
-                self.description = applicationContext.resources.getString(R.string.error_desc_missing)
+                self.description =
+                    applicationContext.resources.getString(R.string.error_desc_missing)
             }
             this.meshController = MeshController(this, advertiser, self!!, scanner)
-            this.meshController.startScan()
-            this.meshController.startAdvertise()
+            this.meshController.connect()
         }
     }
 
 
     fun stop() {
         Log.d(TAG, "stop: ")
-        this.meshController.stopAdvertising()
-        this.meshController.stopScan()
+        this.meshController.disconnect()
         stopSelf()
     }
 
