@@ -22,6 +22,7 @@ class MeshController(
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
+    private var slidingWindowTable: SlidingWindow = SlidingWindow()
 
     init {
         this.updateOwnProfile(this.ownProfile)
@@ -67,7 +68,7 @@ class MeshController(
         )
     }
 
-    fun updateOwnProfile(ownProfile: OwnProfile){
+    fun updateOwnProfile(ownProfile: OwnProfile) {
         Log.d(TAG, "updateOwnProfile() called with: ownProfile = $ownProfile")
         this.ownProfile = ownProfile
         val selfAdvertisement: Advertisement = Advertisement.Builder()
@@ -161,7 +162,9 @@ class MeshController(
     private fun handleMessage(advertisement: Advertisement) {
         if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
-            this.observer.onMessage(advertisement)
+            if (this.slidingWindowTable.add(advertisement.id!!)) {
+                this.observer.onMessage(advertisement)
+            }
         } else {
             val nextTarget: String? =
                 this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
