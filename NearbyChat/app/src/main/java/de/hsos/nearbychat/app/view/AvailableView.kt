@@ -35,7 +35,7 @@ class AvailableView : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
         val adapter = AvailableUserAdapter {
-            (activity as MainActivity).openChat(it!!)
+            (activity as MainActivity).openChat(it!!, true)
         }
 
         viewModel.availableProfiles.observe(viewLifecycleOwner) { profiles ->

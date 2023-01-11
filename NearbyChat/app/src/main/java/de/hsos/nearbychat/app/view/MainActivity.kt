@@ -86,9 +86,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openChat(profile: Profile) {
+    fun openChat(profile: Profile, fromAvailable: Boolean) {
         val intent = Intent(this, ChatActivity::class.java)
         intent.putExtra(ChatActivity.INTENT_ADDRESS, profile.address)
+        intent.putExtra(ChatActivity.INTENT_FROM_AVAILABLE, fromAvailable)
         startActivity(intent)
     }
 
