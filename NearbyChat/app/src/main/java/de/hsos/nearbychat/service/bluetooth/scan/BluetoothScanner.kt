@@ -73,7 +73,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
             val message: String? =
                 result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
             if (message!!.length > 2) {
-                this.observer?.onPackage(result.device.address, result.rssi, message ?: "")
+                this.observer?.onPackage(result.rssi, message ?: "")
             }
         } catch (e: SecurityException) {
             Log.w(TAG, "startScan: ", e)

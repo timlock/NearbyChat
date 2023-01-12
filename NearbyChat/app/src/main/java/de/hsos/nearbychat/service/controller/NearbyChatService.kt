@@ -32,7 +32,7 @@ class NearbyChatService : Service(), MeshObserver {
     private lateinit var ownProfile: LiveData<OwnProfile?>
 
     private val ownProfileObserver = Observer<OwnProfile?> { p ->
-        if (p != null) {
+        if (p != null && this::meshController.isInitialized) {
             this.meshController.updateOwnProfile(p)
         }
     }

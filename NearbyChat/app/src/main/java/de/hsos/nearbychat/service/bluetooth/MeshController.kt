@@ -9,6 +9,7 @@ import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.*
+import java.util.LinkedList
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -28,6 +29,7 @@ class MeshController(
     private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
     private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
+    private val unsentMessageList: MutableList<Message> = LinkedList()
 
     init {
         this.updateOwnProfile(this.ownProfile)
@@ -50,12 +52,20 @@ class MeshController(
         Log.d(TAG, "refresh() called")
         val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
         this.observer.onNeighbourTimeout(timeoutList)
-        val unsentMessages = this.unacknowledgedMessageList.getMessages()
-        Log.d(TAG, "Timeout for: $unsentMessages")
-        unsentMessages.forEach { this@MeshController.advertisementExecutor.addToQueue(it.toString()) }
+        val unacknowledgedMessages = this.unacknowledgedMessageList.getMessages()
+        Log.d(TAG, "Timeout for: $unacknowledgedMessages")
+        unacknowledgedMessages.forEach { this@MeshController.advertisementExecutor.addToQueue(it.toString()) }
+        val messagesToSend: MutableList<Message> = LinkedList()
+        this.unsentMessageList.forEach {
+            if (this.neighbourTable.getClosestNeighbour(it.address) != null) {
+                messagesToSend.add(it)
+            }
+        }
+        this.unsentMessageList.removeAll(messagesToSend)
+        messagesToSend.forEach { this.sendMessage(it) }
     }
 
-    fun connect() :Boolean{
+    fun connect(): Boolean {
         Log.d(TAG, "connect() called")
         if (!this.scanner.start()) {
             Log.w(TAG, "connect: scanner failed")
@@ -66,7 +76,7 @@ class MeshController(
             Log.w(TAG, "connect: advertiser failed")
             return false
         }
-        if(!this.advertisementExecutor.start()){
+        if (!this.advertisementExecutor.start()) {
             Log.w(TAG, "connect: advertisementExecutor failed")
             return false
         }
@@ -83,14 +93,25 @@ class MeshController(
 
 
     fun sendMessage(message: Message) {
-        this.advertisementExecutor.addToQueue(
-            Advertisement.Builder()
-                .type(MessageType.MESSAGE_MESSAGE.type)
-                .id(this.idGenerator.next())
-                .message(message.content)
-                .build()
-                .toString()
-        )
+        Log.d(TAG, "sendMessage() called with: message = $message")
+        val nextHop: String? = this.neighbourTable.getClosestNeighbour(message.address)
+        if (nextHop == null) {
+            Log.d(TAG, "sendMessage: ${message.address} is not reachable")
+            this.unsentMessageList.add(message)
+        } else {
+            this.advertisementExecutor.addToQueue(
+                Advertisement.Builder()
+                    .type(MessageType.MESSAGE_MESSAGE.type)
+                    .id(this.idGenerator.next())
+                    .nextHop(nextHop)
+                    .sender(this.ownProfile.address)
+                    .receiver(message.address)
+                    .message(message.content)
+                    .timestamp(System.currentTimeMillis())
+                    .build()
+                    .toString()
+            )
+        }
     }
 
     fun updateOwnProfile(ownProfile: OwnProfile) {
@@ -98,6 +119,7 @@ class MeshController(
         this.ownProfile = ownProfile
         val selfAdvertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .sender(ownProfile.address)
             .hops(MeshController.MAX_HOPS)
             .rssi(0)
             .address(ownProfile.address)
@@ -107,53 +129,52 @@ class MeshController(
             .build()
         val self: Neighbour =
             Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
+        self.closestNeighbour = self
         this.neighbourTable.updateNeighbour(self)
     }
 
-    override fun onPackage(macAddress: String, rssi: Int, advertisementPackage: String) {
-        Log.i(
+    override fun onPackage(rssi: Int, packageString: String) {
+        Log.d(
             TAG,
-            "onPackage() called with: macAddress = $macAddress, rssi = $rssi, advertisementPackage = $advertisementPackage"
+            "onPackage() called with:  rssi = $rssi, advertisementPackage = $packageString"
         )
         Handler(Looper.getMainLooper()).post {
-            val packageID: Char = advertisementPackage[0]
-            var lastSeparator: Int = advertisementPackage.indexOf(':') + 1
-            var nextSeparator: Int = advertisementPackage.indexOf('}') + 1
-            do {
-                var message: String = advertisementPackage.substring(lastSeparator, nextSeparator)
-                if (!message.contains('{') && !message.contains('}')) {
-                    message = this.messageBuffer.add(packageID, message) ?: message
-                }
-                this.parseMessage(message)
-                lastSeparator = nextSeparator + 1
-                nextSeparator = advertisementPackage.indexOf('}', nextSeparator + 1)
-                if (nextSeparator == -1 && lastSeparator < advertisementPackage.length) {
-                    this.messageBuffer.add(packageID, advertisementPackage.substring(lastSeparator))
-                }
-            } while (nextSeparator != -1)
-        }
-    }
-
-    private fun parseMessage(
-        message: String
-    ) {
-        val advertisement =
-            Advertisement.Builder().rawMessage(message).build()
-        when (advertisement.type) {
-            MessageType.MESSAGE_MESSAGE.type -> {
-                handleMessage(advertisement)
-            }
-            MessageType.ACKNOWLEDGE_MESSAGE.type -> {
-                handleAcknowledgment(advertisement)
-            }
-            MessageType.NEIGHBOUR_MESSAGE.type -> {
-                handleNeighbour(advertisement)
-            }
-            else -> {
-                Log.w(
-                    TAG,
-                    "onMessage: received faulty message: $message"
+            val advertisementPackage = AdvertisementPackage.toPackage(packageString)
+            if (advertisementPackage.getRawMessageBegin() != null) {
+                this.messageBuffer.add(
+                    advertisementPackage.id!!,
+                    advertisementPackage.getRawMessageBegin()!!
                 )
+            }
+            if (advertisementPackage.getRawMessageEnd() != null) {
+                val result = this.messageBuffer.add(
+                    advertisementPackage.id!!,
+                    advertisementPackage.getRawMessageEnd()!!
+                )
+                if (result != null) {
+                    advertisementPackage.addAdvertisement(
+                        Advertisement.Builder().rawMessage(result).build()
+                    )
+                }
+            }
+            advertisementPackage.getMessageList().forEach {
+                when (it.type) {
+                    MessageType.MESSAGE_MESSAGE.type -> {
+                        handleMessage(it)
+                    }
+                    MessageType.ACKNOWLEDGE_MESSAGE.type -> {
+                        handleAcknowledgment(it)
+                    }
+                    MessageType.NEIGHBOUR_MESSAGE.type -> {
+                        handleNeighbour(it, rssi)
+                    }
+                    else -> {
+                        Log.w(
+                            TAG,
+                            "onPackage: received faulty message: $packageString"
+                        )
+                    }
+                }
             }
         }
     }
@@ -178,13 +199,14 @@ class MeshController(
                     "onMessage: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
                 )
             } else {
-                advertisement.address = nextTarget
+                advertisement.nextHop = nextTarget
                 this.advertisementExecutor.addToQueue(advertisement.toString())
             }
         }
     }
 
     private fun handleMessage(advertisement: Advertisement) {
+        Log.d(TAG, "handleMessage() called with: advertisement = $advertisement")
         if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
             if (this.slidingWindowTable.add(advertisement.id!!)) {
@@ -199,15 +221,13 @@ class MeshController(
                     "onMessage: cant forward message: $advertisement ${advertisement.receiver} is unknown"
                 )
             } else {
-                advertisement.address = nextTarget
+                advertisement.nextHop = nextTarget
                 this.advertisementExecutor.addToQueue(advertisement.toString())
             }
         }
     }
 
-    private fun handleNeighbour(
-        advertisement: Advertisement
-    ) {
+    private fun handleNeighbour(advertisement: Advertisement, rssi: Int) {
         advertisement.decrementHop()
         if (advertisement.hops!! < 0) {
             return
@@ -221,11 +241,38 @@ class MeshController(
                 null,
                 advertisement
             )
-            if(advertisement.hops!! >= MeshController.MAX_HOPS - 1){
+            if (advertisement.address == advertisement.sender) {
                 neighbour.closestNeighbour = neighbour
+                neighbour.rssi = rssi
+            } else {
+                this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
             }
+            neighbour.advertisement?.sender = this.ownProfile.address
             this.neighbourTable.updateNeighbour(neighbour)
             this.observer.onNeighbour(advertisement)
+        }
+    }
+
+    private fun updateDirectNeighbour(address: String, rssi: Int, timestamp: Long) {
+        var neighbour = this.neighbourTable.getEntry(address)
+        if (neighbour == null) {
+            val advertisement = Advertisement.Builder()
+                .type(MessageType.NEIGHBOUR_MESSAGE.type)
+                .sender(this.ownProfile.address)
+                .address(address)
+                .hops(MeshController.MAX_HOPS - 1)
+                .rssi(rssi)
+                .name("")
+                .description("")
+                .color(0)
+                .build()
+            neighbour = Neighbour(address, rssi, MeshController.MAX_HOPS - 1, timestamp)
+            neighbour.advertisement = advertisement
+            neighbour.closestNeighbour = neighbour
+            this.neighbourTable.updateNeighbour(neighbour)
+        } else {
+            neighbour.lastSeen = timestamp
+            neighbour.rssi = rssi
         }
     }
 

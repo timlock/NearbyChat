@@ -49,27 +49,6 @@ class NeighbourTableTest {
         assertEquals(eins.address, actual)
     }
 
-//    @Test
-//    fun getNextElements(){
-//        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-//        val eins: Neighbour = Neighbour("eins",-50,9,System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(eins)
-//        val zwei: Neighbour = Neighbour("zwei",-50,9,System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(zwei)
-//        val drei: Neighbour = Neighbour("drei",-50,9,System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(drei)
-//        val vier: Neighbour = Neighbour("vier",-50,9,System.currentTimeMillis())
-//        neighbourTable.updateNeighbour(vier)
-//        var result = neighbourTable.getNextElements(2)
-//        assertEquals(eins, result[0])
-//        assertEquals(zwei, result[1])
-//        result = neighbourTable.getNextElements(2)
-//        assertEquals(drei, result[0])
-//        assertEquals(vier, result[1])
-//        result = neighbourTable.getNextElements(2)
-//        assertEquals(eins, result[0])
-//        assertEquals(zwei, result[1])
-//    }
 
     @Test
     fun getNextElements() {

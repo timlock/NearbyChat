@@ -1,5 +1,5 @@
 package de.hsos.nearbychat.service.bluetooth.scan
 
 interface ScannerObserver {
-    fun onPackage(macAddress: String, rssi: Int, advertisementPackage: String)
+    fun onPackage(rssi: Int, packageString: String)
 }

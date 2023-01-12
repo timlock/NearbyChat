@@ -3,6 +3,7 @@ package de.hsos.nearbychat.service.bluetooth.advertise
 import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
+import de.hsos.nearbychat.service.bluetooth.util.AdvertisementPackage
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
 import java.util.*
 import java.util.concurrent.Executors
@@ -54,46 +55,59 @@ class AdvertisementExecutor(
 
     @Synchronized
     private fun broadcast() {
-        var counter: Int = 0
-        var advertisementCounter: Int = 0
-        val packageBuilder = StringBuilder().append(this.idGenerator.next()).append(':')
-        while (packageBuilder.length < this.sizeLimit
-            && (this.messageQueue.isNotEmpty()
-                    || advertisementCounter < this.advertisementQueue.getSize())
-        ) {
-            var msg: String? = null
-            if (this.messageQueue.isNotEmpty()) {
-                msg = this.messageQueue.removeFirst()
-            } else {
-                msg = this.advertisementQueue.getNextElement()!!.advertisement.toString()
-                advertisementCounter++
-            }
-            if (msg.length + packageBuilder.length > this.sizeLimit) {
-                this.messageQueue.add(0, msg.substring(this.sizeLimit - packageBuilder.length))
-                packageBuilder.append(msg.substring(0, this.sizeLimit - packageBuilder.length))
-            } else {
-                packageBuilder.append(msg)
-            }
-            counter++
+        val advertisementPackage = AdvertisementPackage(this.idGenerator.next())
+        this.addMessages(advertisementPackage)
+        this.addNeighbours(advertisementPackage)
 
-        }
-        if (packageBuilder.length > 2) {
-            if (this.broadCaster.send(packageBuilder.toString())) {
-                Log.i(TAG, "broadcast: $packageBuilder")
-            }else{
+        if (advertisementPackage.size > 2) {
+            if (this.broadCaster.send(advertisementPackage.toString())) {
+                Log.i(TAG, "broadcast: $advertisementPackage")
+            } else {
                 Log.w(TAG, "broadcast failed")
-                this.messageQueue.add(packageBuilder.toString())
+                this.messageQueue.add(advertisementPackage.toString())
             }
         }
-        Log.d(
-            TAG,
-            "broadcast: Send $counter messages including $advertisementCounter advertisements, ${this.messageQueue.size} messages are remaining"
-        )
+    }
+
+
+    private fun addMessages(advertisementPackage: AdvertisementPackage) {
+        while (advertisementPackage.size < this.sizeLimit && this.messageQueue.isNotEmpty()) {
+            val msg = this.messageQueue.removeFirst()
+            if (msg.length + advertisementPackage.size > this.sizeLimit) {
+                this.messageQueue.add(0, msg.substring(this.sizeLimit - advertisementPackage.size))
+                advertisementPackage.addCutMessageEnd(
+                    msg.substring(
+                        0,
+                        this.sizeLimit - advertisementPackage.size
+                    )
+                )
+            } else {
+                if (!msg.contains('{')) {
+                    advertisementPackage.addCutMessageBegin(msg)
+                } else if (!msg.contains('}')) {
+                    advertisementPackage.addCutMessageEnd(msg)
+                } else {
+                    val advertisement = Advertisement.Builder().rawMessage(msg).build()
+                    advertisementPackage.addAdvertisement(advertisement)
+                }
+            }
+        }
+        Log.d(TAG, "addMessages() total ${advertisementPackage.getMessageList().size} messages")
+    }
+
+    private fun addNeighbours(advertisementPackage: AdvertisementPackage) {
+        var advertisementCounter = 0
+        while (advertisementPackage.size < this.sizeLimit && advertisementCounter < this.advertisementQueue.getSize()) {
+            val advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
+            advertisementPackage.addAdvertisement(advertisement)
+            advertisementCounter++
+        }
+        Log.d(TAG, "addNeighbours() total $advertisementCounter neighbour advertisements")
     }
 
     @Synchronized
     fun addToQueue(message: String) {
-        Log.d(TAG, "send: $message")
+        Log.d(TAG, "addToQueue() called with: message = $message")
         this.messageQueue.add(message)
     }
 }

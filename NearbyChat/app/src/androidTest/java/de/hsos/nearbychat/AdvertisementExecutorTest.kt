@@ -88,7 +88,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .rssi(1)
             .hops(1)
             .address("eins")
@@ -130,7 +130,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendMessageAndAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .rssi(1)
             .hops(1)
             .address("eins")
