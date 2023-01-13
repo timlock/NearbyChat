@@ -1,6 +1,7 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
 import android.util.Log
+import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementQueue
 
 class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
@@ -10,13 +11,13 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
 
     @Synchronized
     fun updateNeighbour(neighbour: Neighbour) {
-        val entry: Neighbour? =
-            this.neighbourList.firstOrNull { item -> item.address == neighbour.address }
+        val entry: Neighbour? = this.neighbourList.firstOrNull { it.address == neighbour.address }
         if (entry == null) {
             Log.d(TAG, "updateNeighbour() discovered new neighbour = $neighbour")
             this.neighbourList.add(neighbour)
         } else if ((System.currentTimeMillis() - entry.lastSeen > this.timeout
                     && entry.lastSeen != 0L)
+            || neighbour.hops == MeshController.MAX_HOPS
             || entry.hops < neighbour.hops
             || entry.hops == neighbour.hops && entry.rssi > neighbour.rssi
         ) {
@@ -39,15 +40,7 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
             null
         } else {
             var result: Neighbour = this.neighbourList[this.firstAddressToAdvertise]
-            var counter: Int = this.neighbourList.size
-            while (System.currentTimeMillis() - result.lastSeen > this.timeout && counter > 0) {
-                this.firstAddressToAdvertise =
-                    (this.firstAddressToAdvertise + 1) % this.neighbourList.size
-                result = this.neighbourList[firstAddressToAdvertise]
-                counter--
-            }
-            this.firstAddressToAdvertise =
-                (this.firstAddressToAdvertise + 1) % this.neighbourList.size
+            this.firstAddressToAdvertise = (this.firstAddressToAdvertise + 1) % this.neighbourList.size
             result
         }
     }

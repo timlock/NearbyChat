@@ -81,14 +81,14 @@ class AdvertisementExecutorTest {
         )
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
-        Thread.sleep(advertisementExecutor.period * 2)
+        Thread.sleep(advertisementExecutor.period * 4)
         assertEquals(expected, actual)
     }
 
     @Test
     fun sendAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .rssi(1)
             .hops(1)
             .address("eins")
@@ -130,7 +130,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendMessageAndAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE)
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .rssi(1)
             .hops(1)
             .address("eins")

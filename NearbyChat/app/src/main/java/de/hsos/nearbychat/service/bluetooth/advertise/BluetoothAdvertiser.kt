@@ -98,8 +98,9 @@ class BluetoothAdvertiser(
                 .addServiceUuid(advertiseUUID)
                 .addServiceData(this.advertiseUUID, message.encodeToByteArray())
                 .build()
-            if (this.totalBytes(advertiseData) > this.maxMessageLength) {
-                Log.w(TAG, "changeAdvertisingData: message: $message is too large")
+            val messageSize = this.totalBytes(advertiseData)
+            if (messageSize > this.maxMessageLength) {
+                Log.w(TAG, "changeAdvertisingData: message: $message is too large, size: $messageSize")
                 false
             } else if (!this::currentAdvertisingSet.isInitialized) {
                 Log.w(TAG, "send: currentAdvertisingSet is not initialized")

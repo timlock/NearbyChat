@@ -6,6 +6,8 @@ import android.bluetooth.le.AdvertisingSetParameters
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -30,9 +32,14 @@ class NearbyChatService : Service(), MeshObserver {
     private lateinit var meshController: MeshController
     private lateinit var repository: Repository
     private lateinit var ownProfile: LiveData<OwnProfile?>
+    private var databaseHandler: HandlerThread = HandlerThread("databaseHandler")
+
+    init {
+        this.databaseHandler.start()
+    }
 
     private val ownProfileObserver = Observer<OwnProfile?> { p ->
-        if (p != null) {
+        if (p != null && this::meshController.isInitialized) {
             this.meshController.updateOwnProfile(p)
         }
     }
@@ -63,7 +70,7 @@ class NearbyChatService : Service(), MeshObserver {
         if (this::meshController.isInitialized) {
             Log.d(TAG, "start: service is already running")
         } else {
-            Log.d(TAG, "start: ")
+            Log.d(TAG, "start() called with: ownAddress = $ownAddress")
             val bluetoothManager: BluetoothManager =
                 getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             val advertiser: Advertiser =
@@ -82,12 +89,20 @@ class NearbyChatService : Service(), MeshObserver {
             }
             this.meshController = MeshController(this, advertiser, scanner, self!!)
             this.meshController.connect()
+            Handler(this.databaseHandler.looper).post {
+                runBlocking {
+                    launch {
+                        val unsentMessages = this@NearbyChatService.repository.getUnsentMessages()
+                        this@NearbyChatService.meshController.addUnsentMessages(unsentMessages)
+                    }
+                }
+            }
         }
     }
 
 
     fun stop() {
-        Log.d(TAG, "stop: ")
+        Log.d(TAG, "stop() called")
         this.meshController.disconnect()
         stopSelf()
     }
@@ -98,21 +113,31 @@ class NearbyChatService : Service(), MeshObserver {
     }
 
 
-    override fun onMessage(advertisement: Advertisement): Unit = runBlocking {
-        launch {
-            Log.d(TAG, "onMessage() called: advertisement = $advertisement")
-            val message: Message =
-                Message(advertisement.sender!!, advertisement.message!!, advertisement.timestamp!!)
-            repository.insertMessage(message)
+    override fun onMessage(advertisement: Advertisement) {
+        Handler(this.databaseHandler.looper).post {
+            runBlocking {
+                launch {
+                    Log.d(TAG, "onMessage() called: advertisement = $advertisement")
+                    val message: Message =
+                        Message(
+                            advertisement.sender!!,
+                            advertisement.message!!,
+                            advertisement.timestamp!!
+                        )
+                    repository.insertMessage(message)
+                }
+            }
         }
-
-
     }
 
-    override fun onMessageAck(advertisement: Advertisement): Unit = runBlocking {
-        launch {
-            Log.d(TAG, "onMessageAck() called: advertisement = $advertisement")
-            repository.ackReceivedMessage(advertisement.sender!!, advertisement.timestamp!!)
+    override fun onMessageAck(advertisement: Advertisement) {
+        Handler(this.databaseHandler.looper).post {
+            runBlocking {
+                launch {
+                    Log.d(TAG, "onMessageAck() called: advertisement = $advertisement")
+                    repository.ackReceivedMessage(advertisement.sender!!, advertisement.timestamp!!)
+                }
+            }
         }
     }
 

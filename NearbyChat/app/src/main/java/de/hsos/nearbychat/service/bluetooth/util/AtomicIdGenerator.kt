@@ -24,5 +24,16 @@ class AtomicIdGenerator(private var id: Char = '0' - 1) {
             if (messageID in 'a'..'z') return true
             else return false
         }
+
+        fun getPrevious(id: Char): Char{
+            var previous = id
+            when (id) {
+                '0' -> previous = 'z'
+                'a' -> previous = 'Z'
+                'A' -> previous = '9'
+                else -> previous--
+            }
+            return previous
+        }
     }
 }

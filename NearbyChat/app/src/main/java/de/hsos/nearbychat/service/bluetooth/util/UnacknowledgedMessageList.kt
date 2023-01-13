@@ -1,13 +1,14 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
+import de.hsos.nearbychat.app.domain.Message
 import java.util.LinkedList
 
 class UnacknowledgedMessageList {
-    private var messageList: MutableList<Advertisement> = LinkedList()
+    private var messageList: MutableSet<Message> = mutableSetOf()
 
     @Synchronized
     fun acknowledge(receiver: String, timestamp: Long): Boolean {
-        val result = this.messageList.filter { it.receiver == receiver && it.timestamp == timestamp }
+        val result = this.messageList.filter { it.address == receiver && it.timeStamp == timestamp }
         return if(result.isNotEmpty()){
             this.messageList.remove(result[0])
             true
@@ -17,10 +18,15 @@ class UnacknowledgedMessageList {
     }
 
     @Synchronized
-    fun addMessages(messageList: List<Advertisement>){
+    fun addMessages(messageList: List<Message>){
         this.messageList.addAll(messageList)
     }
 
     @Synchronized
-    fun getMessages() : List<Advertisement> = this.messageList.toList()
+    fun addMessage(message: Message){
+        this.messageList.add(message)
+    }
+
+    @Synchronized
+    fun getMessages() : List<Message> = this.messageList.toList()
 }

@@ -24,6 +24,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
         this.scanSettings = ScanSettings.Builder()
             .setLegacy(false)
             .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build()
         val scanFilter: ScanFilter = ScanFilter.Builder()
             .setServiceUuid(advertiseUUID)
@@ -73,7 +74,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
             val message: String? =
                 result.scanRecord?.serviceData?.get(this.advertiseUUID)?.decodeToString()
             if (message!!.length > 2) {
-                this.observer?.onPackage(result.device.address, result.rssi, message ?: "")
+                this.observer?.onPackage(result.device.address,result.rssi, message ?: "")
             }
         } catch (e: SecurityException) {
             Log.w(TAG, "startScan: ", e)

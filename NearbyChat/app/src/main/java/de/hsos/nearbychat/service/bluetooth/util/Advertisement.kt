@@ -23,7 +23,6 @@ class Advertisement private constructor(
     fun decrementHop() = apply { this.hops = this.hops?.minus(1) }
 
 
-    @Throws(IllegalStateException::class)
     override fun toString(): String {
         val builder: StringBuilder = StringBuilder()
             .append("{")
@@ -31,7 +30,9 @@ class Advertisement private constructor(
             .append(":")
         when (type) {
             MessageType.NEIGHBOUR_MESSAGE.type -> {
-                builder.append(hops)
+                builder.append(sender)
+                    .append(';')
+                    .append(hops)
                     .append(';')
                     .append(rssi)
                     .append(';')
@@ -57,7 +58,7 @@ class Advertisement private constructor(
             MessageType.MESSAGE_MESSAGE.type -> {
                 builder.append(id)
                     .append(';')
-                    .append(address)
+                    .append(nextHop)
                     .append(';')
                     .append(sender)
                     .append(';')
@@ -68,12 +69,52 @@ class Advertisement private constructor(
                     .append(message)
             }
             else -> {
-                throw IllegalStateException()
+                Log.w(TAG, "toString: corrupted package")
+                return ""
             }
         }
         builder.append("}")
         return builder.toString()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Advertisement) return false
+
+        if (type != other.type) return false
+        if (id != other.id) return false
+        if (hops != other.hops) return false
+        if (nextHop != other.nextHop) return false
+        if (rssi != other.rssi) return false
+        if (address != other.address) return false
+        if (sender != other.sender) return false
+        if (receiver != other.receiver) return false
+        if (name != other.name) return false
+        if (description != other.description) return false
+        if (color != other.color) return false
+        if (message != other.message) return false
+        if (timestamp != other.timestamp) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type?.hashCode() ?: 0
+        result = 31 * result + (id?.hashCode() ?: 0)
+        result = 31 * result + (hops ?: 0)
+        result = 31 * result + (nextHop?.hashCode() ?: 0)
+        result = 31 * result + (rssi ?: 0)
+        result = 31 * result + (address?.hashCode() ?: 0)
+        result = 31 * result + (sender?.hashCode() ?: 0)
+        result = 31 * result + (receiver?.hashCode() ?: 0)
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (description?.hashCode() ?: 0)
+        result = 31 * result + (color ?: 0)
+        result = 31 * result + (message?.hashCode() ?: 0)
+        result = 31 * result + (timestamp?.hashCode() ?: 0)
+        return result
+    }
+
 
     data class Builder(
         var type: Char? = null,
@@ -140,15 +181,18 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf('}')
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        nextSeparator = rawMessage.indexOf('}')
                         this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                     }
                     MessageType.NEIGHBOUR_MESSAGE.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
+                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+                        lastSeparator = ++nextSeparator
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.hops = rawMessage.substring(lastSeparator, nextSeparator).toInt()
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)

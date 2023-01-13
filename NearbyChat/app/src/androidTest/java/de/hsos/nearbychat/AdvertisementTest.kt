@@ -16,13 +16,13 @@ class AdvertisementTest {
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.MESSAGE_MESSAGE.type)
             .id('0')
-            .address("address")
+            .nextHop("nextHop")
             .sender("sender")
             .receiver("receiver")
             .message("message")
             .timestamp(1000L)
             .build()
-        var excepted: String = "{M:0;address;sender;receiver;1000;message}"
+        var excepted: String = "{M:0;nextHop;sender;receiver;1000;message}"
         var actual: String = advertisement.toString()
         assertEquals(excepted, actual)
         actual = Advertisement.Builder().rawMessage(excepted).build().toString()
@@ -51,6 +51,7 @@ class AdvertisementTest {
     fun neighbour() {
         val advertisement: Advertisement = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .sender("sender")
             .hops(10)
             .rssi(-50)
             .address("address")
@@ -58,7 +59,7 @@ class AdvertisementTest {
             .description("description")
             .color(255)
             .build()
-        var excepted: String = "{N:10;-50;address;name;description;255}"
+        var excepted: String = "{N:sender;10;-50;address;name;description;255}"
         var actual: String = advertisement.toString()
         assertEquals(excepted, actual)
         actual = Advertisement.Builder().rawMessage(excepted).build().toString()
