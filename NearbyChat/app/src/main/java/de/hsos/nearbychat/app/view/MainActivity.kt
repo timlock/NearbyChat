@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         updateAppTheme()
     }
 
-    fun updateAppTheme() {
+    private fun updateAppTheme() {
         when(getAppTheme()) {
             "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

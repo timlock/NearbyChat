@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NearbyChat</string>
+    <string name="not_compatible">Diese App ist mit Ihrem Smartphone leider nicht kompatibel.</string>
+    <string name="permissions_missing">Diese App benötigt weitere Berechtigungen.</string>
+
     <string name="available">Verfügbar</string>
     <string name="chats">Chats</string>
     <string name="profile">Profil</string>
