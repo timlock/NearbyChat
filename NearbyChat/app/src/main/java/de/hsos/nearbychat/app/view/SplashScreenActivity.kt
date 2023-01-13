@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
 
 
@@ -28,6 +27,7 @@ class SplashScreenActivity : AppCompatActivity() {
         }
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     override fun onRequestPermissionsResult(
@@ -48,6 +48,7 @@ class SplashScreenActivity : AppCompatActivity() {
         }
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun checkPermissions() : Boolean {
