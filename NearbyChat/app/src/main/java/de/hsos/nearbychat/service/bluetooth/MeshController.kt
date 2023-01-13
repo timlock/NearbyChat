@@ -123,11 +123,11 @@ class MeshController(
     }
 
     override fun onPackage(macAddress: String, rssi: Int, packageString: String) {
-        Log.d(
-            TAG,
-            "onPackage() called with:  rssi = $rssi, advertisementPackage = $packageString"
-        )
         Handler(Looper.getMainLooper()).post {
+            Log.d(
+                TAG,
+                "onPackage() called with:  rssi = $rssi, advertisementPackage = $packageString"
+            )
             val advertisementPackage = AdvertisementPackage.toPackage(packageString)
             if (advertisementPackage.getRawMessageBegin() != null) {
                 this.messageBuffer.add(
@@ -202,9 +202,10 @@ class MeshController(
         Log.d(TAG, "handleMessage() called with: advertisement = $advertisement")
         if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
-            if (this.slidingWindowTable.add(advertisement.sender!!, advertisement.id!!)) {
-                this.observer.onMessage(advertisement)
-            }
+//            if (this.slidingWindowTable.add(advertisement.sender!!, advertisement.id!!)) {
+//                this.observer.onMessage(advertisement)
+//            }
+            this.observer.onMessage(advertisement)
             this.sendAck(advertisement)
         } else {
             val nextTarget: String? =

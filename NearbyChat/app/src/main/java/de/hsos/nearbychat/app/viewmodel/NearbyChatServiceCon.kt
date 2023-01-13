@@ -69,6 +69,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
 
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "onReceive() called with")
             when (intent?.action) {
                 NearbyChatService.ON_PROFILE_ACTION -> {
                     val param: String? = intent.getStringExtra(NearbyChatService.PROFILE_PARAM)
@@ -96,6 +97,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                 NearbyChatService.ON_PROFILE_TIMEOUT_ACTION -> {
                     val param: List<String>? =
                         intent.getStringArrayListExtra(NearbyChatService.PROFILE_LIST_PARAM)
+                    Log.d(TAG, "onReceive() ON_PROFILE_TIMEOUT_ACTION = $param")
                     if (param == null) {
                         Log.w(
                             TAG,
