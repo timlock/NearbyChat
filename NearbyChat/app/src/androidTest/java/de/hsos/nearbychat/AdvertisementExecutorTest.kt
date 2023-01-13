@@ -1,8 +1,6 @@
 package de.hsos.nearbychat
 
 
-import android.util.Log
-import androidx.core.graphics.blue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MessageType
@@ -125,6 +123,61 @@ class AdvertisementExecutorTest {
         advertisementExecutor.start()
         Thread.sleep(advertisementExecutor.period * 2)
         assertTrue(actual.contains(advertisement.toString()))
+    }
+
+    @Test
+    fun sendMultipleAdvertisements() {
+        var first: Advertisement = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .rssi(1)
+            .hops(10)
+            .sender("eins")
+            .address("eins")
+            .name("eins")
+            .description("eins")
+            .color(1)
+            .build()
+        var second = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .rssi(1)
+            .hops(9)
+            .sender("eins")
+            .address("zwei")
+            .name("zwei")
+            .description("zwei")
+            .color(1)
+            .build()
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 0L, advertisement = first))
+        neighbourTable.updateNeighbour(Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = second))
+        var actual: MutableList<String> = LinkedList()
+        val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
+            object : Advertiser {
+                override fun start(): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun stop() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getMaxMessageSize(): Int {
+                    TODO("Not yet implemented")
+                }
+
+                override fun send(message: String): Boolean {
+                    actual.add(message.substring(2))
+                    return true
+                }
+            },
+            1000L,
+            50,
+            neighbourTable
+        )
+        advertisementExecutor.start()
+        Thread.sleep(advertisementExecutor.period * 4)
+        assertTrue(actual.contains(first.toString()))
+        assertTrue(actual.contains(second.toString()))
     }
 
     @Test

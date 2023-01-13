@@ -5,6 +5,7 @@ import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.AdvertisementPackage
 import de.hsos.nearbychat.service.bluetooth.util.AtomicIdGenerator
+import de.hsos.nearbychat.service.bluetooth.util.Neighbour
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -15,7 +16,7 @@ class AdvertisementExecutor(
     private val broadCaster: Advertiser,
     val period: Long,
     private val sizeLimit: Int,
-    private val advertisementQueue: AdvertisementQueue,
+    private val neighbourQueue: AdvertisementQueue<Neighbour>
 ) {
     private val TAG: String = AdvertisementExecutor::class.java.simpleName
     private var scheduledExecutor: ScheduledExecutorService =
@@ -57,9 +58,9 @@ class AdvertisementExecutor(
     private fun broadcast() {
         val id = this.idGenerator.next()
         val advertisementPackage = AdvertisementPackage(id)
-        if(id.code % 2 == 0) {
+        if (id.code % 2 == 0) {
             this.addMessages(advertisementPackage)
-        }else {
+        } else {
             this.addNeighbours(advertisementPackage)
         }
         if (advertisementPackage.size > 2) {
@@ -72,39 +73,42 @@ class AdvertisementExecutor(
         }
     }
 
-
     private fun addMessages(advertisementPackage: AdvertisementPackage) {
-        while (advertisementPackage.size < this.sizeLimit && this.messageQueue.isNotEmpty()) {
-            val msg = this.messageQueue.removeFirst()
-            if (msg.length + advertisementPackage.size > this.sizeLimit) {
-                this.messageQueue.add(0, msg.substring(this.sizeLimit - advertisementPackage.size))
-                advertisementPackage.addCutMessageEnd(
-                    msg.substring(
-                        0,
-                        this.sizeLimit - advertisementPackage.size
+        while (this.messageQueue.isNotEmpty()) {
+            var message = this.messageQueue.removeFirst()
+            if(advertisementPackage.size + message.length < this.sizeLimit){
+                if (!message.contains('{')) {
+                    advertisementPackage.addCutMessageBegin(message)
+                }else if (!message.contains('}')) {
+                    advertisementPackage.addCutMessageEnd(message)
+                }else {
+                    advertisementPackage.addAdvertisement(
+                        Advertisement.Builder().rawMessage(message).build()
                     )
-                )
-            } else {
-                if (!msg.contains('{')) {
-                    advertisementPackage.addCutMessageBegin(msg)
-                } else if (!msg.contains('}')) {
-                    advertisementPackage.addCutMessageEnd(msg)
-                } else {
-                    val advertisement = Advertisement.Builder().rawMessage(msg).build()
-                    advertisementPackage.addAdvertisement(advertisement)
                 }
+            }else{
+                if(message.length > this.sizeLimit){
+                    advertisementPackage.addCutMessageEnd(message.substring(0, this.sizeLimit - advertisementPackage.size))
+                    this.messageQueue.add(0,message.substring(this.sizeLimit - advertisementPackage.size - 1))
+                }else{
+                    this.messageQueue.add(0,message)
+                }
+                return
             }
         }
-        Log.d(TAG, "addMessages() total ${advertisementPackage.getMessageList().size} messages")
     }
+
 
     private fun addNeighbours(advertisementPackage: AdvertisementPackage) {
         var advertisementCounter = 0
-        var advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
-        while ((advertisementPackage.size + advertisement.toString().length) < this.sizeLimit && advertisementCounter < this.advertisementQueue.getSize()) {
-            advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
-            advertisementPackage.addAdvertisement(advertisement)
+        while (advertisementCounter < this.neighbourQueue.getSize()){
+            var advertisement = this.neighbourQueue.getNextElement()?.advertisement ?: return
             advertisementCounter++
+            if((advertisementPackage.size + advertisement.toString().length) > this.sizeLimit){
+                return
+            }
+            advertisementPackage.addAdvertisement(advertisement)
+
         }
         Log.d(TAG, "addNeighbours() total $advertisementCounter neighbour advertisements")
     }

@@ -1,6 +1,8 @@
 package de.hsos.nearbychat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
 import de.hsos.nearbychat.service.bluetooth.util.NeighbourTable
 import org.junit.Assert.assertEquals
@@ -73,6 +75,37 @@ class NeighbourTableTest {
         assertEquals(eins, result)
         result = neighbourTable.getNextElement()
         assertEquals(zwei, result)
+    }
+
+    @Test
+    fun tmp(){
+        var first = Neighbour("eins", 1, 1, 0L, advertisement = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .rssi(1)
+            .hops(10)
+            .sender("eins")
+            .address("eins")
+            .name("eins")
+            .description("eins")
+            .color(1)
+            .build())
+        var second = Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = Advertisement.Builder()
+            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .rssi(1)
+            .hops(9)
+            .sender("eins")
+            .address("zwei")
+            .name("zwei")
+            .description("zwei")
+            .color(1)
+            .build())
+        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        neighbourTable.updateNeighbour(first)
+        neighbourTable.updateNeighbour(second)
+        var restult : Neighbour? = neighbourTable.getNextElement()
+        assertEquals(first.toString(), restult.toString())
+        restult = neighbourTable.getNextElement()
+        assertEquals(second.toString(),restult.toString())
     }
 
 
