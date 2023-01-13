@@ -18,14 +18,14 @@ data class AdvertisementPackage(var id: Char? = null) {
         this.size += message.length
     }
 
-    fun getRawMessageBegin() : String? = this.rawMessageBegin
+    fun getRawMessageBegin(): String? = this.rawMessageBegin
 
     fun addCutMessageEnd(message: String) {
         this.rawMessageEnd = message
         this.size += message.length
     }
 
-    fun getRawMessageEnd() : String? = this.rawMessageEnd
+    fun getRawMessageEnd(): String? = this.rawMessageEnd
 
 
     fun getMessageList(): MutableList<Advertisement> = this.messageList
@@ -45,21 +45,28 @@ data class AdvertisementPackage(var id: Char? = null) {
     }
 
     companion object {
+
         fun toPackage(packageStr: String): AdvertisementPackage {
             val result = AdvertisementPackage()
             result.id = packageStr[0]
-            var lastSeparator: Int = packageStr.indexOf('{')
+            var lastSeparator: Int = 2
             var nextSeparator: Int = packageStr.indexOf('}') + 1
-            if (lastSeparator > nextSeparator) {
-                result.rawMessageBegin = packageStr.substring(2, nextSeparator)
-            } else if (nextSeparator == -1) {
-                result.rawMessageBegin = packageStr.substring(2)
+            if (nextSeparator == 0) {
+                nextSeparator = packageStr.length
             }
             while (nextSeparator != 0) {
-                var message: String = packageStr.substring(lastSeparator, nextSeparator)
-                result.messageList.add(Advertisement.Builder().rawMessage(message).build())
+                val msg = packageStr.substring(lastSeparator, nextSeparator)
+                if (msg.contains('{') && msg.contains('}')) {
+                    result.addAdvertisement(Advertisement.Builder().rawMessage(msg).build())
+                } else {
+                    result.addCutMessageBegin(msg)
+                }
                 lastSeparator = nextSeparator
                 nextSeparator = packageStr.indexOf('}', lastSeparator) + 1
+
+            }
+            if (packageStr[packageStr.length - 1] != '}') {
+                result.addCutMessageEnd(packageStr.substring(lastSeparator, packageStr.length))
             }
             return result
         }

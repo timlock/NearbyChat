@@ -40,7 +40,9 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     private fun registerReceiver(context: Context) {
-        val filterServiceStarted: IntentFilter = IntentFilter(NearbyChatService.ON_PROFILE_ACTION)
+        var filterServiceStarted: IntentFilter = IntentFilter(NearbyChatService.ON_PROFILE_ACTION)
+        context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
+        filterServiceStarted = IntentFilter(NearbyChatService.ON_PROFILE_TIMEOUT_ACTION)
         context.registerReceiver(this.broadcastReceiver, filterServiceStarted)
     }
 
@@ -56,11 +58,12 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun sendMessage(message: Message): Boolean {
+        Log.d(TAG, "sendMessage() called with: message = $message")
         return if (this::nearbyChatService.isInitialized) {
-            false
-        } else {
             this.nearbyChatService.sendMessage(message)
             true
+        } else {
+            false
         }
     }
 

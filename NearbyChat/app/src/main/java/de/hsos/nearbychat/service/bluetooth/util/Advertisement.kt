@@ -23,7 +23,6 @@ class Advertisement private constructor(
     fun decrementHop() = apply { this.hops = this.hops?.minus(1) }
 
 
-    @Throws(IllegalStateException::class)
     override fun toString(): String {
         val builder: StringBuilder = StringBuilder()
             .append("{")
@@ -70,7 +69,8 @@ class Advertisement private constructor(
                     .append(message)
             }
             else -> {
-                throw IllegalStateException()
+                Log.w(TAG, "toString: corrupted package")
+                return ""
             }
         }
         builder.append("}")
@@ -181,10 +181,10 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf('}')
+                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
+                        nextSeparator = rawMessage.indexOf('}')
                         this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                     }
                     MessageType.NEIGHBOUR_MESSAGE.type -> {

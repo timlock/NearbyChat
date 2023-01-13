@@ -144,7 +144,7 @@ class Repository(database: Database) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun getUnsentMessages(): List<Message> {
+     suspend fun getUnsentMessages(): List<Message> {
         return messageDao.getUnsentMessages()
     }
 }

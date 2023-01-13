@@ -25,7 +25,6 @@ class MeshControllerTest {
             }
 
             override fun onNeighbour(advertisement: Advertisement) {
-                output.add(advertisement.toString())
             }
 
             override fun onNeighbourTimeout(timeoutList: List<String>) {
@@ -45,7 +44,7 @@ class MeshControllerTest {
             }
 
             override fun send(message: String): Boolean {
-                scannerObserver.onPackage(-50, message)
+                output.add(message.substring(2))
                 return true
             }
 
@@ -68,14 +67,12 @@ class MeshControllerTest {
         val meshController: MeshController =
             MeshController(meshObserver, advertiser, scanner, ownProfile)
         meshController.connect()
-        Thread.sleep(MeshController.ADVERTISING_INTERVAL)
-        meshController.disconnect()
-        Thread.sleep(MeshController.ADVERTISING_INTERVAL)
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 2)
         assertTrue(output.isNotEmpty())
         val expected: String = Advertisement.Builder()
             .type(MessageType.NEIGHBOUR_MESSAGE.type)
             .sender("eins")
-            .hops(MeshController.MAX_HOPS - 1)
+            .hops(MeshController.MAX_HOPS)
             .rssi(0)
             .address(ownProfile.address)
             .name(ownProfile.name)
@@ -83,6 +80,7 @@ class MeshControllerTest {
             .color(ownProfile.color)
             .build()
             .toString()
+        meshController.disconnect()
         assertTrue(output.contains(expected))
     }
 
@@ -152,17 +150,16 @@ class MeshControllerTest {
             .description("zweidescription")
             .color(3)
             .build()
-        scannerObserver.onPackage(-50, "1:$advertisement")
-        Thread.sleep(MeshController.ADVERTISING_INTERVAL)
+        scannerObserver.onPackage("a", -50, "1:$advertisement")
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL)
         val message: Message = Message("zweiAddress", "test", System.currentTimeMillis())
         meshController.sendMessage(message)
-        Thread.sleep(MeshController.ADVERTISING_INTERVAL * 2)
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 3)
         meshController.disconnect()
-        Thread.sleep(MeshController.ADVERTISING_INTERVAL)
         assertTrue(neighbours.isNotEmpty())
         advertisement.decrementHop()
         advertisement.sender = ownProfile.address
-        assertEquals(advertisement.toString(),neighbours[0])
+        assertEquals(advertisement.toString(), neighbours[0])
         assertTrue(messages.isNotEmpty())
         var actual = false
         messages.forEach {

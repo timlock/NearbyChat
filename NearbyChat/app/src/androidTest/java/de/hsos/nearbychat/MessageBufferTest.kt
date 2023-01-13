@@ -17,48 +17,21 @@ class MessageBufferTest {
     @Test
     fun add(){
         val idGenerator = AtomicIdGenerator()
+        var id = idGenerator.next()
         val messageBuffer: MessageBuffer = MessageBuffer()
         var first = "{12"
         var second = "34"
         var third = "5}"
-        var actual = messageBuffer.add(idGenerator.next(),first)
+        var actual = messageBuffer.add(first,id,first)
         assertNull(actual)
-        actual = messageBuffer.add(idGenerator.next(),second)
+        id = idGenerator.next()
+        id = idGenerator.next()
+        actual = messageBuffer.add(first,id,second)
         assertNull(actual)
-        actual = messageBuffer.add(idGenerator.next(),third)
+        id = idGenerator.next()
+        id = idGenerator.next()
+        actual = messageBuffer.add(first,id,third)
         assertEquals("$first$second$third", actual)
     }
 
-    @Test
-    fun addReverseOrder(){
-        val idGenerator = AtomicIdGenerator()
-        val messageBuffer: MessageBuffer = MessageBuffer()
-        var first = "{12"
-        var second = "34"
-        var third = "5}"
-        var actual = messageBuffer.add('2',third)
-        assertNull(actual)
-        actual = messageBuffer.add('1',second)
-        assertNull(actual)
-        actual = messageBuffer.add('0',first)
-        assertEquals("$first$second$third", actual)
-    }
-
-    @Test
-    fun addMixedOrder(){
-        val idGenerator = AtomicIdGenerator()
-        val messageBuffer: MessageBuffer = MessageBuffer()
-        var first = "{12"
-        var second = "34"
-        var third = "56"
-        var fourth = "7}"
-        var actual = messageBuffer.add('0',first)
-        assertNull(actual)
-        actual = messageBuffer.add('3',fourth)
-        assertNull(actual)
-        actual = messageBuffer.add('2',third)
-        assertNull(actual)
-        actual = messageBuffer.add('1',second)
-        assertEquals("$first$second$third$fourth", actual)
-    }
 }

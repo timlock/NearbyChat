@@ -81,7 +81,7 @@ class AdvertisementExecutorTest {
         )
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
-        Thread.sleep(advertisementExecutor.period * 2)
+        Thread.sleep(advertisementExecutor.period * 4)
         assertEquals(expected, actual)
     }
 

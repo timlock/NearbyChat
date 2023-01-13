@@ -30,7 +30,7 @@ class AdvertisementExecutor(
             Log.d(TAG, "start: could not start is already active")
             false
         } else {
-            Log.d(TAG, "start: ")
+            Log.d(TAG, "start: rate ${this.period}")
             this.scheduledExecutor.scheduleAtFixedRate(
                 this::broadcast,
                 0,
@@ -55,10 +55,13 @@ class AdvertisementExecutor(
 
     @Synchronized
     private fun broadcast() {
-        val advertisementPackage = AdvertisementPackage(this.idGenerator.next())
-        this.addMessages(advertisementPackage)
-        this.addNeighbours(advertisementPackage)
-
+        val id = this.idGenerator.next()
+        val advertisementPackage = AdvertisementPackage(id)
+        if(id.code % 2 == 0) {
+            this.addMessages(advertisementPackage)
+        }else {
+            this.addNeighbours(advertisementPackage)
+        }
         if (advertisementPackage.size > 2) {
             if (this.broadCaster.send(advertisementPackage.toString())) {
                 Log.i(TAG, "broadcast: $advertisementPackage")
@@ -97,8 +100,9 @@ class AdvertisementExecutor(
 
     private fun addNeighbours(advertisementPackage: AdvertisementPackage) {
         var advertisementCounter = 0
-        while (advertisementPackage.size < this.sizeLimit && advertisementCounter < this.advertisementQueue.getSize()) {
-            val advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
+        var advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
+        while ((advertisementPackage.size + advertisement.toString().length) < this.sizeLimit && advertisementCounter < this.advertisementQueue.getSize()) {
+            advertisement = this.advertisementQueue.getNextElement()?.advertisement ?: return
             advertisementPackage.addAdvertisement(advertisement)
             advertisementCounter++
         }

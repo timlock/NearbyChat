@@ -1,4 +1,5 @@
 package de.hsos.nearbychat
+import android.bluetooth.BluetoothAdapter
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.service.bluetooth.MessageType
 import de.hsos.nearbychat.service.bluetooth.util.*
@@ -38,6 +39,7 @@ class AdvertisementPackageTest {
         assertEquals(expectedToString, actualString)
         val actualAdvertisementPackage = AdvertisementPackage.toPackage(actualString)
         assertEquals(expected, actualAdvertisementPackage)
+
     }
 
     @Test
@@ -59,6 +61,37 @@ class AdvertisementPackageTest {
         advertisementPackage.addCutMessageEnd(cutOffMessage)
         var expected = "${advertisementPackage.id}:${advertisementPackage.getRawMessageBegin()}$advertisementAck${advertisementPackage.getRawMessageEnd()}"
         var actual = advertisementPackage.toString()
+        assertEquals(expected,actual)
+        var actualPackage = AdvertisementPackage.toPackage(expected)
+        actual = actualPackage.toString()
+        assertEquals(expected,actual)
+    }
+
+    @Test
+    fun halfMessageBegin(){
+        val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
+        val advertisementPackage = AdvertisementPackage(idGenerator.next())
+        var cutOffMessage = ";7466f7be43bf8a39;09760fab11efc653;7466f7be43bf8a39;1673613299452}"
+        advertisementPackage.addCutMessageBegin(cutOffMessage)
+        var expected = "${advertisementPackage.id}:${advertisementPackage.getRawMessageBegin()}"
+        var actual = advertisementPackage.toString()
+        assertEquals(expected,actual)
+        var actualPackage = AdvertisementPackage.toPackage(expected)
+        actual = actualPackage.toString()
+        assertEquals(expected,actual)
+    }
+
+    @Test
+    fun halfMessageEnd(){
+        val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
+        val advertisementPackage = AdvertisementPackage(idGenerator.next())
+        var cutOffMessage = "{7466f7be43bf8a39;09760fab11efc653;7466f7be43bf8a39;1673613299452"
+        advertisementPackage.addCutMessageBegin(cutOffMessage)
+        var expected = "${advertisementPackage.id}:${advertisementPackage.getRawMessageBegin()}"
+        var actual = advertisementPackage.toString()
+        assertEquals(expected,actual)
+        var actualPackage = AdvertisementPackage.toPackage(expected)
+        actual = actualPackage.toString()
         assertEquals(expected,actual)
     }
 }

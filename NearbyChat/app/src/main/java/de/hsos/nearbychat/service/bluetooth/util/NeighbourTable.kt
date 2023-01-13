@@ -40,15 +40,7 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue {
             null
         } else {
             var result: Neighbour = this.neighbourList[this.firstAddressToAdvertise]
-            var counter: Int = this.neighbourList.size
-            while (System.currentTimeMillis() - result.lastSeen > this.timeout && counter > 0) {
-                this.firstAddressToAdvertise =
-                    (this.firstAddressToAdvertise + 1) % this.neighbourList.size
-                result = this.neighbourList[firstAddressToAdvertise]
-                counter--
-            }
-            this.firstAddressToAdvertise =
-                (this.firstAddressToAdvertise + 1) % this.neighbourList.size
+            this.firstAddressToAdvertise = (this.firstAddressToAdvertise + 1) % this.neighbourList.size
             result
         }
     }
