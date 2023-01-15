@@ -7,8 +7,4 @@ import androidx.room.PrimaryKey
 class Message(val address: String, val content: String, val timeStamp: Long) {
     var isReceived: Boolean = false
     var isSelfAuthored: Boolean = false
-
-    override fun toString(): String {
-        return "Message(address='$address', content='$content', timeStamp=$timeStamp, isReceived=$isReceived, isSelfAuthored=$isSelfAuthored)"
-    }
 }
