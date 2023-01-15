@@ -1,22 +1,37 @@
 package de.hsos.nearbychat.app.application
 
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.provider.Settings
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import de.hsos.nearbychat.R
 import de.hsos.nearbychat.app.data.Database
 import de.hsos.nearbychat.app.data.Repository
-import de.hsos.nearbychat.app.domain.Message
 
 class NearbyApplication: Application() {
     private val database by lazy { Database.getDatabase(this) }
-    val repository by lazy { Repository(database, this) }
+    val repository by lazy { Repository(database) }
     val ownAddress: String by lazy { Settings.Secure.getString(this.getContentResolver(),Settings.Secure.ANDROID_ID) }
     val TAG: String = Application::class.java.simpleName
+
+//    init{
+//        repository.ownProfile.observeForever {
+//            var ownProfile: OwnProfile? = it
+//            if (ownProfile == null) {
+//                ownProfile = OwnProfile(
+//                    Settings.Secure.getString(
+//                        this.getContentResolver(),
+//                        Settings.Secure.ANDROID_ID
+//                    )
+//                )
+//                GlobalScope.launch {
+//                    repository.updateOwnProfile(ownProfile)
+//                }
+//            }
+//            this.chatServiceCon.startService(
+//                applicationContext,
+//                ownProfile
+//            )
+//        }
+//    }
 
     companion object {
         fun getUserColorRes(id: Int): Int {
