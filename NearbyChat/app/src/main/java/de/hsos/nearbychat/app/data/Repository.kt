@@ -1,8 +1,11 @@
 package de.hsos.nearbychat.app.data
 
+import android.os.Handler
+import android.os.HandlerThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.OwnProfile
 import de.hsos.nearbychat.app.domain.Profile
@@ -22,7 +25,10 @@ class Repository(database: Database) {
     val savedProfiles: LiveData<List<Profile>> = MutableLiveData()
     val ownProfile: LiveData<OwnProfile?> = ownProfileDao.get()
 
+    private var databaseHandler: HandlerThread = HandlerThread("databaseHandler")
+
     init {
+        this.databaseHandler.start()
         // register for changes in available profiles
         availableProfiles.observeForever {
             availableList = it.toMutableList()
@@ -31,7 +37,7 @@ class Repository(database: Database) {
                     if (availableProfile.address == savedProfile.address) {
                         if (availableProfile != savedProfile) {
                             // update saved profile because it differs from the saved one
-                            savedList[savedList.indexOf(savedProfile)] = availableProfile
+                            savedList[savedList.indexOf(savedProfile)].updateReceivedData(availableProfile)
                         } else {
                             // update available signal information (async)
                             runBlocking {
@@ -95,39 +101,51 @@ class Repository(database: Database) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertMessage(message: Message) {
-        // check if profile to message is saved
-        var foundProfile = false
-        savedList.forEach { savedProfile ->
-            if (message.address == savedProfile.address) {
-                if (!message.isSelfAuthored) {
-                    // set unread if message is not self authored
-                    savedProfile.isUnread = true
-                    updateProfile(savedProfile)
-                }
-                foundProfile = true
-            }
-        }
-        if (!foundProfile) {
-            // profile not found, search if profile is available
-            var profile: Profile? = null
-            availableList.forEach { availableProfile ->
-                if (message.address == availableProfile.address) {
-                    profile = availableProfile
-                }
-            }
-            if (profile == null) {
-                // profile not available so use empty profile just with address and let it update later
-                profile = Profile(message.address)
-            }
-            if (!message.isSelfAuthored) {
-                // set unread if message is not self authored
-                profile!!.isUnread = true
-                profile!!.lastInteraction = message.timeStamp
+        Handler(this.databaseHandler.looper).post {
+            runBlocking {
+                launch {
+                    // check if message exists
+                    if (messageDao.get(message.address, message.timeStamp, message.isSelfAuthored)
+                            .isEmpty()
+                    ) {
+                        // check if profile to message is saved
+                        var foundProfile = false
+                        savedList.forEach { savedProfile ->
+                            if (message.address == savedProfile.address) {
+                                if (!message.isSelfAuthored) {
+                                    // set unread if message is not self authored
+                                    savedProfile.isUnread = true
+                                }
+                                savedProfile.lastInteraction = message.timeStamp
+                                updateProfile(savedProfile)
+                                foundProfile = true
+                            }
+                        }
+                        if (!foundProfile) {
+                            // profile not found, search if profile is available
+                            var profile: Profile? = null
+                            availableList.forEach { availableProfile ->
+                                if (message.address == availableProfile.address) {
+                                    profile = availableProfile
+                                }
+                            }
+                            if (profile == null) {
+                                // profile not available so use empty profile just with address and let it update later
+                                profile = Profile(message.address)
+                            }
+                            if (!message.isSelfAuthored) {
+                                // set unread if message is not self authored
+                                profile!!.isUnread = true
 
+                            }
+                            profile!!.lastInteraction = message.timeStamp
+                            insertProfile(profile!!)
+                        }
+                        messageDao.insert(message)
+                    }
+                }
             }
-            insertProfile(profile!!)
         }
-        messageDao.insert(message)
     }
 
     @Suppress("RedundantSuspendModifier")
