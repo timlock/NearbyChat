@@ -150,7 +150,6 @@ class Repository(database: Database, private val application: NearbyApplication)
                     ) {
                         // check if profile to message is saved
                         var foundProfile: Profile? = null
-                        var fromAvailable = false
                         savedList.forEach { savedProfile ->
                             if (message.address == savedProfile.address) {
                                 if (!message.isSelfAuthored) {
@@ -162,7 +161,7 @@ class Repository(database: Database, private val application: NearbyApplication)
                                 foundProfile = savedProfile
                             }
                         }
-                        if (foundProfile == null) {
+                        if (foundProfile != null) {
                             // profile not found, search if profile is available
                             var profile: Profile? = null
                             availableList.forEach { availableProfile ->
@@ -188,6 +187,25 @@ class Repository(database: Database, private val application: NearbyApplication)
                         createNotification(message, foundProfile!!, fromAvailable)
                     }
                 }
+            }
+        }
+        if (!foundProfile) {
+            // profile not found, search if profile is available
+            var profile: Profile? = null
+            availableList.forEach { availableProfile ->
+                if (message.address == availableProfile.address) {
+                    profile = availableProfile
+                }
+            }
+            if (profile == null) {
+                // profile not available so use empty profile just with address and let it update later
+                profile = Profile(message.address)
+            }
+            if (!message.isSelfAuthored) {
+                // set unread if message is not self authored
+                profile!!.isUnread = true
+                profile!!.lastInteraction = message.timeStamp
+
             }
         }
     }
