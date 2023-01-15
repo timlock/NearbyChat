@@ -71,5 +71,7 @@ class Profile(@PrimaryKey val address: String) {
         return result
     }
 
-
+    override fun toString(): String {
+        return "Profile(address='$address', name='$name', description='$description', color=$color, lastInteraction=$lastInteraction, isUnread=$isUnread, rssi=$rssi, hopCount=$hopCount)"
+    }
 }
