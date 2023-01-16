@@ -72,6 +72,7 @@ class SplashScreenActivity : AppCompatActivity() {
             return
         }
         if(!checkBtLeCompatibility()) {
+            findViewById<TextView>(R.id.splash_screen_text).setText(R.string.not_compatible)
             return
         }
         if(!checkGpsEnabled()) {
