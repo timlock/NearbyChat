@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">NearbyChat</string>
     <string name="not_compatible">Diese App ist mit Ihrem Smartphone leider nicht kompatibel.</string>
-    <string name="permissions_missing">Diese App benötigt weitere Berechtigungen.</string>
     <string name="request_gps">"NearbyChat" benötigt eigneschaltetes GPS.</string>
     <string name="request_permissions">"NearbyChat" benötigt alle geforderten Berechtigungen.</string>
     <string name="ok">OK</string>
