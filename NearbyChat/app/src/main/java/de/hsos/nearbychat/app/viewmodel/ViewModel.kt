@@ -60,8 +60,10 @@ class ViewModel(private val repository: Repository, application: Application) :
         }
         for (i in 0 until list.size) {
             if (list[i].address == profile.address) {
-                list[i] = profile
-                (availableProfiles as MutableLiveData).value = list
+                if(list[i] != profile) {
+                    list[i] = profile
+                    (availableProfiles as MutableLiveData).value = list
+                }
                 return
             }
         }

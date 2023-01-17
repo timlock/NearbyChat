@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.PermissionManager
 import de.hsos.nearbychat.app.application.NearbyApplication
 import de.hsos.nearbychat.app.domain.Message
 import de.hsos.nearbychat.app.domain.Profile
@@ -45,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         if(savedInstanceState == null) {
             openFragment(AvailableView.newInstance())
         }
-        PermissionManager.permissionCheck(this,this)
 
         updateAppTheme()
 

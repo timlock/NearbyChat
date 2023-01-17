@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">NearbyChat</string>
     <string name="not_compatible">This app is unfortunately not compatible with your device.</string>
-    <string name="permissions_missing">This app needs more permissions.</string>
+    <string name="request_gps">"NearbyChat" needs activated GPS.</string>
+    <string name="request_permissions">"NearbyChat" needs all required permissions.</string>
+    <string name="ok">OK</string>
 
     <string name="available">available</string>
     <string name="chats">chats</string>

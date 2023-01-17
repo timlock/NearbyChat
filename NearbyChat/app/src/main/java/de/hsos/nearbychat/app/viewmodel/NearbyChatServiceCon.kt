@@ -90,7 +90,6 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                         profile.hopCount = advertisement.hops!!
                         profile.rssi = advertisement.rssi!!
                         profile.color = advertisement.color!!
-                        profile.lastInteraction = System.currentTimeMillis()
                         this@NearbyChatServiceCon.observer.onProfile(profile)
                     }
                 }

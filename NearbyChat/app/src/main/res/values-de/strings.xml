@@ -2,7 +2,9 @@
 <resources>
     <string name="app_name">NearbyChat</string>
     <string name="not_compatible">Diese App ist mit Ihrem Smartphone leider nicht kompatibel.</string>
-    <string name="permissions_missing">Diese App benötigt weitere Berechtigungen.</string>
+    <string name="request_gps">"NearbyChat" benötigt eigneschaltetes GPS.</string>
+    <string name="request_permissions">"NearbyChat" benötigt alle geforderten Berechtigungen.</string>
+    <string name="ok">OK</string>
 
     <string name="available">Verfügbar</string>
     <string name="chats">Chats</string>
@@ -23,7 +25,7 @@
     <string name="save">Speichern</string>
     <string name="saved_profile">Profil gespeichert</string>
     <string name="profile_parts_empty">Name und Beschreibung dürfen nicht leer sein</string>
-    <string name="theme_label">Darstellung</string>
+    <string name="theme_label">Darstellung:</string>
     <string name="dark_mode">Dunkler Modus</string>
     <string name="light_mode">Heller Modus</string>
     <string name="language_label">Sprache:</string>

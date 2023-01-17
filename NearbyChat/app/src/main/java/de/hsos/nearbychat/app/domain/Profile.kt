@@ -19,16 +19,24 @@ class Profile(@PrimaryKey val address: String) {
     var hopCount: Int = 0
 
     fun getSignalStrength0to4(): Int {
-        return min(max(getSignalStrength() / 60, 0), 4)
+        return min(max(getSignalStrength() / 15, 0), 4)
     }
 
     fun getSignalStrength(): Int {
-        var strength = rssi + 140
-        strength -= hopCount * 20
+        var strength = rssi + 90
+        strength -= hopCount * 10
         return strength
     }
 
     fun updateSignal(profile: Profile) {
+        rssi = profile.rssi
+        hopCount = profile.hopCount
+    }
+
+    fun updateReceivedData(profile: Profile) {
+        name = profile.name
+        description = profile.description
+        color = profile.color
         rssi = profile.rssi
         hopCount = profile.hopCount
     }
@@ -44,6 +52,9 @@ class Profile(@PrimaryKey val address: String) {
         if (description != other.description) return false
         if (color != other.color) return false
         if (lastInteraction != other.lastInteraction) return false
+        if (isUnread != other.isUnread) return false
+        if (rssi != other.rssi) return false
+        if (hopCount != other.hopCount) return false
 
         return true
     }
@@ -54,6 +65,13 @@ class Profile(@PrimaryKey val address: String) {
         result = 31 * result + description.hashCode()
         result = 31 * result + color
         result = 31 * result + lastInteraction.hashCode()
+        result = 31 * result + isUnread.hashCode()
+        result = 31 * result + rssi
+        result = 31 * result + hopCount
         return result
+    }
+
+    override fun toString(): String {
+        return "Profile(address='$address', name='$name', description='$description', color=$color, lastInteraction=$lastInteraction, isUnread=$isUnread, rssi=$rssi, hopCount=$hopCount)"
     }
 }
