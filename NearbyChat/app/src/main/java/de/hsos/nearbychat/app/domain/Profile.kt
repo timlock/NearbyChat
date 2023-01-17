@@ -23,8 +23,8 @@ class Profile(@PrimaryKey val address: String) {
     }
 
     fun getSignalStrength(): Int {
-        var strength = rssi + 90
-        strength -= (9 - hopCount) * 10
+        var strength = rssi + 100
+        strength -= (9 - hopCount) * 2
         return strength
     }
 

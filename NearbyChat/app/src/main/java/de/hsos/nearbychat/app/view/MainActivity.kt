@@ -162,8 +162,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             if(i % 2 == 0) {
-                profile.hopCount = i % 5
-                profile.rssi = 120
+                profile.hopCount = i % 10
+                profile.rssi = -30
                 viewModel.updateAvailableProfile(profile)
             }
             viewModel.updateSavedProfile(profile)
