@@ -69,7 +69,7 @@ class MeshControllerTest {
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 2)
         assertTrue(output.isNotEmpty())
         val expected: String = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .sender("eins")
             .hops(MeshController.MAX_HOPS)
             .rssi(0)

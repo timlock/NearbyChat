@@ -1,8 +1,7 @@
 package de.hsos.nearbychat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -14,7 +13,7 @@ class AdvertisementTest {
     @Test
     fun message() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.MESSAGE_MESSAGE.type)
+            .type(AdvertisementType.MESSAGE_ADVERTISEMENT.type)
             .id('0')
             .nextHop("nextHop")
             .sender("sender")
@@ -32,7 +31,7 @@ class AdvertisementTest {
     @Test
     fun ack() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.ACKNOWLEDGE_MESSAGE.type)
+            .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
             .id('0')
             .nextHop("address")
             .sender("sender")
@@ -50,7 +49,7 @@ class AdvertisementTest {
     @Test
     fun neighbour() {
         val advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .sender("sender")
             .hops(10)
             .rssi(-50)

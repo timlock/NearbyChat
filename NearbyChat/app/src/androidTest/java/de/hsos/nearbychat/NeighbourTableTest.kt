@@ -1,7 +1,7 @@
 package de.hsos.nearbychat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
 import de.hsos.nearbychat.service.bluetooth.util.NeighbourTable
@@ -80,7 +80,7 @@ class NeighbourTableTest {
     @Test
     fun tmp(){
         var first = Neighbour("eins", 1, 1, 0L, advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(10)
             .sender("eins")
@@ -90,7 +90,7 @@ class NeighbourTableTest {
             .color(1)
             .build())
         var second = Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(9)
             .sender("eins")

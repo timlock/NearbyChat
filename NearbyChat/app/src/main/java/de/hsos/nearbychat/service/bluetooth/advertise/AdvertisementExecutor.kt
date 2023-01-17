@@ -16,13 +16,14 @@ class AdvertisementExecutor(
     private val broadCaster: Advertiser,
     val period: Long,
     private val sizeLimit: Int,
-    private val neighbourQueue: AdvertisementQueue<Neighbour>
+    private val advertisementQueue: AdvertisementQueue<Neighbour>
 ) {
     private val TAG: String = AdvertisementExecutor::class.java.simpleName
     private var scheduledExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
     private var isActive: Boolean = false
     private var messageQueue: MutableList<String> = LinkedList()
+    private var neighbourQueue: MutableList<Advertisement> = LinkedList()
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
 
     @Synchronized
@@ -76,22 +77,24 @@ class AdvertisementExecutor(
     private fun addMessages(advertisementPackage: AdvertisementPackage) {
         while (this.messageQueue.isNotEmpty()) {
             var message = this.messageQueue.removeFirst()
-            if(advertisementPackage.size + message.length < this.sizeLimit){
+            if (advertisementPackage.size + message.length <= this.sizeLimit) {
                 if (!message.contains('{')) {
                     advertisementPackage.addCutMessageBegin(message)
-                }else if (!message.contains('}')) {
+                } else if (!message.contains('}')) {
                     advertisementPackage.addCutMessageEnd(message)
-                }else {
+                } else {
                     advertisementPackage.addAdvertisement(
                         Advertisement.Builder().rawMessage(message).build()
                     )
                 }
-            }else{
-                if(message.length > this.sizeLimit){
-                    advertisementPackage.addCutMessageEnd(message.substring(0, this.sizeLimit - advertisementPackage.size))
-                    this.messageQueue.add(0,message.substring(this.sizeLimit - advertisementPackage.size - 1))
-                }else{
-                    this.messageQueue.add(0,message)
+            } else {
+                if (message.length + AdvertisementPackage.OFFSET > this.sizeLimit) {
+                    val cutPos = this.sizeLimit - advertisementPackage.size
+                    advertisementPackage.addCutMessageEnd(message.substring(0, cutPos))
+                    this.messageQueue.add(0, message.substring(cutPos))
+                    Log.d(TAG, "addMessages: split message: ${advertisementPackage.getRawMessageEnd()}|${this.messageQueue.first()} ")
+                } else {
+                    this.messageQueue.add(0, message)
                 }
                 return
             }
@@ -101,13 +104,19 @@ class AdvertisementExecutor(
 
     private fun addNeighbours(advertisementPackage: AdvertisementPackage) {
         var advertisementCounter = 0
-        while (advertisementCounter < this.neighbourQueue.getSize()){
-            var advertisement = this.neighbourQueue.getNextElement()?.advertisement ?: return
-            advertisementCounter++
-            if((advertisementPackage.size + advertisement.toString().length) > this.sizeLimit){
-                return
+        while (advertisementCounter < this.advertisementQueue.getSize()) {
+            var advertisement: Advertisement = if (this.neighbourQueue.isEmpty()) {
+                this.advertisementQueue.getNextElement()?.advertisement ?: return
+            } else {
+                this.neighbourQueue.removeFirst()
             }
-            advertisementPackage.addAdvertisement(advertisement)
+            advertisementCounter++
+            if ((advertisementPackage.size + advertisement.toString().length) > this.sizeLimit) {
+                this.neighbourQueue.add(advertisement)
+                return
+            } else {
+                advertisementPackage.addAdvertisement(advertisement)
+            }
 
         }
         Log.d(TAG, "addNeighbours() total $advertisementCounter neighbour advertisements")
