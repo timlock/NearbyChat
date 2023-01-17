@@ -246,4 +246,109 @@ class MeshControllerTest {
         assertEquals(zweiMessage.timeStamp, resultZweiAck.first().timestamp)
     }
 
+    @Test
+    fun sendMessageOneHop() {
+        var resultEinsMessage = mutableListOf<Advertisement>()
+        var resultEinsAck = mutableListOf<Advertisement>()
+        var resultEinsNeighbour = mutableListOf<Advertisement>()
+        var resultZweiMessage = mutableListOf<Advertisement>()
+        var resultZweiAck = mutableListOf<Advertisement>()
+        var resultDreiMessage = mutableListOf<Advertisement>()
+        var resultDreiAck = mutableListOf<Advertisement>()
+        var eins: MeshController? = null
+        var zwei: MeshController? = null
+        var drei: MeshController? = null
+        var einsSend: (String) -> Unit = {
+            val rssi = -60
+            val mac = "eins"
+            zwei?.onPackage(mac, rssi, it)
+        }
+        var zweiSend: (String) -> Unit = {
+            val rssi = -50
+            val mac = "zwei"
+            eins?.onPackage(mac, rssi, it)
+            drei?.onPackage(mac, rssi, it)
+        }
+        var dreiSend: (String) -> Unit = {
+            val rssi = -40
+            val mac = "drei"
+            zwei?.onPackage(mac, rssi, it)
+        }
+        var einsObserver = object : MeshObserver {
+            override fun onMessage(advertisement: Advertisement) {
+                resultEinsMessage.add(advertisement)
+            }
+
+            override fun onMessageAck(advertisement: Advertisement) {
+                resultEinsAck.add(advertisement)
+            }
+
+            override fun onNeighbour(advertisement: Advertisement) {
+                resultEinsNeighbour.add(advertisement)
+            }
+
+            override fun onNeighbourTimeout(timeoutList: List<String>) {
+                TODO("Not yet implemented")
+            }
+
+        }
+        var zweiObserver = object : MeshObserver {
+            override fun onMessage(advertisement: Advertisement) {
+                resultZweiMessage.add(advertisement)
+            }
+
+            override fun onMessageAck(advertisement: Advertisement) {
+                resultZweiAck.add(advertisement)
+            }
+
+            override fun onNeighbour(advertisement: Advertisement) {
+            }
+
+            override fun onNeighbourTimeout(timeoutList: List<String>) {
+                TODO("Not yet implemented")
+            }
+
+        }
+        var dreiObserver = object : MeshObserver {
+            override fun onMessage(advertisement: Advertisement) {
+                resultDreiMessage.add(advertisement)
+            }
+
+            override fun onMessageAck(advertisement: Advertisement) {
+                resultDreiAck.add(advertisement)
+            }
+
+            override fun onNeighbour(advertisement: Advertisement) {
+            }
+
+            override fun onNeighbourTimeout(timeoutList: List<String>) {
+                TODO("Not yet implemented")
+            }
+
+        }
+        eins = MockMeshControllerBuilder.createBuilder()
+            .ownProfile("eins")
+            .advertiser(150, einsSend)
+            .build(einsObserver)
+        eins.connect()
+        zwei = MockMeshControllerBuilder.createBuilder()
+            .ownProfile("zwei")
+            .advertiser(150, zweiSend)
+            .build(zweiObserver)
+        zwei.connect()
+        drei = MockMeshControllerBuilder.createBuilder()
+            .ownProfile("drei")
+            .advertiser(150, dreiSend)
+            .build(dreiObserver)
+        drei.connect()
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 4)
+        assertNotNull(resultEinsNeighbour.firstOrNull{it.address == "drei"})
+        val einsMessage = Message("drei","hallo drei",System.currentTimeMillis())
+        eins.sendMessage(einsMessage)
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 4)
+        assertTrue(resultDreiMessage.isNotEmpty())
+        assertEquals("eins",resultDreiMessage.first().sender)
+        assertEquals(einsMessage.content,resultDreiMessage.first().message)
+    }
+
 }

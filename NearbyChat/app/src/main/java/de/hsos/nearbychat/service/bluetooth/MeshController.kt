@@ -202,9 +202,6 @@ class MeshController(
         Log.d(TAG, "handleMessage() called with: advertisement = $advertisement")
         if (this.ownProfile.address == advertisement.receiver) {
             Log.d(TAG, "onMessage: received message for this device")
-//            if (this.slidingWindowTable.add(advertisement.sender!!, advertisement.id!!)) {
-//                this.observer.onMessage(advertisement)
-//            }
             this.observer.onMessage(advertisement)
             this.sendAck(advertisement)
         } else {
@@ -263,8 +260,10 @@ class MeshController(
                 if (advertisement.address == advertisement.sender) {
                     neighbour.closestNeighbour = neighbour
                     neighbour.rssi = rssi
+                    advertisement.rssi = rssi
                 } else {
                     this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
+                    neighbour.closestNeighbour = this.neighbourTable.getEntry(advertisement.sender!!)
                 }
                 neighbour.advertisement?.sender = this.ownProfile.address
                 this.neighbourTable.updateNeighbour(neighbour)
