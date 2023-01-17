@@ -28,6 +28,7 @@ class MeshController(
     private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
     private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
+    private val packageIDMap: HashMap<String, Char> = HashMap()
 
     init {
         this.updateOwnProfile(this.ownProfile)
@@ -90,7 +91,7 @@ class MeshController(
             Log.d(TAG, "sendMessage: ${message.address} is not reachable")
         } else {
             var messageAdvertisement = Advertisement.Builder()
-                .type(MessageType.MESSAGE_MESSAGE.type)
+                .type(AdvertisementType.MESSAGE_ADVERTISEMENT.type)
                 .id(this.idGenerator.next())
                 .nextHop(nextHop)
                 .sender(this.ownProfile.address)
@@ -107,7 +108,7 @@ class MeshController(
         Log.d(TAG, "updateOwnProfile() called with: ownProfile = $ownProfile")
         this.ownProfile = ownProfile
         val selfAdvertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .sender(ownProfile.address)
             .hops(MeshController.MAX_HOPS)
             .rssi(0)
@@ -129,6 +130,11 @@ class MeshController(
                 "onPackage() called with:  rssi = $rssi, advertisementPackage = $packageString"
             )
             val advertisementPackage = AdvertisementPackage.toPackage(packageString)
+            when (this.packageIDMap[macAddress]) {
+                null -> this.packageIDMap[macAddress] = advertisementPackage.id!!
+                advertisementPackage.id -> return@post
+                else -> this.packageIDMap[macAddress] = advertisementPackage.id!!
+            }
             if (advertisementPackage.getRawMessageBegin() != null) {
                 this.messageBuffer.add(
                     macAddress,
@@ -150,13 +156,13 @@ class MeshController(
             }
             advertisementPackage.getMessageList().forEach {
                 when (it.type) {
-                    MessageType.MESSAGE_MESSAGE.type -> {
+                    AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
                         handleMessage(it)
                     }
-                    MessageType.ACKNOWLEDGE_MESSAGE.type -> {
+                    AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
                         handleAcknowledgment(it)
                     }
-                    MessageType.NEIGHBOUR_MESSAGE.type -> {
+                    AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type -> {
                         handleNeighbour(it, rssi)
                     }
                     else -> {
@@ -224,7 +230,7 @@ class MeshController(
         val nextHop = this.neighbourTable.getClosestNeighbour(advertisement.sender!!)
         if (nextHop != null) {
             val ack = Advertisement.Builder()
-                .type(MessageType.ACKNOWLEDGE_MESSAGE.type)
+                .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
                 .id(advertisement.id!!)
                 .nextHop(nextHop)
                 .sender(this.ownProfile.address)
@@ -263,7 +269,8 @@ class MeshController(
                     advertisement.rssi = rssi
                 } else {
                     this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
-                    neighbour.closestNeighbour = this.neighbourTable.getEntry(advertisement.sender!!)
+                    neighbour.closestNeighbour =
+                        this.neighbourTable.getEntry(advertisement.sender!!)
                 }
                 neighbour.advertisement?.sender = this.ownProfile.address
                 this.neighbourTable.updateNeighbour(neighbour)
@@ -276,7 +283,7 @@ class MeshController(
         var neighbour = this.neighbourTable.getEntry(address)
         if (neighbour == null) {
             val advertisement = Advertisement.Builder()
-                .type(MessageType.NEIGHBOUR_MESSAGE.type)
+                .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
                 .sender(this.ownProfile.address)
                 .address(address)
                 .hops(MeshController.MAX_HOPS - 1)

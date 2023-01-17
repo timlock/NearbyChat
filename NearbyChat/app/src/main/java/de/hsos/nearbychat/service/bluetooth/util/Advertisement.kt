@@ -1,7 +1,7 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
 import android.util.Log
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 
 class Advertisement private constructor(
     var type: Char? = null,
@@ -29,7 +29,7 @@ class Advertisement private constructor(
             .append(type)
             .append(":")
         when (type) {
-            MessageType.NEIGHBOUR_MESSAGE.type -> {
+            AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type -> {
                 builder.append(sender)
                     .append(';')
                     .append(hops)
@@ -44,7 +44,7 @@ class Advertisement private constructor(
                     .append(';')
                     .append(color)
             }
-            MessageType.ACKNOWLEDGE_MESSAGE.type -> {
+            AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
                 builder.append(id)
                     .append(';')
                     .append(nextHop)
@@ -55,7 +55,7 @@ class Advertisement private constructor(
                     .append(';')
                     .append(timestamp)
             }
-            MessageType.MESSAGE_MESSAGE.type -> {
+            AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
                 builder.append(id)
                     .append(';')
                     .append(nextHop)
@@ -149,7 +149,7 @@ class Advertisement private constructor(
             try {
                 this.type = rawMessage[1]
                 when (this.type) {
-                    MessageType.MESSAGE_MESSAGE.type -> {
+                    AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id =
@@ -170,7 +170,7 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf('}')
                         this.message = rawMessage.substring(lastSeparator, nextSeparator)
                     }
-                    MessageType.ACKNOWLEDGE_MESSAGE.type -> {
+                    AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.id = rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
@@ -187,7 +187,7 @@ class Advertisement private constructor(
                         nextSeparator = rawMessage.indexOf('}')
                         this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
                     }
-                    MessageType.NEIGHBOUR_MESSAGE.type -> {
+                    AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
                         this.sender = rawMessage.substring(lastSeparator, nextSeparator)

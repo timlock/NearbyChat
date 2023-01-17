@@ -6,7 +6,7 @@ data class AdvertisementPackage(var id: Char? = null) {
     private val messageList: MutableList<Advertisement> = LinkedList()
     private var rawMessageBegin: String? = null
     private var rawMessageEnd: String? = null
-    var size: Int = 2
+    var size: Int = AdvertisementPackage.OFFSET
 
     fun addAdvertisement(advertisement: Advertisement) {
         this.messageList.add(advertisement)
@@ -45,6 +45,7 @@ data class AdvertisementPackage(var id: Char? = null) {
     }
 
     companion object {
+        const val OFFSET = 2
 
         fun toPackage(packageStr: String): AdvertisementPackage {
             val result = AdvertisementPackage()

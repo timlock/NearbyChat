@@ -1,7 +1,6 @@
 package de.hsos.nearbychat
-import android.bluetooth.BluetoothAdapter
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.util.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -15,7 +14,7 @@ class AdvertisementPackageTest {
         val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
         expected.id = idGenerator.next()
         val advertisementNeighbour: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .sender("sender")
             .hops(10)
             .rssi(-50)
@@ -25,7 +24,7 @@ class AdvertisementPackageTest {
             .color(255)
             .build()
         val advertisementAck: Advertisement = Advertisement.Builder()
-            .type(MessageType.ACKNOWLEDGE_MESSAGE.type)
+            .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
             .id('0')
             .nextHop("address")
             .sender("sender")
@@ -49,7 +48,7 @@ class AdvertisementPackageTest {
         var cutOffMessage = "test}"
         advertisementPackage.addCutMessageBegin(cutOffMessage)
         val advertisementAck: Advertisement = Advertisement.Builder()
-            .type(MessageType.ACKNOWLEDGE_MESSAGE.type)
+            .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
             .id('0')
             .nextHop("address")
             .sender("sender")

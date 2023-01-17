@@ -3,7 +3,7 @@ package de.hsos.nearbychat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.service.bluetooth.Advertiser
-import de.hsos.nearbychat.service.bluetooth.MessageType
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
@@ -73,7 +73,7 @@ class AdvertisementExecutorTest {
                     return true
                 }
             },
-            1000L,
+            100L,
             4,
             NeighbourTable(5000L),
         )
@@ -86,7 +86,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(1)
             .address("eins")
@@ -116,7 +116,7 @@ class AdvertisementExecutorTest {
                     return true
                 }
             },
-            1000L,
+            100L,
             50,
             neighbourTable
         )
@@ -128,7 +128,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendMultipleAdvertisements() {
         var first: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(10)
             .sender("eins")
@@ -138,7 +138,7 @@ class AdvertisementExecutorTest {
             .color(1)
             .build()
         var second = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(9)
             .sender("eins")
@@ -147,9 +147,13 @@ class AdvertisementExecutorTest {
             .description("zwei")
             .color(1)
             .build()
+        val neighbourEins = Neighbour("eins", 1, 1, 0L, advertisement = first)
+        val neighbourZwei = Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = second)
+        neighbourEins.closestNeighbour = neighbourEins
+        neighbourZwei.closestNeighbour = neighbourZwei
         val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 0L, advertisement = first))
-        neighbourTable.updateNeighbour(Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = second))
+        neighbourTable.updateNeighbour(neighbourEins)
+        neighbourTable.updateNeighbour(neighbourZwei)
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             object : Advertiser {
@@ -170,12 +174,13 @@ class AdvertisementExecutorTest {
                     return true
                 }
             },
-            1000L,
+            100L,
             50,
             neighbourTable
         )
         advertisementExecutor.start()
         Thread.sleep(advertisementExecutor.period * 4)
+        advertisementExecutor.stop()
         assertTrue(actual.contains(first.toString()))
         assertTrue(actual.contains(second.toString()))
     }
@@ -183,7 +188,7 @@ class AdvertisementExecutorTest {
     @Test
     fun sendMessageAndAdvertisements() {
         var advertisement: Advertisement = Advertisement.Builder()
-            .type(MessageType.NEIGHBOUR_MESSAGE.type)
+            .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
             .rssi(1)
             .hops(1)
             .address("eins")
