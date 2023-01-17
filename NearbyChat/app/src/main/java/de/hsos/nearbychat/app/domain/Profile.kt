@@ -16,7 +16,7 @@ class Profile(@PrimaryKey val address: String) {
     @Ignore
     var rssi: Int = Int.MIN_VALUE
     @Ignore
-    var hopCount: Int = 0
+    var hopCount: Int = 0 // max is 10
 
     fun getSignalStrength0to4(): Int {
         return min(max(getSignalStrength() / 15, 0), 4)
@@ -24,7 +24,7 @@ class Profile(@PrimaryKey val address: String) {
 
     fun getSignalStrength(): Int {
         var strength = rssi + 90
-        strength -= hopCount * 10
+        strength -= (9 - hopCount) * 10
         return strength
     }
 
