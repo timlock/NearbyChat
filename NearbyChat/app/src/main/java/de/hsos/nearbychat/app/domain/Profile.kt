@@ -16,15 +16,15 @@ class Profile(@PrimaryKey val address: String) {
     @Ignore
     var rssi: Int = Int.MIN_VALUE
     @Ignore
-    var hopCount: Int = 0
+    var hopCount: Int = 0 // max is 10
 
     fun getSignalStrength0to4(): Int {
         return min(max(getSignalStrength() / 15, 0), 4)
     }
 
     fun getSignalStrength(): Int {
-        var strength = rssi + 90
-        strength -= hopCount * 10
+        var strength = rssi + 100
+        strength -= (9 - hopCount) * 2
         return strength
     }
 
