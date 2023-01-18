@@ -1,0 +1,27 @@
+<diagram program="umletino" version="15.0.0"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>90</x><y>160</y><w>210</w><h>190</h></coordinates><panel_attributes>&lt;&lt;Entity&gt;&gt;
+Message
+--
++address: String {part of id}
++content: String
++timeStamp: Long {part of id}
++isReceived: Boolean
++isSelfAuthored: Boolean {part of id}</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>330</x><y>160</y><w>210</w><h>190</h></coordinates><panel_attributes>&lt;&lt;Entity&gt;&gt;
+OwnProfile
+--
++address: String {id}
++name: String
++description: String
++color: Int</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>570</x><y>160</y><w>210</w><h>190</h></coordinates><panel_attributes>&lt;&lt;Entity&gt;&gt;
+Profile
+--
++address: String {id}
++name: String
++description: String
++color: Int
++lastInteraction: Long
++isUnread: Boolean
++rssi: Int
++hopCount: Int</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLNote</id><coordinates><x>830</x><y>250</y><w>150</w><h>70</h></coordinates><panel_attributes>rssi und hopCount
+werden nicht in der 
+Datenbank, sondern nur 
+zur Laufzeit persistiert</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>770</x><y>270</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;60;10</additional_attributes></element></diagram>
