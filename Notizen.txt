@@ -1,0 +1,30 @@
+Generelle Infos zu Mesh
+7- Anwendungsfall in der Regel IOT
+8- N:M Verbindung statt 1:1 
+9- Messages werden zur Kommunikation verwendet
+9- Messagetypen acknowledged unackowledged
+11f- Geräte können über states und properties verfügen:
+	State ist ein Datenwert, dessen Änderung Auswirkungen auf das Gerät hat
+	Properties hält ebenfalls einen Datenwert, hat jedoch keine direkte Auswirkung auf das Gerät
+12- Es gibt drei Arten von Messages:
+	GET fordert einen State an
+	STATUS Antwort auf eine GET, enthält den angeforderten Status, wird angefordert oder selbstständig geschickt bsp. Interval
+	SET ändert einen State, bei einer acknowledged SET wird als Antwort ein STATUS gesendet
+17- BLE wird zwar von den meisten Smartphones und Tablets unterstützt, Bluetooth Mesh jedoch nicht, daher kann ein Smartphone nur über bestimmte Proxy nodes mit einem Mesh kommunizieren, hierzu wird GATT verwendet 
+19- Mesh basiert auf dem BLE Stack
+19- Zum senden und empfangen von PDUs werden Scanning und Advertising vom regulären BLE verwendet
+
+Unterschiede zum regulären Mesh
+8,15-Geräte fügen sich nicht selber zum Netz hinzu sondern werden hinzugefügt und werden ein Node
+9-Sicherheitsaspekt NetKeys
+10-Es gibt drei Adressarten, Unicast identifiziert ein Gerät, Group address mehrere und virtual address für ein oder mehrere Geräte
+11-In der Regel werden Group und virtual addresses verwendet.
+	Geräte können sich bei einer Adresse Subscriben oder an eine Adresse publishen
+13- Geräte in einem Mesh können eine von drei verschiedenen Rollen haben:
+	Server definieren mehrere Zustände, Messages etc. welche vom Gerät gesendet werden können und wie auf Zustandsänderungen reagiert wird
+	Clients halten keine States und senden nur Messages an Server
+	Control Models enthalten sowohl einen Server um mit Clients zu kommunizieren als auch einen Client um mit anderen Servern zu kommunizieren
+25- Im gegensatz zu WiFi werden Nachrichten nicht geroutet sondern fluten das System
+25- Geräte advertisen sich selber regelmäßig, Geräte können anhand der Hops die Entfernung ermitteln
+25- Time To Live definiert die Anzahl der Hops, die ein Message nehmen kann bevor sie erlischt
+26- Jedes Node hält einen Message Cache, anhand dessen doppelte Nachrichten erkannt und verworfen werden können
