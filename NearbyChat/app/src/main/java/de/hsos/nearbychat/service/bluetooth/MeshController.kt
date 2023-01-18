@@ -24,7 +24,6 @@ class MeshController(
     private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
-    private var slidingWindowTable: SlidingWindowTable = SlidingWindowTable()
     private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
     private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
@@ -191,7 +190,7 @@ class MeshController(
             }
         } else {
             val nextTarget: String? =
-                this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
+                this.neighbourTable.getClosestNeighbour(advertisement.receiver!!)
             if (nextTarget == null) {
                 Log.w(
                     TAG,
