@@ -11,13 +11,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.application.NearbyApplication
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import java.sql.Timestamp
 import java.time.Instant

@@ -1,9 +1,6 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
-import java.util.LinkedList
-
-class MessageBuffer {
-    //    private val buffer: HashMap<Char, String> = HashMap()
+class CutMessagesBuffer {
     private val bufferMap: HashMap<String, Pair<Char, String>> = HashMap()
 
 

@@ -1,10 +1,10 @@
-package de.hsos.nearbychat.app.application
+package de.hsos.nearbychat.common.application
 
 import android.app.Application
 import android.provider.Settings
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.data.Database
-import de.hsos.nearbychat.app.data.Repository
+import de.hsos.nearbychat.common.data.Database
+import de.hsos.nearbychat.common.data.Repository
 
 class NearbyApplication: Application() {
     private val database by lazy { Database.getDatabase(this) }

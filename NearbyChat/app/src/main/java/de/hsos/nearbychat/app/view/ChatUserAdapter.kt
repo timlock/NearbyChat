@@ -9,8 +9,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.application.NearbyApplication
+import de.hsos.nearbychat.common.domain.Profile
 
 
 class ChatUserAdapter (private val onItemClicked: (Profile?) -> Unit) : RecyclerView.Adapter<ChatUserAdapter.ViewHolder>()

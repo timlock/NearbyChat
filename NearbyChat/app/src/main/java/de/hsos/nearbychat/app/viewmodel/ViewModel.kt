@@ -1,16 +1,14 @@
 package de.hsos.nearbychat.app.viewmodel
 
 import android.app.Application
-import android.os.Looper
-import android.provider.Settings
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.ViewModel
-import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.data.Repository
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.application.NearbyApplication
+import de.hsos.nearbychat.common.data.Repository
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.Profile
 import kotlinx.coroutines.launch
 
 

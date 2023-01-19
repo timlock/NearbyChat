@@ -1,7 +1,6 @@
 package de.hsos.nearbychat.app.viewmodel
 
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.domain.Profile
 
 interface NearbyChatObserver {
     fun onBound()

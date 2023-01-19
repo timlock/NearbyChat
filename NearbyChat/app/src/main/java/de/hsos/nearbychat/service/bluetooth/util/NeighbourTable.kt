@@ -15,10 +15,13 @@ class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue<Nei
         if (entry == null) {
             Log.d(TAG, "updateNeighbour() discovered new neighbour = $neighbour")
             this.neighbourList.add(neighbour)
-        } else if ((System.currentTimeMillis() - entry.lastSeen > this.timeout
-                    && entry.lastSeen != 0L)
-            || neighbour.hops == MeshController.MAX_HOPS
-            || entry.hops < neighbour.hops
+        } else if (
+//            (System.currentTimeMillis() - entry.lastSeen > this.timeout
+//                    && entry.lastSeen != 0L)
+//            ||
+//            neighbour.hops == MeshController.MAX_HOPS
+//            ||
+            entry.hops < neighbour.hops
             || entry.hops == neighbour.hops && entry.rssi > neighbour.rssi
         ) {
             Log.d(TAG, "updateNeighbour() updated neighbour = $neighbour")

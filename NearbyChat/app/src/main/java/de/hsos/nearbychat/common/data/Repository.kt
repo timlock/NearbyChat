@@ -1,14 +1,13 @@
-package de.hsos.nearbychat.app.data
+package de.hsos.nearbychat.common.data
 
 import android.os.Handler
 import android.os.HandlerThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.Profile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 

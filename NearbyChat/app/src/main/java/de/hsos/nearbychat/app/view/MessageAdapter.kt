@@ -9,7 +9,7 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.domain.Message
+import de.hsos.nearbychat.common.domain.Message
 
 class MessageAdapter (private val context: Context?) : RecyclerView.Adapter<MessageAdapter.ViewHolder>()
 {

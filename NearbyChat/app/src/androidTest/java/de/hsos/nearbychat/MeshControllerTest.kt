@@ -1,8 +1,8 @@
 package de.hsos.nearbychat
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.*
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
@@ -87,8 +87,8 @@ class MeshControllerTest {
     fun discoverNeighbour() {
         var resultEins = mutableListOf<Advertisement>()
         var resultZwei = mutableListOf<Advertisement>()
-         var eins: MeshController? = null
-         var zwei: MeshController? = null
+        var eins: MeshController? = null
+        var zwei: MeshController? = null
         var einsSend: (String) -> Unit = {
             val rssi = -60
             val mac = "eins"
@@ -220,9 +220,9 @@ class MeshControllerTest {
             .build(zweiObserver)
         zwei.connect()
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 2)
-        val einsMessage = Message("zwei","hallo zwei",System.currentTimeMillis())
+        val einsMessage = Message("zwei", "hallo zwei", System.currentTimeMillis())
         eins.sendMessage(einsMessage)
-        val zweiMessage = Message("eins","hallo eins", System.currentTimeMillis())
+        val zweiMessage = Message("eins", "hallo eins", System.currentTimeMillis())
         zwei.sendMessage(zweiMessage)
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 3)
         assertTrue(resultEinsMessage.isNotEmpty())
@@ -342,13 +342,103 @@ class MeshControllerTest {
             .build(dreiObserver)
         drei.connect()
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 4)
-        assertNotNull(resultEinsNeighbour.firstOrNull{it.address == "drei"})
-        val einsMessage = Message("drei","hallo drei",System.currentTimeMillis())
+        assertNotNull(resultEinsNeighbour.firstOrNull { it.address == "drei" })
+        val einsMessage = Message("drei", "hallo drei", System.currentTimeMillis())
         eins.sendMessage(einsMessage)
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 4)
         assertTrue(resultDreiMessage.isNotEmpty())
-        assertEquals("eins",resultDreiMessage.first().sender)
-        assertEquals(einsMessage.content,resultDreiMessage.first().message)
+        assertEquals("eins", resultDreiMessage.first().sender)
+        assertEquals(einsMessage.content, resultDreiMessage.first().message)
+    }
+
+
+    @Test
+    fun sendMultipleMessages() {
+        var resultEinsMessage = mutableListOf<Advertisement>()
+        var resultEinsAck = mutableListOf<Advertisement>()
+        var resultZweiMessage = mutableListOf<Advertisement>()
+        var resultZweiAck = mutableListOf<Advertisement>()
+        var eins: MeshController? = null
+        var zwei: MeshController? = null
+        var einsSend: (String) -> Unit = {
+            val rssi = -60
+            val mac = "eins"
+            zwei?.onPackage(mac, rssi, it)
+        }
+        var zweiSend: (String) -> Unit = {
+            val rssi = -50
+            val mac = "zwei"
+            eins?.onPackage(mac, rssi, it)
+        }
+        var einsObserver = object : MeshObserver {
+            override fun onMessage(advertisement: Advertisement) {
+                resultEinsMessage.add(advertisement)
+            }
+
+            override fun onMessageAck(advertisement: Advertisement) {
+                resultEinsAck.add(advertisement)
+            }
+
+            override fun onNeighbour(advertisement: Advertisement) {
+            }
+
+            override fun onNeighbourTimeout(timeoutList: List<String>) {
+                TODO("Not yet implemented")
+            }
+
+        }
+        var zweiObserver = object : MeshObserver {
+            override fun onMessage(advertisement: Advertisement) {
+                resultZweiMessage.add(advertisement)
+            }
+
+            override fun onMessageAck(advertisement: Advertisement) {
+                resultZweiAck.add(advertisement)
+            }
+
+            override fun onNeighbour(advertisement: Advertisement) {
+            }
+
+            override fun onNeighbourTimeout(timeoutList: List<String>) {
+                TODO("Not yet implemented")
+            }
+
+        }
+        eins = MockMeshControllerBuilder.createBuilder()
+            .ownProfile("eins")
+            .advertiser(1650, einsSend)
+            .build(einsObserver)
+        eins.connect()
+        zwei = MockMeshControllerBuilder.createBuilder()
+            .ownProfile("zwei")
+            .advertiser(1650, zweiSend)
+            .build(zweiObserver)
+        zwei.connect()
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 2)
+        val einsMessageList = mutableListOf<Message>()
+        for (i in 0 until 10) {
+            val msg = Message("zwei", "$i", System.currentTimeMillis())
+            einsMessageList.add(msg)
+            eins.sendMessage(msg)
+        }
+        val zweiMessageList = mutableListOf<Message>()
+        for (i in 0 until 10) {
+            val msg = Message("eins", "$i", System.currentTimeMillis())
+            zweiMessageList.add(msg)
+            zwei.sendMessage(msg)
+        }
+        Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 6)
+        assertTrue(resultEinsMessage.isNotEmpty())
+        for (i in 0 until 10) {
+            val receivedMessage = resultEinsMessage.filter { it.message!!.toInt() == i }
+            assertNotNull(receivedMessage)
+        }
+        assertTrue(resultZweiMessage.isNotEmpty())
+        for (i in 0 until 10) {
+            val receivedMessage = resultZweiMessage.filter { it.message!!.toInt() == i }
+            assertNotNull(receivedMessage)
+        }
+
     }
 
 }

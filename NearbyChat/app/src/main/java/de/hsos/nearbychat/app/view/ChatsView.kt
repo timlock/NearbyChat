@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.NearbyApplication
+import de.hsos.nearbychat.common.application.NearbyApplication
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 
 class ChatsView : Fragment() {

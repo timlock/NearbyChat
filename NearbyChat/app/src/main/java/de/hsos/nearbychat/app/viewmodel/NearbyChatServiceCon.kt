@@ -3,8 +3,8 @@ package de.hsos.nearbychat.app.viewmodel
 import android.content.*
 import android.os.IBinder
 import android.util.Log
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.Profile
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.controller.NearbyChatService
 
@@ -27,9 +27,9 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
 
     fun connect(context: Context, ownAddress: String) {
         Log.d(TAG, "startService: ")
-        registerReceiver(context)
+        this.registerReceiver(context)
         this.ownAddress = ownAddress
-        startService(context)
+        this.startService(context)
     }
 
     private fun startService(context: Context) {

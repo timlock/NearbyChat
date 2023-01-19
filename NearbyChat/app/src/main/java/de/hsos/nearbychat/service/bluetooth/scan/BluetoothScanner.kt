@@ -25,6 +25,7 @@ class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : Sca
             .setLegacy(false)
             .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setNumOfMatches(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT)
             .build()
         val scanFilter: ScanFilter = ScanFilter.Builder()
             .setServiceUuid(advertiseUUID)

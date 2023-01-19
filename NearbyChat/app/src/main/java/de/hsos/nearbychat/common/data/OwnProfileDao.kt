@@ -1,11 +1,11 @@
-package de.hsos.nearbychat.app.data
+package de.hsos.nearbychat.common.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import de.hsos.nearbychat.app.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.OwnProfile
 
 @Dao
 interface OwnProfileDao {

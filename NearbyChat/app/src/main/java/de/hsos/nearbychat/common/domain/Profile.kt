@@ -1,4 +1,4 @@
-package de.hsos.nearbychat.app.domain
+package de.hsos.nearbychat.common.domain
 
 import androidx.room.Entity
 import androidx.room.Ignore

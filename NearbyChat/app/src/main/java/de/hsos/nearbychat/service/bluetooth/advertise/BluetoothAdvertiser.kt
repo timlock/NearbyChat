@@ -93,7 +93,7 @@ class BluetoothAdvertiser(
 
     override fun send(message: String): Boolean {
         Log.d(TAG, "send() called with: message = $message")
-        Handler(Looper.getMainLooper()).post {
+//        Handler(Looper.getMainLooper()).post {
             val advertiseData: AdvertiseData = AdvertiseData.Builder()
                 .addServiceUuid(advertiseUUID)
                 .addServiceData(this.advertiseUUID, message.encodeToByteArray())
@@ -101,10 +101,10 @@ class BluetoothAdvertiser(
             val messageSize = this.totalBytes(advertiseData)
             if (messageSize > this.maxMessageLength) {
                 Log.w(TAG, "changeAdvertisingData: message: $message is too large, size: $messageSize")
-                false
+                return false
             } else if (!this::currentAdvertisingSet.isInitialized) {
                 Log.w(TAG, "send: currentAdvertisingSet is not initialized")
-                false
+                return false
             } else {
                 this.currentAdvertisingData = advertiseData
                 try {
@@ -112,14 +112,14 @@ class BluetoothAdvertiser(
                     this.currentAdvertisingSet.setAdvertisingData(
                         this.currentAdvertisingData
                     )
-                    true
+                    return true
                 } catch (e: SecurityException) {
                     Log.w(TAG, "initAdvertiser: ", e)
-                    false
+                    return false
                 }
             }
-        }
-        return true
+//        }
+//        return true
     }
 
     private var advertisingSetCallback: AdvertisingSetCallback = object : AdvertisingSetCallback() {

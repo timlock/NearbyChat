@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.NearbyApplication
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.application.NearbyApplication
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.Profile
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import java.sql.Timestamp
 import java.util.*

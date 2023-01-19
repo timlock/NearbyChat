@@ -4,8 +4,8 @@ import android.bluetooth.le.AdvertisingSetParameters
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.*
@@ -22,8 +22,8 @@ class MeshController(
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
-    private var messageBuffer: MessageBuffer = MessageBuffer()
-    private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
+    private var cutMessagesBuffer: CutMessagesBuffer = CutMessagesBuffer()
+    private val unacknowledgedMessageBuffer: UnacknowledgedMessageBuffer = UnacknowledgedMessageBuffer()
     private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
     private val packageIDMap: HashMap<String, Char> = HashMap()
@@ -50,7 +50,7 @@ class MeshController(
         if (timeoutList.isNotEmpty()) {
             this.observer.onNeighbourTimeout(timeoutList)
         }
-        val unacknowledgedMessages = this.unacknowledgedMessageList.getMessages()
+        val unacknowledgedMessages = this.unacknowledgedMessageBuffer.getMessages()
         unacknowledgedMessages.forEach { this.sendMessage(it) }
         Log.d(TAG, "refresh() timeout: $timeoutList messages resend: $unacknowledgedMessages")
     }
@@ -98,7 +98,7 @@ class MeshController(
                 .build()
             this.advertisementExecutor.addToQueue(messageAdvertisement.toString())
         }
-        this.unacknowledgedMessageList.addMessage(message)
+        this.unacknowledgedMessageBuffer.addMessage(message)
     }
 
     fun updateOwnProfile(ownProfile: OwnProfile) {
@@ -132,25 +132,7 @@ class MeshController(
                 advertisementPackage.id -> return@post
                 else -> this.packageIDMap[macAddress] = advertisementPackage.id!!
             }
-            if (advertisementPackage.getRawMessageBegin() != null) {
-                this.messageBuffer.add(
-                    macAddress,
-                    advertisementPackage.id!!,
-                    advertisementPackage.getRawMessageBegin()!!
-                )
-            }
-            if (advertisementPackage.getRawMessageEnd() != null) {
-                val result = this.messageBuffer.add(
-                    macAddress,
-                    advertisementPackage.id!!,
-                    advertisementPackage.getRawMessageEnd()!!
-                )
-                if (result != null) {
-                    advertisementPackage.addAdvertisement(
-                        Advertisement.Builder().rawMessage(result).build()
-                    )
-                }
-            }
+            this.storeCutOffMessagesInBuffer(advertisementPackage, macAddress)
             advertisementPackage.getMessageList().forEach {
                 when (it.type) {
                     AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
@@ -173,12 +155,38 @@ class MeshController(
         }
     }
 
+    private fun storeCutOffMessagesInBuffer(
+        advertisementPackage: AdvertisementPackage,
+        macAddress: String
+    ) {
+        if (advertisementPackage.getRawMessageBegin() != null) {
+            this.cutMessagesBuffer.add(
+                macAddress,
+                advertisementPackage.id!!,
+                advertisementPackage.getRawMessageBegin()!!
+            )
+        }
+        if (advertisementPackage.getRawMessageEnd() != null) {
+            val result = this.cutMessagesBuffer.add(
+                macAddress,
+                advertisementPackage.id!!,
+                advertisementPackage.getRawMessageEnd()!!
+            )
+            if (result != null) {
+                advertisementPackage.addAdvertisement(
+                    Advertisement.Builder().rawMessage(result).build()
+                )
+            }
+        }
+    }
+
 
     private fun handleAcknowledgment(advertisement: Advertisement) {
-        if (advertisement.sender == this.ownProfile.address) {
-            return
-        } else if (this.ownProfile.address == advertisement.receiver) {
-            if (this.unacknowledgedMessageList.acknowledge(
+//        if (advertisement.sender == this.ownProfile.address) {
+//            return
+//        } else
+        if (this.ownProfile.address == advertisement.receiver) {
+            if (this.unacknowledgedMessageBuffer.acknowledge(
                     advertisement.sender!!,
                     advertisement.timestamp!!
                 )
@@ -250,29 +258,36 @@ class MeshController(
             if (advertisement.hops!! < 0) {
                 return
             } else {
-                val timeStamp: Long = System.currentTimeMillis()
-                val neighbour: Neighbour = Neighbour(
-                    advertisement.address!!,
-                    advertisement.rssi!!,
-                    advertisement.hops!!,
-                    timeStamp,
-                    null,
-                    advertisement
-                )
-                if (advertisement.address == advertisement.sender) {
-                    neighbour.closestNeighbour = neighbour
-                    neighbour.rssi = rssi
-                    advertisement.rssi = rssi
-                } else {
-                    this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
-                    neighbour.closestNeighbour =
-                        this.neighbourTable.getEntry(advertisement.sender!!)
-                }
-                neighbour.advertisement?.sender = this.ownProfile.address
-                this.neighbourTable.updateNeighbour(neighbour)
+                this.updateNeighbour(advertisement, rssi)
                 this.observer.onNeighbour(advertisement)
             }
         }
+    }
+
+    private fun updateNeighbour(
+        advertisement: Advertisement,
+        rssi: Int
+    ) {
+        val timeStamp: Long = System.currentTimeMillis()
+        val neighbour: Neighbour = Neighbour(
+            advertisement.address!!,
+            advertisement.rssi!!,
+            advertisement.hops!!,
+            timeStamp,
+            null,
+            advertisement
+        )
+        if (advertisement.address == advertisement.sender) {
+            neighbour.closestNeighbour = neighbour
+            neighbour.rssi = rssi
+            advertisement.rssi = rssi
+        } else {
+            this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
+            neighbour.closestNeighbour =
+                this.neighbourTable.getEntry(advertisement.sender!!)
+        }
+        neighbour.advertisement?.sender = this.ownProfile.address
+        this.neighbourTable.updateNeighbour(neighbour)
     }
 
     private fun updateDirectNeighbour(address: String, rssi: Int, timestamp: Long) {
@@ -300,11 +315,11 @@ class MeshController(
 
     fun addUnsentMessages(unsentMessages: List<Message>) {
         Log.d(TAG, "addUnsentMessages() called with: unsentMessages = $unsentMessages")
-        this.unacknowledgedMessageList.addMessages(unsentMessages)
+        this.unacknowledgedMessageBuffer.addMessages(unsentMessages)
     }
 
     companion object {
-        const val MAX_HOPS: Int = 10
+        const val MAX_HOPS: Int = 5
         const val TIMEOUT: Long = 5000L
         const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MIN.toLong()
         const val ADVERTISING_UPDATE_INTERVAL: Long =

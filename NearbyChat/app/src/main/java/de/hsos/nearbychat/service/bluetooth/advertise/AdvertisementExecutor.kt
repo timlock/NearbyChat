@@ -78,27 +78,42 @@ class AdvertisementExecutor(
         while (this.messageQueue.isNotEmpty()) {
             var message = this.messageQueue.removeFirst()
             if (advertisementPackage.size + message.length <= this.sizeLimit) {
-                if (!message.contains('{')) {
-                    advertisementPackage.addCutMessageBegin(message)
-                } else if (!message.contains('}')) {
-                    advertisementPackage.addCutMessageEnd(message)
-                } else {
-                    advertisementPackage.addAdvertisement(
-                        Advertisement.Builder().rawMessage(message).build()
-                    )
-                }
+                this.addMessageToPackage(message, advertisementPackage)
             } else {
                 if (message.length + AdvertisementPackage.OFFSET > this.sizeLimit) {
-                    val cutPos = this.sizeLimit - advertisementPackage.size
-                    advertisementPackage.addCutMessageEnd(message.substring(0, cutPos))
-                    this.messageQueue.add(0, message.substring(cutPos))
-                    Log.d(TAG, "addMessages: split message: ${advertisementPackage.getRawMessageEnd()}|${this.messageQueue.first()} ")
+                    this.splitMessage(advertisementPackage, message)
                 } else {
                     this.messageQueue.add(0, message)
                 }
                 return
             }
         }
+    }
+
+
+    private fun addMessageToPackage(message: String, advertisementPackage: AdvertisementPackage) {
+        if (!message.contains('{')) {
+            advertisementPackage.addCutMessageBegin(message)
+        } else if (!message.contains('}')) {
+            advertisementPackage.addCutMessageEnd(message)
+        } else {
+            advertisementPackage.addAdvertisement(
+                Advertisement.Builder().rawMessage(message).build()
+            )
+        }
+    }
+
+    private fun splitMessage(
+        advertisementPackage: AdvertisementPackage,
+        message: String
+    ) {
+        val cutPos = this.sizeLimit - advertisementPackage.size
+        advertisementPackage.addCutMessageEnd(message.substring(0, cutPos))
+        this.messageQueue.add(0, message.substring(cutPos))
+        Log.d(
+            TAG,
+            "addMessages: split message: ${advertisementPackage.getRawMessageEnd()}|${this.messageQueue.first()} "
+        )
     }
 
 

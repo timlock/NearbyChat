@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.hsos.nearbychat.R
-import de.hsos.nearbychat.app.application.NearbyApplication
+import de.hsos.nearbychat.common.application.NearbyApplication
 import de.hsos.nearbychat.app.viewmodel.ViewModel
 import de.hsos.nearbychat.app.viewmodel.ViewModel.ViewModelFactory
 

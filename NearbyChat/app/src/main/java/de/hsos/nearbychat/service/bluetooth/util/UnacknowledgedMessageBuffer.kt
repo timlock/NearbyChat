@@ -1,9 +1,8 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
-import de.hsos.nearbychat.app.domain.Message
-import java.util.LinkedList
+import de.hsos.nearbychat.common.domain.Message
 
-class UnacknowledgedMessageList {
+class UnacknowledgedMessageBuffer {
     private var messageList: MutableSet<Message> = mutableSetOf()
 
     @Synchronized

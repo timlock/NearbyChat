@@ -1,13 +1,11 @@
 package de.hsos.nearbychat
 
-import de.hsos.nearbychat.app.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.MeshObserver
 import de.hsos.nearbychat.service.bluetooth.Scanner
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
-import de.hsos.nearbychat.service.bluetooth.util.Advertisement
-import de.hsos.nearbychat.service.bluetooth.util.AdvertisementPackage
 
 class MockMeshControllerBuilder private constructor() {
     private var ownProfile: OwnProfile? = null

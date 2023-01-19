@@ -1,11 +1,11 @@
-package de.hsos.nearbychat.app.data
+package de.hsos.nearbychat.common.data
 
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import de.hsos.nearbychat.app.domain.Message
-import de.hsos.nearbychat.app.domain.OwnProfile
-import de.hsos.nearbychat.app.domain.Profile
+import de.hsos.nearbychat.common.domain.Message
+import de.hsos.nearbychat.common.domain.OwnProfile
+import de.hsos.nearbychat.common.domain.Profile
 
 @androidx.room.Database(entities = [Message::class, Profile::class, OwnProfile::class], version = 1, exportSchema = false)
 abstract class Database: RoomDatabase() {

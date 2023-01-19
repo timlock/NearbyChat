@@ -143,69 +143,86 @@ class Advertisement private constructor(
                 this.type = rawMessage[1]
                 when (this.type) {
                     AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
-                        var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf('}')
-                        this.message = rawMessage.substring(lastSeparator, nextSeparator)
+                        this.parseMessage(rawMessage)
                     }
                     AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
-                        var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf('}')
-                        this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
+                        parseAcknowledgement(rawMessage)
                     }
                     AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type -> {
-                        var lastSeparator: Int = rawMessage.indexOf(':') + 1
-                        var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.sender = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.hops = rawMessage.substring(lastSeparator, nextSeparator).toInt()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.rssi = rawMessage.substring(lastSeparator, nextSeparator).toInt()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.address = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.name = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
-                        this.description = rawMessage.substring(lastSeparator, nextSeparator)
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf('}')
-                        this.color = rawMessage.substring(lastSeparator, nextSeparator).toInt()
+                        parseNeighbour(rawMessage)
                     }
                     else -> Log.w(
                         TAG,
-                        "toMessage: unknown message type in: $rawMessage"
+                        "rawMessage: unknown message type in: $rawMessage"
                     )
 
                 }
-            } catch (e: IndexOutOfBoundsException) {
-                Log.w(TAG, "toMessage: received incomplete message: $rawMessage")
+            } catch (e: Exception) {
+                Log.w(TAG, "rawMessage: received incomplete message: $rawMessage")
             }
         }
+
+
+        @Throws(Exception::class)
+        private fun parseMessage(rawMessage: String) {
+            var lastSeparator: Int = rawMessage.indexOf(':') + 1
+            var nextSeparator: Int = rawMessage.indexOf(';')
+            this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf('}')
+            this.message = rawMessage.substring(lastSeparator, nextSeparator)
+        }
+
+        @Throws(Exception::class)
+        private fun parseAcknowledgement(rawMessage: String) {
+            var lastSeparator: Int = rawMessage.indexOf(':') + 1
+            var nextSeparator: Int = rawMessage.indexOf(';')
+            this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.receiver = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf('}')
+            this.timestamp = rawMessage.substring(lastSeparator, nextSeparator).toLong()
+        }
+
+        @Throws(Exception::class)
+        private fun parseNeighbour(rawMessage: String) {
+            var lastSeparator: Int = rawMessage.indexOf(':') + 1
+            var nextSeparator: Int = rawMessage.indexOf(';')
+            this.sender = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.hops = rawMessage.substring(lastSeparator, nextSeparator).toInt()
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.rssi = rawMessage.substring(lastSeparator, nextSeparator).toInt()
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.address = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.name = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf(';', nextSeparator)
+            this.description = rawMessage.substring(lastSeparator, nextSeparator)
+            lastSeparator = ++nextSeparator
+            nextSeparator = rawMessage.indexOf('}')
+            this.color = rawMessage.substring(lastSeparator, nextSeparator).toInt()
+        }
+
 
         fun build() =
             Advertisement(
