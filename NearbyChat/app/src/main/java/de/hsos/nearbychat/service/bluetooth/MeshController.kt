@@ -21,7 +21,6 @@ class MeshController(
 ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
-    private var idGenerator: AtomicIdGenerator = AtomicIdGenerator()
     private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
     private var messageBuffer: MessageBuffer = MessageBuffer()
     private val unacknowledgedMessageList: UnacknowledgedMessageList = UnacknowledgedMessageList()
@@ -91,7 +90,6 @@ class MeshController(
         } else {
             var messageAdvertisement = Advertisement.Builder()
                 .type(AdvertisementType.MESSAGE_ADVERTISEMENT.type)
-                .id(this.idGenerator.next())
                 .nextHop(nextHop)
                 .sender(this.ownProfile.address)
                 .receiver(message.address)
@@ -230,7 +228,6 @@ class MeshController(
         if (nextHop != null) {
             val ack = Advertisement.Builder()
                 .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
-                .id(advertisement.id!!)
                 .nextHop(nextHop)
                 .sender(this.ownProfile.address)
                 .receiver(advertisement.sender!!)

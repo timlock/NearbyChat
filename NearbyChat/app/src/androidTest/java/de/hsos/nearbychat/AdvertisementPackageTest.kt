@@ -10,8 +10,8 @@ import org.junit.runner.RunWith
 class AdvertisementPackageTest {
     @Test
     fun toStringTest(){
+        val idGenerator = AtomicIdGenerator()
         val expected: AdvertisementPackage = AdvertisementPackage()
-        val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
         expected.id = idGenerator.next()
         val advertisementNeighbour: Advertisement = Advertisement.Builder()
             .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
@@ -25,7 +25,6 @@ class AdvertisementPackageTest {
             .build()
         val advertisementAck: Advertisement = Advertisement.Builder()
             .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
-            .id('0')
             .nextHop("address")
             .sender("sender")
             .receiver("receiver")
@@ -43,13 +42,12 @@ class AdvertisementPackageTest {
 
     @Test
     fun cutOffMessage(){
-        val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
+        val idGenerator = AtomicIdGenerator()
         val advertisementPackage = AdvertisementPackage(idGenerator.next())
         var cutOffMessage = "test}"
         advertisementPackage.addCutMessageBegin(cutOffMessage)
         val advertisementAck: Advertisement = Advertisement.Builder()
             .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
-            .id('0')
             .nextHop("address")
             .sender("sender")
             .receiver("receiver")
@@ -82,7 +80,7 @@ class AdvertisementPackageTest {
 
     @Test
     fun halfMessageEnd(){
-        val idGenerator: AtomicIdGenerator = AtomicIdGenerator()
+        val idGenerator = AtomicIdGenerator()
         val advertisementPackage = AdvertisementPackage(idGenerator.next())
         var cutOffMessage = "{7466f7be43bf8a39;09760fab11efc653;7466f7be43bf8a39;1673613299452"
         advertisementPackage.addCutMessageBegin(cutOffMessage)

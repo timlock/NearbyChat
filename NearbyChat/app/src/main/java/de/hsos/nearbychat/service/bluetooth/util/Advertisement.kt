@@ -5,7 +5,6 @@ import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 
 class Advertisement private constructor(
     var type: Char? = null,
-    var id: Char? = null,
     var hops: Int? = null,
     var nextHop: String? = null,
     var rssi: Int? = null,
@@ -45,8 +44,7 @@ class Advertisement private constructor(
                     .append(color)
             }
             AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
-                builder.append(id)
-                    .append(';')
+                builder
                     .append(nextHop)
                     .append(';')
                     .append(sender)
@@ -56,8 +54,7 @@ class Advertisement private constructor(
                     .append(timestamp)
             }
             AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
-                builder.append(id)
-                    .append(';')
+                builder
                     .append(nextHop)
                     .append(';')
                     .append(sender)
@@ -82,7 +79,6 @@ class Advertisement private constructor(
         if (other !is Advertisement) return false
 
         if (type != other.type) return false
-        if (id != other.id) return false
         if (hops != other.hops) return false
         if (nextHop != other.nextHop) return false
         if (rssi != other.rssi) return false
@@ -100,7 +96,6 @@ class Advertisement private constructor(
 
     override fun hashCode(): Int {
         var result = type?.hashCode() ?: 0
-        result = 31 * result + (id?.hashCode() ?: 0)
         result = 31 * result + (hops ?: 0)
         result = 31 * result + (nextHop?.hashCode() ?: 0)
         result = 31 * result + (rssi ?: 0)
@@ -118,7 +113,6 @@ class Advertisement private constructor(
 
     data class Builder(
         var type: Char? = null,
-        var id: Char? = null,
         var hops: Int? = null,
         var nextHop: String? = null,
         var rssi: Int? = null,
@@ -133,7 +127,6 @@ class Advertisement private constructor(
     ) {
         private val TAG: String = Advertisement.Builder::class.java.simpleName
         fun type(type: Char) = apply { this.type = type }
-        fun id(id: Char) = apply { this.id = id }
         fun hops(hops: Int) = apply { this.hops = hops }
         fun nextHop(nextHop: String) = apply { this.nextHop = nextHop }
         fun rssi(rssi: Int) = apply { this.rssi = rssi }
@@ -144,7 +137,7 @@ class Advertisement private constructor(
         fun description(description: String) = apply { this.description = description }
         fun color(color: Int) = apply { this.color = color }
         fun message(message: String) = apply { this.message = message }
-        fun timestamp(timestamp: Long) = apply {this.timestamp = timestamp}
+        fun timestamp(timestamp: Long) = apply { this.timestamp = timestamp }
         fun rawMessage(rawMessage: String) = apply {
             try {
                 this.type = rawMessage[1]
@@ -152,10 +145,6 @@ class Advertisement private constructor(
                     AdvertisementType.MESSAGE_ADVERTISEMENT.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.id =
-                            rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
@@ -173,9 +162,6 @@ class Advertisement private constructor(
                     AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type -> {
                         var lastSeparator: Int = rawMessage.indexOf(':') + 1
                         var nextSeparator: Int = rawMessage.indexOf(';')
-                        this.id = rawMessage.substring(lastSeparator, nextSeparator).toCharArray().first()
-                        lastSeparator = ++nextSeparator
-                        nextSeparator = rawMessage.indexOf(';', nextSeparator)
                         this.nextHop = rawMessage.substring(lastSeparator, nextSeparator)
                         lastSeparator = ++nextSeparator
                         nextSeparator = rawMessage.indexOf(';', nextSeparator)
@@ -224,7 +210,6 @@ class Advertisement private constructor(
         fun build() =
             Advertisement(
                 type,
-                id,
                 hops,
                 nextHop,
                 rssi,
