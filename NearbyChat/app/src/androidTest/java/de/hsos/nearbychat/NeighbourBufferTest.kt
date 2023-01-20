@@ -4,76 +4,76 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
-import de.hsos.nearbychat.service.bluetooth.util.NeighbourTable
+import de.hsos.nearbychat.service.bluetooth.util.NeighbourBuffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class NeighbourTableTest {
+class NeighbourBufferTest {
     @Test
     fun getClosestNeighbourZeroHop() {
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
         val eins: Neighbour = Neighbour("eins", -50, 10, 500L)
         eins.closestNeighbour = eins
-        neighbourTable.updateNeighbour(eins)
-        val expected: String? = neighbourTable.getClosestNeighbour("eins")
+        neighbourBuffer.updateNeighbour(eins)
+        val expected: String? = neighbourBuffer.getClosestNeighbour("eins")
         assertEquals(eins.address, expected)
     }
 
     @Test
     fun getClosestNeighbourOneHop() {
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
         val eins: Neighbour = Neighbour("eins", -50, 10, 500L)
         val zwei: Neighbour = Neighbour("zwei", -50, 10, 500L)
         zwei.closestNeighbour = zwei
-        neighbourTable.updateNeighbour(zwei)
+        neighbourBuffer.updateNeighbour(zwei)
         eins.closestNeighbour = zwei
-        neighbourTable.updateNeighbour(eins)
-        val actual: String? = neighbourTable.getClosestNeighbour("eins")
+        neighbourBuffer.updateNeighbour(eins)
+        val actual: String? = neighbourBuffer.getClosestNeighbour("eins")
         assertEquals(zwei.address, actual)
     }
 
     @Test
     fun replaceOneHopWithZeroHop() {
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
         var eins: Neighbour = Neighbour("eins", -50, 9, System.currentTimeMillis())
         val zwei: Neighbour = Neighbour("zwei", -50, 10, System.currentTimeMillis())
         zwei.closestNeighbour = zwei
         eins.closestNeighbour = zwei
-        neighbourTable.updateNeighbour(zwei)
-        neighbourTable.updateNeighbour(eins)
+        neighbourBuffer.updateNeighbour(zwei)
+        neighbourBuffer.updateNeighbour(eins)
         eins = Neighbour("eins", -50, 10, System.currentTimeMillis())
         eins.closestNeighbour = eins
-        neighbourTable.updateNeighbour(eins)
-        val actual: String? = neighbourTable.getClosestNeighbour(eins.address)
+        neighbourBuffer.updateNeighbour(eins)
+        val actual: String? = neighbourBuffer.getClosestNeighbour(eins.address)
         assertEquals(eins.address, actual)
     }
 
 
     @Test
     fun getNextElements() {
-        val neighbourTable: NeighbourTable = NeighbourTable(500000L)
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(500000L)
         val eins: Neighbour = Neighbour("eins", -50, 9, System.currentTimeMillis())
-        neighbourTable.updateNeighbour(eins)
+        neighbourBuffer.updateNeighbour(eins)
         val zwei: Neighbour = Neighbour("zwei", -50, 9, System.currentTimeMillis())
-        neighbourTable.updateNeighbour(zwei)
+        neighbourBuffer.updateNeighbour(zwei)
         val drei: Neighbour = Neighbour("drei", -50, 9, System.currentTimeMillis())
-        neighbourTable.updateNeighbour(drei)
+        neighbourBuffer.updateNeighbour(drei)
         val vier: Neighbour = Neighbour("vier", -50, 9, System.currentTimeMillis())
-        neighbourTable.updateNeighbour(vier)
-        var result = neighbourTable.getNextElement()
+        neighbourBuffer.updateNeighbour(vier)
+        var result = neighbourBuffer.getNextElement()
         assertEquals(eins, result)
-        result = neighbourTable.getNextElement()
+        result = neighbourBuffer.getNextElement()
         assertEquals(zwei, result)
-        result = neighbourTable.getNextElement()
+        result = neighbourBuffer.getNextElement()
         assertEquals(drei, result)
-        result = neighbourTable.getNextElement()
+        result = neighbourBuffer.getNextElement()
         assertEquals(vier, result)
-        result = neighbourTable.getNextElement()
+        result = neighbourBuffer.getNextElement()
         assertEquals(eins, result)
-        result = neighbourTable.getNextElement()
+        result = neighbourBuffer.getNextElement()
         assertEquals(zwei, result)
     }
 
@@ -99,41 +99,41 @@ class NeighbourTableTest {
             .description("zwei")
             .color(1)
             .build())
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(first)
-        neighbourTable.updateNeighbour(second)
-        var restult : Neighbour? = neighbourTable.getNextElement()
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
+        neighbourBuffer.updateNeighbour(first)
+        neighbourBuffer.updateNeighbour(second)
+        var restult : Neighbour? = neighbourBuffer.getNextElement()
         assertEquals(first.toString(), restult.toString())
-        restult = neighbourTable.getNextElement()
+        restult = neighbourBuffer.getNextElement()
         assertEquals(second.toString(),restult.toString())
     }
 
 
     @Test
     fun getNextElementsEmptyTable() {
-        val neighbourTable: NeighbourTable = NeighbourTable()
-        val result = neighbourTable.getNextElement()
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer()
+        val result = neighbourBuffer.getNextElement()
         assertNull(result)
     }
 
 
     @Test
     fun getEntry(){
-        val neighbourTable: NeighbourTable = NeighbourTable()
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer()
         val expected = Neighbour("eins",1,1,1)
-        neighbourTable.updateNeighbour(expected)
-        val result = neighbourTable.getEntry("eins")
+        neighbourBuffer.updateNeighbour(expected)
+        val result = neighbourBuffer.getEntry("eins")
         assertEquals(expected,result)
     }
 
     @Test
     fun removeNeighboursWithTimeout(){
-        val neighbourTable: NeighbourTable = NeighbourTable()
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer()
         val expected = Neighbour("eins",1,1,1)
         val noTimeout = Neighbour("zwei",1,1,System.currentTimeMillis())
-        neighbourTable.updateNeighbour(expected)
-        neighbourTable.updateNeighbour(noTimeout)
-        val result = neighbourTable.removeNeighboursWithTimeout()
+        neighbourBuffer.updateNeighbour(expected)
+        neighbourBuffer.updateNeighbour(noTimeout)
+        val result = neighbourBuffer.removeNeighboursWithTimeout()
         assertEquals(1, result.size)
         assertEquals(expected.address,result[0])
     }

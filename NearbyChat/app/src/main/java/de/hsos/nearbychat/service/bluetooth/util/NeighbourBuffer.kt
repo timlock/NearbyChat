@@ -1,11 +1,10 @@
 package de.hsos.nearbychat.service.bluetooth.util
 
 import android.util.Log
-import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementQueue
 
-class NeighbourTable(private val timeout: Long = 5000L) : AdvertisementQueue<Neighbour> {
-    private val TAG: String = NeighbourTable::class.java.simpleName
+class NeighbourBuffer(private val timeout: Long = 5000L) : AdvertisementQueue<Neighbour> {
+    private val TAG: String = NeighbourBuffer::class.java.simpleName
     private var neighbourList: MutableList<Neighbour> = mutableListOf()
     private var firstAddressToAdvertise: Int = 0
 

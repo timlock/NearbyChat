@@ -21,9 +21,10 @@ class MeshController(
 ) : ScannerObserver {
     private val TAG: String = MeshController::class.java.simpleName
     private var advertisementExecutor: AdvertisementExecutor
-    private var neighbourTable: NeighbourTable = NeighbourTable(TIMEOUT)
+    private var neighbourBuffer: NeighbourBuffer = NeighbourBuffer(TIMEOUT)
     private var cutMessagesBuffer: CutMessagesBuffer = CutMessagesBuffer()
-    private val unacknowledgedMessageBuffer: UnacknowledgedMessageBuffer = UnacknowledgedMessageBuffer()
+    private val unacknowledgedMessageBuffer: UnacknowledgedMessageBuffer =
+        UnacknowledgedMessageBuffer()
     private val meshExecutor: ScheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor()
     private val packageIDMap: HashMap<String, Char> = HashMap()
@@ -34,7 +35,7 @@ class MeshController(
             this.advertiser,
             MeshController.ADVERTISING_UPDATE_INTERVAL,
             this.advertiser.getMaxMessageSize(),
-            this.neighbourTable
+            this.neighbourBuffer
         )
         this.scanner.subscribe(this)
         this.meshExecutor.scheduleAtFixedRate(
@@ -46,7 +47,7 @@ class MeshController(
     }
 
     private fun refresh() {
-        val timeoutList = this.neighbourTable.removeNeighboursWithTimeout()
+        val timeoutList = this.neighbourBuffer.removeNeighboursWithTimeout()
         if (timeoutList.isNotEmpty()) {
             this.observer.onNeighbourTimeout(timeoutList)
         }
@@ -61,8 +62,7 @@ class MeshController(
             Log.w(TAG, "connect: scanner failed")
             return false
         }
-        if (!this.advertiser.start()
-        ) {
+        if (!this.advertiser.start()) {
             Log.w(TAG, "connect: advertiser failed")
             return false
         }
@@ -84,7 +84,7 @@ class MeshController(
 
     fun sendMessage(message: Message) {
         Log.d(TAG, "sendMessage() called with: message = $message")
-        val nextHop: String? = this.neighbourTable.getClosestNeighbour(message.address)
+        val nextHop: String? = this.neighbourBuffer.getClosestNeighbour(message.address)
         if (nextHop == null) {
             Log.d(TAG, "sendMessage: ${message.address} is not reachable")
         } else {
@@ -117,7 +117,7 @@ class MeshController(
         val self: Neighbour =
             Neighbour(ownProfile.address, 0, MeshController.MAX_HOPS, 0, null, selfAdvertisement)
         self.closestNeighbour = self
-        this.neighbourTable.updateNeighbour(self)
+        this.neighbourBuffer.updateNeighbour(self)
     }
 
     override fun onPackage(macAddress: String, rssi: Int, packageString: String) {
@@ -196,7 +196,7 @@ class MeshController(
             }
         } else {
             val nextTarget: String? =
-                this.neighbourTable.getClosestNeighbour(advertisement.receiver!!)
+                this.neighbourBuffer.getClosestNeighbour(advertisement.receiver!!)
             if (nextTarget == null) {
                 Log.w(
                     TAG,
@@ -217,7 +217,7 @@ class MeshController(
             this.sendAck(advertisement)
         } else {
             val nextTarget: String? =
-                this.neighbourTable.getClosestNeighbour(advertisement.receiver as String)
+                this.neighbourBuffer.getClosestNeighbour(advertisement.receiver as String)
             if (nextTarget == null) {
                 Log.w(
                     TAG,
@@ -232,7 +232,7 @@ class MeshController(
 
     private fun sendAck(advertisement: Advertisement) {
         Log.d(TAG, "sendAck() called with: advertisement = $advertisement")
-        val nextHop = this.neighbourTable.getClosestNeighbour(advertisement.sender!!)
+        val nextHop = this.neighbourBuffer.getClosestNeighbour(advertisement.sender!!)
         if (nextHop != null) {
             val ack = Advertisement.Builder()
                 .type(AdvertisementType.ACKNOWLEDGE_ADVERTISEMENT.type)
@@ -284,14 +284,14 @@ class MeshController(
         } else {
             this.updateDirectNeighbour(advertisement.sender!!, rssi, timeStamp)
             neighbour.closestNeighbour =
-                this.neighbourTable.getEntry(advertisement.sender!!)
+                this.neighbourBuffer.getEntry(advertisement.sender!!)
         }
         neighbour.advertisement?.sender = this.ownProfile.address
-        this.neighbourTable.updateNeighbour(neighbour)
+        this.neighbourBuffer.updateNeighbour(neighbour)
     }
 
     private fun updateDirectNeighbour(address: String, rssi: Int, timestamp: Long) {
-        var neighbour = this.neighbourTable.getEntry(address)
+        var neighbour = this.neighbourBuffer.getEntry(address)
         if (neighbour == null) {
             val advertisement = Advertisement.Builder()
                 .type(AdvertisementType.NEIGHBOUR_ADVERTISEMENT.type)
@@ -306,7 +306,7 @@ class MeshController(
             neighbour = Neighbour(address, rssi, MeshController.MAX_HOPS - 1, timestamp)
             neighbour.advertisement = advertisement
             neighbour.closestNeighbour = neighbour
-            this.neighbourTable.updateNeighbour(neighbour)
+            this.neighbourBuffer.updateNeighbour(neighbour)
         } else {
             neighbour.lastSeen = timestamp
             neighbour.rssi = rssi

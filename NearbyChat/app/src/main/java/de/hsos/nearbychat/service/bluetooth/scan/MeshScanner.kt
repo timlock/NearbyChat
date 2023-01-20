@@ -10,9 +10,9 @@ import android.util.Log
 import de.hsos.nearbychat.service.bluetooth.Scanner
 import java.util.*
 
-class BluetoothScanner(private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback(),
+class MeshScanner(private var bluetoothLeScanner: BluetoothLeScanner) : ScanCallback(),
     Scanner {
-    private val TAG: String = BluetoothScanner::class.java.simpleName
+    private val TAG: String = MeshScanner::class.java.simpleName
     private var observer: ScannerObserver? = null
     private var scanning = false
     private var advertiseUUID: ParcelUuid =

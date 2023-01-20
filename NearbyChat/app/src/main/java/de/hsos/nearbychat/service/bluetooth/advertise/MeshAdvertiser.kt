@@ -3,8 +3,6 @@ package de.hsos.nearbychat.service.bluetooth.advertise
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.*
-import android.os.Handler
-import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.util.forEach
@@ -14,12 +12,12 @@ import java.nio.ByteOrder
 import java.util.*
 
 
-class BluetoothAdvertiser(
+class MeshAdvertiser(
     private var bluetoothAdapter: BluetoothAdapter,
     private val advertisingInterval: Int
 ) :
     Advertiser {
-    private val TAG: String = BluetoothAdvertiser::class.java.simpleName
+    private val TAG: String = MeshAdvertiser::class.java.simpleName
     private var advertiseUUID: ParcelUuid =
         ParcelUuid(UUID.fromString("e889813c-5d19-49e2-8bc4-d4596b4f5250"))
     private var advertiser: BluetoothLeAdvertiser = bluetoothAdapter.bluetoothLeAdvertiser
@@ -99,7 +97,7 @@ class BluetoothAdvertiser(
                 .addServiceData(this.advertiseUUID, message.encodeToByteArray())
                 .build()
             val messageSize = this.totalBytes(advertiseData)
-            if (messageSize > this.maxMessageLength) {
+            if (messageSize > this.maxTotalLength) {
                 Log.w(TAG, "changeAdvertisingData: message: $message is too large, size: $messageSize")
                 return false
             } else if (!this::currentAdvertisingSet.isInitialized) {

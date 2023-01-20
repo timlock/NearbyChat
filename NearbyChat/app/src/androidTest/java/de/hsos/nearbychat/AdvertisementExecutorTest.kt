@@ -7,7 +7,7 @@ import de.hsos.nearbychat.service.bluetooth.AdvertisementType
 import de.hsos.nearbychat.service.bluetooth.advertise.AdvertisementExecutor
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.bluetooth.util.Neighbour
-import de.hsos.nearbychat.service.bluetooth.util.NeighbourTable
+import de.hsos.nearbychat.service.bluetooth.util.NeighbourBuffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -42,7 +42,7 @@ class AdvertisementExecutorTest {
             },
             1000L,
             10,
-            NeighbourTable(5000L)
+            NeighbourBuffer(5000L)
         )
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
@@ -75,7 +75,7 @@ class AdvertisementExecutorTest {
             },
             100L,
             4,
-            NeighbourTable(5000L),
+            NeighbourBuffer(5000L),
         )
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(expected)
@@ -94,8 +94,8 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
+        neighbourBuffer.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             object : Advertiser {
@@ -118,7 +118,7 @@ class AdvertisementExecutorTest {
             },
             100L,
             50,
-            neighbourTable
+            neighbourBuffer
         )
         advertisementExecutor.start()
         Thread.sleep(advertisementExecutor.period * 2)
@@ -151,9 +151,9 @@ class AdvertisementExecutorTest {
         val neighbourZwei = Neighbour("zwei", 1, 9, System.currentTimeMillis(), advertisement = second)
         neighbourEins.closestNeighbour = neighbourEins
         neighbourZwei.closestNeighbour = neighbourZwei
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(neighbourEins)
-        neighbourTable.updateNeighbour(neighbourZwei)
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
+        neighbourBuffer.updateNeighbour(neighbourEins)
+        neighbourBuffer.updateNeighbour(neighbourZwei)
         var actual: MutableList<String> = LinkedList()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
             object : Advertiser {
@@ -176,7 +176,7 @@ class AdvertisementExecutorTest {
             },
             100L,
             50,
-            neighbourTable
+            neighbourBuffer
         )
         advertisementExecutor.start()
         Thread.sleep(advertisementExecutor.period * 4)
@@ -196,8 +196,8 @@ class AdvertisementExecutorTest {
             .description("eins")
             .color(1)
             .build()
-        val neighbourTable: NeighbourTable = NeighbourTable(5000L)
-        neighbourTable.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
+        val neighbourBuffer: NeighbourBuffer = NeighbourBuffer(5000L)
+        neighbourBuffer.updateNeighbour(Neighbour("eins", 1, 1, 1, advertisement = advertisement))
         val message = "test"
         var actual: MutableList<String> = mutableListOf()
         val advertisementExecutor: AdvertisementExecutor = AdvertisementExecutor(
@@ -221,7 +221,7 @@ class AdvertisementExecutorTest {
             },
             1000L,
             50,
-            neighbourTable
+            neighbourBuffer
         )
         advertisementExecutor.start()
         advertisementExecutor.addToQueue(message)

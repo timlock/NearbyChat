@@ -20,8 +20,8 @@ import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.MeshController
 import de.hsos.nearbychat.service.bluetooth.MeshObserver
 import de.hsos.nearbychat.service.bluetooth.Scanner
-import de.hsos.nearbychat.service.bluetooth.advertise.BluetoothAdvertiser
-import de.hsos.nearbychat.service.bluetooth.scan.BluetoothScanner
+import de.hsos.nearbychat.service.bluetooth.advertise.MeshAdvertiser
+import de.hsos.nearbychat.service.bluetooth.scan.MeshScanner
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -73,7 +73,7 @@ class NearbyChatService : Service(), MeshObserver {
             Log.d(TAG, "start() called with: ownAddress = $ownAddress")
             val bluetoothAdapter: BluetoothAdapter = getBluetoothAdapter()
             val advertiser: Advertiser = createAdvertiser(bluetoothAdapter)
-            val scanner: Scanner = BluetoothScanner(bluetoothAdapter.bluetoothLeScanner)
+            val scanner: Scanner = MeshScanner(bluetoothAdapter.bluetoothLeScanner)
             var self: OwnProfile = getOwnProfile(ownAddress)
             this.meshController = MeshController(this, advertiser, scanner, self)
             this.meshController.connect()
@@ -104,7 +104,7 @@ class NearbyChatService : Service(), MeshObserver {
     }
 
     private fun createAdvertiser(bluetoothAdapter: BluetoothAdapter): Advertiser {
-        return BluetoothAdvertiser(
+        return MeshAdvertiser(
             bluetoothAdapter,
             MeshController.ADVERTISING_INTERVAL.toInt()
         )
