@@ -182,16 +182,13 @@ class MeshController(
 
 
     private fun handleAcknowledgment(advertisement: Advertisement) {
-//        if (advertisement.sender == this.ownProfile.address) {
-//            return
-//        } else
         if (this.ownProfile.address == advertisement.receiver) {
             if (this.unacknowledgedMessageBuffer.acknowledge(
                     advertisement.sender!!,
                     advertisement.timestamp!!
                 )
             ) {
-                Log.d(TAG, "onMessage: received ack for this device")
+                Log.d(TAG, "handleAcknowledgment: received ack for this device")
                 this.observer.onMessageAck(advertisement)
             }
         } else {
@@ -200,7 +197,7 @@ class MeshController(
             if (nextTarget == null) {
                 Log.w(
                     TAG,
-                    "onMessage: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
+                    "handleAcknowledgment: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
                 )
             } else {
                 advertisement.nextHop = nextTarget
@@ -323,7 +320,7 @@ class MeshController(
         const val TIMEOUT: Long = 5000L
         const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MIN.toLong()
         const val ADVERTISING_UPDATE_INTERVAL: Long =
-            AdvertisingSetParameters.INTERVAL_HIGH.toLong()
+            AdvertisingSetParameters.INTERVAL_MEDIUM.toLong() * 2
 
     }
 }

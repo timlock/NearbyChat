@@ -3,6 +3,7 @@ package de.hsos.nearbychat.common.domain
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import de.hsos.nearbychat.service.bluetooth.MeshController
 import java.lang.Integer.max
 import java.lang.Integer.min
 
@@ -24,7 +25,7 @@ class Profile(@PrimaryKey val address: String) {
 
     fun getSignalStrength(): Int {
         var strength = rssi + 100
-        strength -= (9 - hopCount) * 2
+        strength -= (MeshController.MAX_HOPS - 1 - hopCount) * 2
         return strength
     }
 
