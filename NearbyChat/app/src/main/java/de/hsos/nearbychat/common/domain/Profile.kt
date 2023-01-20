@@ -28,9 +28,14 @@ class Profile(@PrimaryKey val address: String) {
         return strength
     }
 
-    fun updateSignal(profile: Profile) {
-        rssi = profile.rssi
-        hopCount = profile.hopCount
+    fun updateSignal(profile: Profile?) {
+        if (profile != null) {
+            rssi = profile.rssi
+            hopCount = profile.hopCount
+        } else {
+            rssi = Int.MIN_VALUE
+            hopCount = 0
+        }
     }
 
     fun updateReceivedData(profile: Profile) {

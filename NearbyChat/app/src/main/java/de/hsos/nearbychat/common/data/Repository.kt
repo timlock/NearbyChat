@@ -31,9 +31,11 @@ class Repository(database: Database) {
         // register for changes in available profiles
         availableProfiles.observeForever {
             availableList = it.toMutableList()
-            availableList.forEach { availableProfile ->
-                savedList.forEach { savedProfile ->
+            savedList.forEach { savedProfile ->
+                var found = false;
+                availableList.forEach { availableProfile ->
                     if (availableProfile.address == savedProfile.address) {
+                        found = true;
                         if (availableProfile != savedProfile) {
                             // update saved profile because it differs from the saved one
                             savedList[savedList.indexOf(savedProfile)].updateReceivedData(availableProfile)
@@ -46,6 +48,9 @@ class Repository(database: Database) {
                             }
                         }
                     }
+                }
+                if(!found) {
+                    savedList[savedList.indexOf(savedProfile)].updateSignal(null)
                 }
             }
             (savedProfiles as MutableLiveData).value = savedList
