@@ -320,7 +320,7 @@ class MeshController(
         const val TIMEOUT: Long = 5000L
         const val ADVERTISING_INTERVAL: Long = AdvertisingSetParameters.INTERVAL_MIN.toLong()
         const val ADVERTISING_UPDATE_INTERVAL: Long =
-            AdvertisingSetParameters.INTERVAL_MEDIUM.toLong() * 2
+            AdvertisingSetParameters.INTERVAL_HIGH.toLong()
 
     }
 }

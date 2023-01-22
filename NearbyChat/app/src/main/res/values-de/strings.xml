@@ -39,6 +39,9 @@
     <string name="time_pattern">HH:mm</string>
     <string name="date_pattern">dd.MM.yyyy</string>
 
+    <string name="notification_shutdown">Klicken um App zu beenden</string>
+
+
     <string name="error_name_missing">[Name fehlt]</string>
     <string name="error_desc_missing">[Beschreibung fehlt]</string>
     <string name="error_message_missing">[Nachricht fehlt]</string>

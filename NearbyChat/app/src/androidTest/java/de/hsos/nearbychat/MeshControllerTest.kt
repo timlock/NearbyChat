@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.hsos.nearbychat.common.domain.Message
 import de.hsos.nearbychat.common.domain.OwnProfile
 import de.hsos.nearbychat.service.bluetooth.*
+import de.hsos.nearbychat.service.bluetooth.Advertiser
 import de.hsos.nearbychat.service.bluetooth.scan.ScannerObserver
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import org.junit.Assert.*

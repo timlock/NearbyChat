@@ -25,7 +25,7 @@ class AdvertisementTest {
         assertEquals(excepted, actual)
         actual = Advertisement.Builder().rawMessage(excepted).build().toString()
         excepted = actual
-        assertEquals(excepted, actual )
+        assertEquals(excepted, actual)
     }
     @Test
     fun ack() {

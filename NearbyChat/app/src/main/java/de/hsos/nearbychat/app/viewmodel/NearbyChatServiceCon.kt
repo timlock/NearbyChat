@@ -8,7 +8,7 @@ import de.hsos.nearbychat.common.domain.Profile
 import de.hsos.nearbychat.service.bluetooth.util.Advertisement
 import de.hsos.nearbychat.service.controller.NearbyChatService
 
-class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceConnection {
+class NearbyChatServiceCon(private val observer: NearbyChatObserver?) : ServiceConnection {
     private val TAG: String = NearbyChatServiceCon::class.java.simpleName
     private lateinit var nearbyChatService: NearbyChatService
     private lateinit var ownAddress: String
@@ -18,7 +18,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
         val binder: NearbyChatService.LocalBinder = service as NearbyChatService.LocalBinder
         this.nearbyChatService = binder.getService()
         this.nearbyChatService.start(this.ownAddress)
-        this.observer.onBound()
+        this.observer?.onBound()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -53,8 +53,11 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
     }
 
     fun closeService(context: Context) {
-        this.nearbyChatService.stop()
-        this.disconnect(context)
+//        this.nearbyChatService.stop()
+//        this.disconnect(context)
+        val shutDownServiceIntent: Intent = Intent(context, NearbyChatService::class.java)
+        shutDownServiceIntent.action = NearbyChatService.ACTION_SHUTDOWN
+        context.startService(shutDownServiceIntent)
     }
 
     fun sendMessage(message: Message): Boolean {
@@ -90,7 +93,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                         profile.hopCount = advertisement.hops!!
                         profile.rssi = advertisement.rssi!!
                         profile.color = advertisement.color!!
-                        this@NearbyChatServiceCon.observer.onProfile(profile)
+                        this@NearbyChatServiceCon.observer?.onProfile(profile)
                     }
                 }
                 NearbyChatService.ON_PROFILE_TIMEOUT_ACTION -> {
@@ -103,7 +106,7 @@ class NearbyChatServiceCon(private val observer: NearbyChatObserver) : ServiceCo
                             "onReceive: received ${NearbyChatService.ON_PROFILE_TIMEOUT_ACTION} intent without content"
                         )
                     } else {
-                        param.forEach{this@NearbyChatServiceCon.observer.onProfileTimeout(it) }
+                        param.forEach{this@NearbyChatServiceCon.observer?.onProfileTimeout(it) }
                     }
                 }
             }

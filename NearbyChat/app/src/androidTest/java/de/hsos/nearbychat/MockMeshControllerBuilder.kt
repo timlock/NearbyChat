@@ -42,7 +42,6 @@ class MockMeshControllerBuilder private constructor() {
                 this@MockMeshControllerBuilder.send!!(message)
                 return true
             }
-
         }
         val scanner: Scanner = object : Scanner {
             override fun start(): Boolean {
@@ -58,7 +57,12 @@ class MockMeshControllerBuilder private constructor() {
             }
 
         }
-        return  MeshController(meshObserver, advertiser, scanner,this@MockMeshControllerBuilder.ownProfile!!)
+        return MeshController(
+            meshObserver,
+            advertiser,
+            scanner,
+            this@MockMeshControllerBuilder.ownProfile!!
+        )
     }
 
 

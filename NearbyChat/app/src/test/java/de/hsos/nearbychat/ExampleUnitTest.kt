@@ -1,5 +1,9 @@
 package de.hsos.nearbychat
 
+import de.hsos.nearbychat.service.bluetooth.AdvertisementType
+import de.hsos.nearbychat.service.bluetooth.util.Advertisement
+import de.hsos.nearbychat.service.bluetooth.util.Neighbour
+import de.hsos.nearbychat.service.bluetooth.util.NeighbourBuffer
 import org.junit.Test
 
 import org.junit.Assert.*

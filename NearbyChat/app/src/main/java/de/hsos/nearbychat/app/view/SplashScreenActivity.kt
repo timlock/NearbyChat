@@ -18,33 +18,50 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import de.hsos.nearbychat.R
+import de.hsos.nearbychat.app.viewmodel.NearbyChatObserver
+import de.hsos.nearbychat.app.viewmodel.NearbyChatServiceCon
+import de.hsos.nearbychat.common.domain.Profile
+import de.hsos.nearbychat.service.controller.NearbyChatService
 
 
 class SplashScreenActivity : AppCompatActivity() {
-    private val TAG: String = ViewModel::class.java.simpleName
+    private val TAG: String = SplashScreenActivity::class.java.simpleName
 
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var locationManager: LocationManager
 
     private var alreadyTriedPermissionRequest = false
 
-    private var btIntentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        proceedCheck()
-    }
+    private var btIntentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            proceedCheck()
+        }
 
-    private var gpsIntentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        proceedCheck()
-    }
+    private var gpsIntentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            proceedCheck()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
+
+        if (intent?.action == NearbyChatService.ACTION_SHUTDOWN) {
+            this.shutdownService(intent)
+            finishAffinity()
+            return
+        }
         bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         supportActionBar?.hide()
 
         proceedCheck()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy() called")
+        super.onDestroy()
     }
 
     override fun onRequestPermissionsResult(
@@ -60,35 +77,35 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     private fun proceedCheck() {
-        if(!checkPermissions()) {
+        if (!checkPermissions()) {
             requestMissingPermissions()
             return
         }
-        if(!checkBtCompatibility()) {
+        if (!checkBtCompatibility()) {
             return
         }
-        if(!checkBtEnabled()) {
+        if (!checkBtEnabled()) {
             requestBtEnable()
             return
         }
-        if(!checkBtLeCompatibility()) {
+        if (!checkBtLeCompatibility()) {
             findViewById<TextView>(R.id.splash_screen_text).setText(R.string.not_compatible)
             return
         }
-        if(!checkGpsEnabled()) {
+        if (!checkGpsEnabled()) {
             requestGpsEnable()
             return
         }
         startApp()
     }
 
-    private fun checkPermissions() : Boolean {
+    private fun checkPermissions(): Boolean {
         return getMissingPermissions().isEmpty()
     }
 
     private fun requestMissingPermissions() {
         Log.d(TAG, "requestMissingPermissions: ")
-        if(!alreadyTriedPermissionRequest) {
+        if (!alreadyTriedPermissionRequest) {
             requestPermissions(getMissingPermissions().toTypedArray(), 0)
         } else {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -152,7 +169,7 @@ class SplashScreenActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_COARSE_LOCATION,
         )
 
-        if(Build.VERSION.SDK_INT > 30) {
+        if (Build.VERSION.SDK_INT > 30) {
             permissionNeeded.add(Manifest.permission.BLUETOOTH_ADVERTISE)
             permissionNeeded.add(Manifest.permission.BLUETOOTH_CONNECT)
             permissionNeeded.add(Manifest.permission.BLUETOOTH_SCAN)
@@ -166,5 +183,20 @@ class SplashScreenActivity : AppCompatActivity() {
             }
         }
         return missingPermissions
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        Log.d(TAG, "onNewIntent() called with: intent = $intent")
+        super.onNewIntent(intent)
+        this.shutdownService(intent)
+        this.shutdownService(intent)
+        finishAffinity()
+        return
+    }
+
+    private fun shutdownService(intent: Intent?) {
+        Log.d(TAG, "shutdownService() called")
+        val nearbyChatServiceCon = NearbyChatServiceCon(null)
+        nearbyChatServiceCon.closeService(this)
     }
 }

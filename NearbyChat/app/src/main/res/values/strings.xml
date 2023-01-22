@@ -38,6 +38,8 @@
     <string name="time_pattern">HH:mm</string>
     <string name="date_pattern">MM/dd/yyyy</string>
 
+    <string name="notification_shutdown">Click to shutdown app</string>
+
     <string name="error_name_missing">[name missing]</string>
     <string name="error_desc_missing">[description missing]</string>
     <string name="error_message_missing">[message missing]</string>
