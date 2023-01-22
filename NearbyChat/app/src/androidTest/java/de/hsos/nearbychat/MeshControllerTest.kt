@@ -355,6 +355,7 @@ class MeshControllerTest {
 
     @Test
     fun sendMultipleMessages() {
+        val amount = 10
         var resultEinsMessage = mutableListOf<Advertisement>()
         var resultEinsAck = mutableListOf<Advertisement>()
         var resultZweiMessage = mutableListOf<Advertisement>()
@@ -417,29 +418,26 @@ class MeshControllerTest {
         zwei.connect()
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 2)
         val einsMessageList = mutableListOf<Message>()
-        for (i in 0 until 10) {
+        for (i in 0 until amount) {
             val msg = Message("zwei", "$i", System.currentTimeMillis())
             einsMessageList.add(msg)
             eins.sendMessage(msg)
         }
         val zweiMessageList = mutableListOf<Message>()
-        for (i in 0 until 10) {
+        for (i in 0 until amount) {
             val msg = Message("eins", "$i", System.currentTimeMillis())
             zweiMessageList.add(msg)
             zwei.sendMessage(msg)
         }
         Thread.sleep(MeshController.ADVERTISING_UPDATE_INTERVAL * 6)
         assertTrue(resultEinsMessage.isNotEmpty())
-        for (i in 0 until 10) {
-            val receivedMessage = resultEinsMessage.filter { it.message!!.toInt() == i }
-            assertNotNull(receivedMessage)
-        }
+        assertTrue(amount <= resultEinsMessage.size)
+        assertTrue(resultEinsAck.isNotEmpty())
+        assertTrue(amount <= resultEinsAck.size)
         assertTrue(resultZweiMessage.isNotEmpty())
-        for (i in 0 until 10) {
-            val receivedMessage = resultZweiMessage.filter { it.message!!.toInt() == i }
-            assertNotNull(receivedMessage)
-        }
-
+        assertTrue(amount <= resultZweiMessage.size)
+        assertTrue(resultZweiAck.isNotEmpty())
+        assertTrue(amount <= resultZweiAck.size)
     }
 
 }

@@ -26,10 +26,6 @@ class ViewModel(private val repository: Repository, application: Application) :
             (application as NearbyApplication).ownAddress
         )
     }
-// Service darf nicht mit dem schließen der App beendet werden
-//    override fun onCleared() {
-//        this.chatServiceCon.disconnect(getApplication())
-//    }
 
     fun updateOwnProfile(name: String, description: String, color: Int) = viewModelScope.launch {
         var profile = repository.ownProfile.value

@@ -195,7 +195,6 @@ class NearbyChatService : Service(), MeshObserver {
         Handler(this.databaseHandler.looper).post {
             runBlocking {
                 launch {
-                    Log.d(TAG, "onMessageAck() called: advertisement = $advertisement")
                     repository.ackReceivedMessage(advertisement.sender!!, advertisement.timestamp!!)
                 }
             }

@@ -192,19 +192,10 @@ class MeshController(
                 this.observer.onMessageAck(advertisement)
             }
         } else {
-            val nextTarget: String? =
-                this.neighbourBuffer.getClosestNeighbour(advertisement.receiver!!)
-            if (nextTarget == null) {
-                Log.w(
-                    TAG,
-                    "handleAcknowledgment: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
-                )
-            } else {
-                advertisement.nextHop = nextTarget
-                this.advertisementExecutor.addToQueue(advertisement.toString())
-            }
+            this.forwardMessage(advertisement)
         }
     }
+
 
     private fun handleMessage(advertisement: Advertisement) {
         Log.d(TAG, "handleMessage() called with: advertisement = $advertisement")
@@ -213,17 +204,21 @@ class MeshController(
             this.observer.onMessage(advertisement)
             this.sendAck(advertisement)
         } else {
-            val nextTarget: String? =
-                this.neighbourBuffer.getClosestNeighbour(advertisement.receiver as String)
-            if (nextTarget == null) {
-                Log.w(
-                    TAG,
-                    "onMessage: cant forward message: $advertisement ${advertisement.receiver} is unknown"
-                )
-            } else {
-                advertisement.nextHop = nextTarget
-                this.advertisementExecutor.addToQueue(advertisement.toString())
-            }
+            this.forwardMessage(advertisement)
+        }
+    }
+
+    private fun forwardMessage(advertisement: Advertisement) {
+        val nextTarget: String? =
+            this.neighbourBuffer.getClosestNeighbour(advertisement.receiver!!)
+        if (nextTarget == null) {
+            Log.w(
+                TAG,
+                "handleAcknowledgment: cant forward message: $advertisement ${advertisement.receiver} is not reachable"
+            )
+        } else {
+            advertisement.nextHop = nextTarget
+            this.advertisementExecutor.addToQueue(advertisement.toString())
         }
     }
 
@@ -261,10 +256,7 @@ class MeshController(
         }
     }
 
-    private fun updateNeighbour(
-        advertisement: Advertisement,
-        rssi: Int
-    ) {
+    private fun updateNeighbour(advertisement: Advertisement, rssi: Int) {
         val timeStamp: Long = System.currentTimeMillis()
         val neighbour: Neighbour = Neighbour(
             advertisement.address!!,
@@ -300,7 +292,7 @@ class MeshController(
                 .description("")
                 .color(0)
                 .build()
-            neighbour = Neighbour(address, rssi, MeshController.MAX_HOPS - 1, timestamp)
+            neighbour = Neighbour(address, rssi, advertisement.hops!!, timestamp)
             neighbour.advertisement = advertisement
             neighbour.closestNeighbour = neighbour
             this.neighbourBuffer.updateNeighbour(neighbour)

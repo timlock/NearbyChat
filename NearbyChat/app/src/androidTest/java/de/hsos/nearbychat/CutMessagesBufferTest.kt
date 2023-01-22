@@ -18,11 +18,11 @@ class CutMessagesBufferTest {
         var third = "5}"
         var actual = cutMessagesBuffer.add(first,id,first)
         assertNull(actual)
-        id = idGenerator.next()
+        idGenerator.next()
         id = idGenerator.next()
         actual = cutMessagesBuffer.add(first,id,second)
         assertNull(actual)
-        id = idGenerator.next()
+        idGenerator.next()
         id = idGenerator.next()
         actual = cutMessagesBuffer.add(first,id,third)
         assertEquals("$first$second$third", actual)

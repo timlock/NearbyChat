@@ -15,14 +15,13 @@ class NeighbourBuffer(private val timeout: Long = 5000L) : AdvertisementQueue<Ne
             Log.d(TAG, "updateNeighbour() discovered new neighbour = $neighbour")
             this.neighbourList.add(neighbour)
         } else if (
-//            (System.currentTimeMillis() - entry.lastSeen > this.timeout
-//                    && entry.lastSeen != 0L)
-//            ||
-//            neighbour.hops == MeshController.MAX_HOPS
-//            ||
             entry.hops < neighbour.hops
-            || entry.hops == neighbour.hops && entry.rssi > neighbour.rssi
+            || (entry.hops == neighbour.hops && entry.lastSeen > neighbour.lastSeen)
         ) {
+            if(neighbour.advertisement != null && neighbour.advertisement!!.name!!.isEmpty()){
+                neighbour.advertisement!!.description = entry.advertisement!!.description
+                neighbour.advertisement!!.color = entry.advertisement!!.color
+            }
             Log.d(TAG, "updateNeighbour() updated neighbour = $neighbour")
             this.neighbourList[this.neighbourList.indexOf(entry)] = neighbour
         }
@@ -42,7 +41,8 @@ class NeighbourBuffer(private val timeout: Long = 5000L) : AdvertisementQueue<Ne
             null
         } else {
             var result: Neighbour = this.neighbourList[this.firstAddressToAdvertise]
-            this.firstAddressToAdvertise = (this.firstAddressToAdvertise + 1) % this.neighbourList.size
+            this.firstAddressToAdvertise =
+                (this.firstAddressToAdvertise + 1) % this.neighbourList.size
             result
         }
     }
